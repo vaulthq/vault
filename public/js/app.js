@@ -1,0 +1,1 @@
+function ilgasvardas(){return"sddaaaa"}console.log(ilgasvardas());
