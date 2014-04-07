@@ -15,3 +15,15 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
+
+
+Route::get('/a', function()
+{
+	return View::make('hello');
+});
+
+Route::group(array('prefix' => 'api'), function() {
+    Route::controller('user', 'UserController');
+});
+
+
