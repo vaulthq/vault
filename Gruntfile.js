@@ -3,15 +3,15 @@ module.exports = function(grunt) {
     // configure the tasks
     grunt.initConfig({
 
-        /*copy: {
+        copy: {
             build: {
                 cwd: 'source',
-                src: [ '**' ],
-                dest: 'build',
+                src: [ '**/*.html' ],
+                dest: 'public/t',
                 expand: true
             }
         },
-
+/*
         clean: {
             build: {
                 src: [ 'build' ]
@@ -33,13 +33,17 @@ module.exports = function(grunt) {
             scripts: {
                 files: 'source/**/*.js',
                 tasks: ['uglify']
+            },
+            templates: {
+                files: 'source/**/*.html',
+                tasks: ['copy']
             }
         }
 
     });
 
     // load the tasks
-  //  grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-copy');
    // grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
