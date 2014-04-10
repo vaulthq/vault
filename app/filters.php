@@ -60,6 +60,16 @@ Route::filter('guest', function()
 	if (Auth::check()) return Redirect::to('/');
 });
 
+Route::filter('ngcsrf', function($route, $request)
+{
+    $token = md5(Session::token());
+    $supplied = $request->header('X-XSRF-TOKEN');
+
+    if (empty($supplied) || $token != $supplied) {
+        throw new Illuminate\Session\TokenMismatchException('CSRF detected, please check your cookies.');
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter

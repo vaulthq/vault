@@ -1,14 +1,11 @@
 <?php
 
-class UserController extends \BaseController {
-
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
+class UserController extends \BaseController
+{
 	public function getIndex()
 	{
 		return User::all();
 	}
+
+
 }

@@ -11,12 +11,12 @@ module.exports = function(grunt) {
                 expand: true
             }
         },
-/*
+
         clean: {
             build: {
-                src: [ 'build' ]
+                src: [ 'public/t' ]
             }
-        },*/
+        },
 
         uglify: {
             build: {
@@ -26,13 +26,26 @@ module.exports = function(grunt) {
                 files: {
                     'public/js/app.js': [ 'source/**/*.js' ]
                 }
+            },
+            vendor: {
+                options: {
+                    mangle: false
+                },
+                files: {
+                    'public/js/vendor.js': [
+                        'js_vendor/angular/angular.min.js',
+                        'js_vendor/angular/angular-route.min.js',
+                        'js_vendor/angular/angular-sanitize.min.js',
+                        'js_vendor/angular/angular-resource.min.js'
+                    ]
+                }
             }
         },
 
         watch: {
             scripts: {
                 files: 'source/**/*.js',
-                tasks: ['uglify']
+                tasks: ['uglify:build']
             },
             templates: {
                 files: 'source/**/*.html',
@@ -44,9 +57,21 @@ module.exports = function(grunt) {
 
     // load the tasks
     grunt.loadNpmTasks('grunt-contrib-copy');
-   // grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+
+    grunt.registerTask(
+        'vendor',
+        'Concat vendor JS',
+        ['uglify:vendor']
+    );
+
+    grunt.registerTask(
+        'full',
+        'Concat vendor JS',
+        ['clean', 'uglify', 'copy']
+    );
 
     // define the tasks
     grunt.registerTask(

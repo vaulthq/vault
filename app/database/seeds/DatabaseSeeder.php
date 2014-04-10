@@ -12,6 +12,10 @@ class DatabaseSeeder extends Seeder {
 		Eloquent::unguard();
 
 		// $this->call('UserTableSeeder');
+        User::create([
+            'email' => 'admin',
+            'password' => Hash::make('admin')
+        ]);
 	}
 
 }

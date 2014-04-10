@@ -1,21 +1,16 @@
-var xApp = angular.module('xApp', ['ngRoute']);
+var xApp = angular.module('xApp', ['ngRoute', 'ngSanitize', 'ngResource', 'flash']);
 
 xApp.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/login', {
-            templateUrl: '/t/login/template.html',
-            controller: 'LoginController'
+            templateUrl: '/t/auth/login.html',
+            controller: 'AuthController'
         })
-        .when('/test', {
-            templateUrl: '/t/login/template.html',
-            controller: 'TestController'
+        .when('/home', {
+            templateUrl: '/t/auth/home.html',
+            controller: 'HomeController'
         })
         .otherwise({
             redirectTo: '/login'
         });
-}]);
-
-
-xApp.controller('TestController', ['$scope', function($scope) {
-    $scope.test = 'b';
 }]);

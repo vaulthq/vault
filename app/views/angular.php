@@ -2,13 +2,11 @@
 <html ng-app="xApp">
 <head>
     <meta charset="utf-8" />
-    <script src="angular/angular.min.js"></script>
-    <script src="angular/angular-route.min.js"></script>
+    <script src="js/vendor.js"></script>
     <script src="js/app.js"></script>
 </head>
 <body>
-<input ng-model="test">
-{{ test }}
+<flash:messages></flash:messages>
 <div ng-view></div>
 </body>
 </html>
