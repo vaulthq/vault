@@ -1,5 +1,5 @@
 xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, $modal, users) {
+    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users) {
         $scope.users = users;
 
         $scope.createUser = function() {
@@ -12,6 +12,7 @@ xApp
                     };
 
                     $scope.ok = function () {
+
                         $modalInstance.close($scope.selected.item);
                     };
 
@@ -31,6 +32,14 @@ xApp
             }, function () {
                 console.info('Modal dismissed at: ' + new Date());
             });
+        }
+
+        $scope.deleteUser = function(index) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            UserFactory.delete({id: $scope.users[index].id});
+            $scope.users.splice(index, 1);
         }
     })
     .factory('UsersFactory', function ($resource) {

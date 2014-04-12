@@ -1,2 +1,17 @@
-home!
-<a href="#" ng-click="logout()">logout</a>
+<div class="row">
+    <div class="col-xs-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <input type="text" placeholder="Filter..." class="form-control">
+            </div>
+            <div class="panel-body">
+                <div class="list-group" ng-repeat="project in projects">
+                    <li class="list-group-item">{{ project.name }}</li>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-9">
+        pp
+    </div>
+</div>

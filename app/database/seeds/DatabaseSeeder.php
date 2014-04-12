@@ -18,6 +18,13 @@ class DatabaseSeeder extends Seeder {
             'name' => 'Main',
             'surname' => 'Admin'
         ]);
+
+        for ($i=0; $i<5; $i++) {
+            Project::create([
+                'name' => 'Project' . ($i + 1),
+                'description' => 'some description about what dis is'
+            ]);
+        }
 	}
 
 }

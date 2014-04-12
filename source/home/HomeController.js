@@ -1,4 +1,4 @@
 xApp
-    .controller('HomeController',function($scope) {
-
+    .controller('HomeController',function($scope, projects) {
+        $scope.projects = projects;
     })

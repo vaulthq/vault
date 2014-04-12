@@ -17,7 +17,12 @@ xApp.config(['$routeProvider', '$httpProvider', '$injector', function($routeProv
         })
         .when('/home', {
             templateUrl: '/t/home/home.html',
-            controller: 'HomeController'
+            controller: 'HomeController',
+            resolve: {
+                projects: function(ProjectsFactory) {
+                    return ProjectsFactory.query();
+                }
+            }
         })
         .otherwise({
             redirectTo: '/login'
