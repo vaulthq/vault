@@ -20,6 +20,7 @@ class UserTable extends Migration {
 		    $table->string('name', 255);
 		    $table->string('surname', 255);
 		    $table->timestamps();
+            $table->softDeletes();
 		});
 	}
 

@@ -26,8 +26,8 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::controller('auth', 'AuthController');
     });
 
-    Route::group(array('prefix' => 'api'), function() {
-        Route::controller('user', 'UserController');
+    Route::group(array('prefix' => 'api', 'before' => 'ngauth'), function() {
+        Route::resource('user', 'UserController');
     });
 });
 

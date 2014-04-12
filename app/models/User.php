@@ -5,13 +5,20 @@ use Illuminate\Auth\Reminders\RemindableInterface;
 
 class User extends Eloquent implements UserInterface, RemindableInterface
 {
+    protected $softDelete = true;
 
+    protected $guarded = ['id'];
 	/**
 	 * The database table used by the model.
 	 *
 	 * @var string
 	 */
 	protected $table = 'user';
+
+    public static $rules = [
+        'email' => 'unique:user',
+        'password' => 'required'
+    ];
 
 	/**
 	 * The attributes excluded from the model's JSON form.

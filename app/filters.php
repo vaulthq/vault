@@ -38,6 +38,14 @@ Route::filter('auth', function()
 	if (Auth::guest()) return Redirect::guest('login');
 });
 
+Route::filter('ngauth', function()
+{
+    if (Auth::guest()) {
+        return Response::json(['flash' => 'Session expired.'], 401);
+    }
+});
+
+
 
 Route::filter('auth.basic', function()
 {

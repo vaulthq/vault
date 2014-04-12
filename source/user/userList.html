@@ -1,0 +1,19 @@
+<button class="btn btn-default" ng-click="createUser()">Create user</button>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Username</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="user in users">
+        <td>1</td>
+        <td>{{user.email}}</td>
+        <td>Otto</td>
+        <td>@mdo</td>
+    </tr>
+    </tbody>
+</table>
