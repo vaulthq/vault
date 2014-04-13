@@ -1,19 +1,53 @@
 xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users) {
+    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, flash) {
         $scope.users = users;
 
         $scope.createUser = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
-                controller: function($scope, $modalInstance, items) {
-                    $scope.items = items;
-                    $scope.selected = {
-                        item: $scope.items[0]
-                    };
+                controller: function($scope, $modalInstance, UsersFactory, flash) {
+                    $scope.user = {};
 
                     $scope.ok = function () {
+                        UsersFactory.create($scope.user,
+                            function() {
+                                $modalInstance.close($scope.user);
+                            },
+                            function(err) {
+                                flash('danger', err.data);
+                            }
+                        );
+                    };
 
-                        $modalInstance.close($scope.selected.item);
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.users.push(model);
+                flash([]);
+            }, function() {
+                flash([]);
+            });
+        }
+
+        $scope.updateUser = function(index) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: function($scope, $modalInstance, UserFactory, flash, user) {
+                    $scope.user = user;
+
+                    $scope.ok = function () {
+                        UserFactory.update($scope.user,
+                            function() {
+                                $modalInstance.close($scope.user);
+                            },
+                            function(err) {
+                                flash('danger', err.data);
+                            }
+                        );
                     };
 
                     $scope.cancel = function () {
@@ -21,16 +55,17 @@ xApp
                     };
                 },
                 resolve: {
-                    items: function() {
-                        return UsersFactory.query()
+                    user: function(UserFactory) {
+                        return UserFactory.show({id: $scope.users[index].id});
                     }
                 }
             });
 
-            modalInstance.result.then(function (selectedItem) {
-                $scope.selected = selectedItem;
-            }, function () {
-                console.info('Modal dismissed at: ' + new Date());
+            modalInstance.result.then(function (model) {
+                $scope.users[index] = model;
+                flash([]);
+            }, function() {
+                flash([]);
             });
         }
 

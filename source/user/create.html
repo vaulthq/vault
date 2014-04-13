@@ -1,17 +1,17 @@
 <div class="modal-header">
     <h3>Enter User Details</h3>
 </div>
-<div class="modal-body">
-    <form>
-        <div class="row">
+<form>
+    <div class="modal-body">
+       <div class="row">
             <div class="col-xs-6">
                 <div class="form-group">
                     <label class="control-label" for="iEmail">Email</label>
-                    <input type="text" class="form-control" id="iEmail" ng-model="user.email">
+                    <input type="text" name="email" class="form-control" id="iEmail" ng-model="user.email" required autofocus>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="iPassword">Password</label>
-                    <input type="password" class="form-control" id="iPassword" ng-model="user.password">
+                    <input type="password" class="form-control" id="iPassword" ng-model="user.password" required>
                 </div>
             </div>
             <div class="col-xs-6">
@@ -25,9 +25,9 @@
                 </div>
             </div>
         </div>
-    </form>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-primary" ng-click="ok()">Save</button>
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-</div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    </div>
+</form>

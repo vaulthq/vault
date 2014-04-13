@@ -1,4 +1,13 @@
-<button class="btn btn-default" ng-click="createUser()">Create user</button>
+<div class="page-header" style="margin: 10px 0;">
+    <h3 style="margin-top: 0">
+        User List
+        <p class="pull-right">
+            <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
+                Add new user
+            </a>
+        </p>
+    </h3>
+</div>
 <table class="table table-hover">
     <thead>
         <tr>
@@ -16,8 +25,11 @@
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>
             <th class="text-right">
-                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" alt="Remove">
-                    <i class="glyphicon glyphicon-remove"></i>
+                <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
+                    <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </th>
         </tr>

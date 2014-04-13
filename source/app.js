@@ -1,6 +1,16 @@
-var xApp = angular.module('xApp', ['ngRoute', 'ngSanitize', 'ngResource', 'flash', 'ngCookies', 'ui.bootstrap']);
+var xApp = angular.module('xApp', [
+    'ngRoute',
+    'ngSanitize',
+    'ngResource',
+    'ngAnimate',
+    'ngCookies',
+    'flash',
+    'ui.bootstrap',
+    'chieffancypants.loadingBar',
+    //'xtForm'
+]);
 
-xApp.config(['$routeProvider', '$httpProvider', '$injector', function($routeProvider, $httpProvider, $injector) {
+xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', function($routeProvider, $httpProvider, cfpLoadingBarProvider) {
     $routeProvider
         .when('/login', {
             templateUrl: '/t/auth/login.html',
@@ -27,5 +37,7 @@ xApp.config(['$routeProvider', '$httpProvider', '$injector', function($routeProv
         .otherwise({
             redirectTo: '/login'
         });
+
     $httpProvider.interceptors.push('AuthInterceptor');
+    cfpLoadingBarProvider.includeSpinner = false;
 }]);

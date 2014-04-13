@@ -30,6 +30,10 @@ angular.module('flash', [])
         };
 
         var flash = function(level, text) {
+            if (level == []) {
+                emit([]);
+                return;
+            }
             emit(messages = asArrayOfMessages(level, text));
         };
 

@@ -39,7 +39,9 @@ module.exports = function(grunt) {
                         'js_vendor/angular/angular-resource.min.js',
                         'js_vendor/angular/angular-cookies.min.js',
                         'js_vendor/angular/angular-animate.min.js',
-                        'js_vendor/ui-bs-0.10.min.js'
+                        'js_vendor/ui-bs-0.10.min.js',
+                        'js_vendor/loader.min.js',
+                     //   'js_vendor/xtForm.js'
                     ]
                 }
             }

@@ -16,7 +16,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 	protected $table = 'user';
 
     public static $rules = [
-        'email' => 'unique:user',
+        'email' => 'required|unique:user',
         'password' => 'required'
     ];
 
@@ -25,7 +25,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('password');
+	protected $hidden = array('password', 'created_at', 'updated_at', 'deleted_at');
 
 	/**
 	 * Get the unique identifier for the user.

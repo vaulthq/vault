@@ -16,7 +16,8 @@ class Projects extends Migration {
         {
             $table->increments('id');
             $table->string('name', 255);
-            $table->string('description', 255);
+            $table->string('description', 255)->nullable();
+            $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('user');
             $table->timestamps();
             $table->softDeletes();

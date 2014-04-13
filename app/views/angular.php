@@ -22,8 +22,12 @@
         #footer .alert {
             margin: 0;
             border-radius: 0;
+            z-index: 1060;
+            position: absolute;
+            width: 100%;
         }
     </style>
+    <link rel="stylesheet" href="/css/loader.css">
 </head>
 <body>
 

@@ -12,7 +12,16 @@ class Project extends Eloquent
 	 */
 	protected $table = 'project';
 
-    public static $rules = [
-        'name' => 'requred',
+    protected $hidden = [
+        'deleted_at'
     ];
+
+    public static $rules = [
+        'name' => 'required',
+    ];
+
+    public function keys()
+    {
+        return $this->hasMany('Entry', 'project_id');
+    }
 }
