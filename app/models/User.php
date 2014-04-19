@@ -5,6 +5,11 @@ use Illuminate\Auth\Reminders\RemindableInterface;
 
 class User extends Eloquent implements UserInterface, RemindableInterface
 {
+    const GROUP_ADMIN = 'admin';
+    const GROUP_DEV = 'dev';
+    const GROUP_TESTER = 'tester';
+    const GROUP_PM = 'pm';
+
     protected $softDelete = true;
 
     protected $guarded = ['id'];
@@ -17,6 +22,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     public static $rules = [
         'email' => 'required|unique:user',
+        'group' => 'required',
         'password' => 'required'
     ];
 

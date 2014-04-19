@@ -5,24 +5,7 @@ xApp
         $scope.createUser = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
-                controller: function($scope, $modalInstance, UsersFactory, flash) {
-                    $scope.user = {};
-
-                    $scope.ok = function () {
-                        UsersFactory.create($scope.user,
-                            function() {
-                                $modalInstance.close($scope.user);
-                            },
-                            function(err) {
-                                flash('danger', err.data);
-                            }
-                        );
-                    };
-
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                }
+                controller: 'ModalCreateUserController'
             });
 
             modalInstance.result.then(function (model) {
@@ -36,24 +19,7 @@ xApp
         $scope.updateUser = function(index) {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
-                controller: function($scope, $modalInstance, UserFactory, flash, user) {
-                    $scope.user = user;
-
-                    $scope.ok = function () {
-                        UserFactory.update($scope.user,
-                            function() {
-                                $modalInstance.close($scope.user);
-                            },
-                            function(err) {
-                                flash('danger', err.data);
-                            }
-                        );
-                    };
-
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                },
+                controller: 'ModalUpdateUserController',
                 resolve: {
                     user: function(UserFactory) {
                         return UserFactory.show({id: $scope.users[index].id});

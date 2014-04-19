@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder {
             'email' => 'admin',
             'password' => Hash::make('admin'),
             'name' => 'Main',
-            'surname' => 'Admin'
+            'surname' => 'Admin',
+            'group' => \User::GROUP_ADMIN
         ]);
 
         for ($i=0; $i<5; $i++) {

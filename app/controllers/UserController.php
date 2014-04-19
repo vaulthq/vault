@@ -25,6 +25,8 @@ destroy*/
         $model = User::create(Input::all());
         $model->password = Hash::make(Input::get('password'));
         $model->save();
+
+        return $model;
     }
 
     public function show($id)
@@ -41,6 +43,7 @@ destroy*/
         $model->email = $data->email;
         $model->name = $data->name;
         $model->surname = $data->surname;
+        $model->group = $data->group;
 
         if (isset($data->password)) {
             $model->password = Hash::make($data->password);

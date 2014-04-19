@@ -6,12 +6,22 @@
        <div class="row">
             <div class="col-xs-6">
                 <div class="form-group">
-                    <label class="control-label" for="iEmail">Email</label>
+                    <label class="control-label" for="iEmail">Email *</label>
                     <input type="text" name="email" class="form-control" id="iEmail" ng-model="user.email" required autofocus>
                 </div>
                 <div class="form-group">
-                    <label class="control-label" for="iPassword">Password</label>
-                    <input type="password" class="form-control" id="iPassword" ng-model="user.password" required>
+                    <label class="control-label" for="iPassword">Password *</label>
+                    <input type="password" class="form-control" id="iPassword" ng-model="user.password">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="iGroup">User Group *</label>
+                    <select class="form-control" id="iGroup" ng-model="user.group" required>
+                        <option value="">select...</option>
+                        <option value="admin">Administrator</option>
+                        <option value="dev">Developer</option>
+                        <option value="tester">Tester</option>
+                        <option value="pm">Project Manager</option>
+                    </select>
                 </div>
             </div>
             <div class="col-xs-6">
