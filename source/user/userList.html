@@ -8,7 +8,10 @@
         </p>
     </h3>
 </div>
-<table class="table table-hover">
+
+<loader when="!users.$resolved"></loader>
+
+<table ng-if="users.length > 0" class="table table-hover">
     <thead>
         <tr>
             <th>#</th>

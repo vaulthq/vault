@@ -1,0 +1,28 @@
+<div class="page-header" style="margin: 10px 0;">
+    <h3 style="margin-top: 0">
+        Recently Accessed Items
+    </h3>
+</div>
+
+<table class="table" ng-show="entries.length > 0">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>URL</th>
+        <th>Created</th>
+        <th>Updated</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="entry in entries">
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.name }}</td>
+        <td>{{ entry.url }}</td>
+        <td>{{ entry.created_at }}</td>
+        <td>{{ entry.updated_at }}</td>
+    </tr>
+</table>
+
+<div ng-show="entries.length == 0">
+    There are no recently accessed items.
+</div>

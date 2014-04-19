@@ -3,13 +3,19 @@ xApp
         $scope.projects = projects;
         $scope.entries = [];
 
-        $scope.activeProject = 0;
+        $scope.activeProject = -1;
+
+        $scope.loading = {entries: false};
+
+
 
         $scope.openProject = function(index) {
             $scope.activeProject = index;
+            $scope.loading.entries = true;
 
             ProjectKeysFactory.keys({id: $scope.getProject().id}, function(response) {
                 $scope.entries = response;
+                $scope.loading.entries = false;
             });
         }
 
@@ -20,26 +26,7 @@ xApp
         $scope.createEntry = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/entry/form.html',
-                controller: function($scope, $modalInstance, EntriesFactory, flash, project_id) {
-                    $scope.entry = {
-                        project_id: project_id
-                    };
-
-                    $scope.ok = function () {
-                        EntriesFactory.create($scope.entry,
-                            function(response) {
-                                $modalInstance.close(response);
-                            },
-                            function(err) {
-                                flash('danger', err.data);
-                            }
-                        );
-                    };
-
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                },
+                controller: 'ModalCreateEntryController',
                 resolve: {
                     project_id: function() {
                         return $scope.getProject().id;
@@ -48,7 +35,8 @@ xApp
             });
 
             modalInstance.result.then(function (model) {
-                $scope.projects.push(model);
+                console.log($scope.getProject());
+                $scope.entries.push(model);
                 flash([]);
             }, function() {
                 flash([]);
@@ -58,24 +46,7 @@ xApp
         $scope.createProject = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/project/form.html',
-                controller: function($scope, $modalInstance, ProjectsFactory, flash) {
-                    $scope.project = {};
-
-                    $scope.ok = function () {
-                        ProjectsFactory.create($scope.project,
-                            function(response) {
-                                $modalInstance.close(response);
-                            },
-                            function(err) {
-                                flash('danger', err.data);
-                            }
-                        );
-                    };
-
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                }
+                controller: 'ModalCreateProjectController'
             });
 
             modalInstance.result.then(function (model) {
@@ -85,4 +56,5 @@ xApp
                 flash([]);
             });
         }
+
     })

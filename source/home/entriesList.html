@@ -1,0 +1,44 @@
+<div class="page-header" style="margin: 10px 0;">
+    <h3 style="margin-top: 0">
+        {{ getProject().name }} <small>{{ getProject().description }}</small>
+        <p class="pull-right">
+            <a class="btn btn-default btn-xs" title="Delete project" style="margin-right: 30px" ng-click="createEntry()">
+                Add new key
+            </a>
+            <a class="btn btn-danger btn-xs" title="Delete project">
+                <i class="glyphicon glyphicon-trash"></i>
+            </a>
+            <a class="btn btn-warning btn-xs" title="Edit project">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+            <a class="btn btn-success btn-xs" title="Add new project" ng-click="createProject()">
+                <i class="glyphicon glyphicon-plus"></i>
+            </a>
+        </p>
+    </h3>
+</div>
+
+<table class="table" ng-show="!loading.entries && entries.length > 0">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>URL</th>
+        <th>Created</th>
+        <th>Updated</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="entry in entries">
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.name }}</td>
+        <td>{{ entry.url }}</td>
+        <td>{{ entry.created_at }}</td>
+        <td>{{ entry.updated_at }}</td>
+    </tr>
+</table>
+
+<div ng-if="!loading.entries && entries.length == 0">
+    This project has no added keys.
+</div>
+
+<loader when="loading.entries"></loader>

@@ -74,6 +74,7 @@ Route::filter('ngcsrf', function($route, $request)
     $supplied = $request->header('X-XSRF-TOKEN');
 
     if (empty($supplied) || $token != $supplied) {
+        return Response::json(['flash' => 'Session token expired.'], 401);
         throw new Illuminate\Session\TokenMismatchException('CSRF detected, please check your cookies.');
     }
 });

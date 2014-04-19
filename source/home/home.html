@@ -4,37 +4,23 @@
             <div class="panel-heading">
                 <input type="text" placeholder="Filter..." class="form-control" ng-model="projectFilter">
             </div>
-                <ul class="list-group" style="max-height: 300px; overflow-y: scroll">
-                    <li
-                            ng-repeat="project in projects | filter:projectFilter"
-                            class="list-group-item"
-                            ng-class="{'list-group-item-info': $index == activeProject}"
-                            ng-click="openProject($index)"
-                            >{{ project.name }}</li>
-                </ul>
+
+
+            <ul class="list-group" style="max-height: 300px; overflow-y: scroll">
+                <li
+                        ng-repeat="project in projects | filter:projectFilter"
+                        class="list-group-item"
+                        ng-class="{'list-group-item-info': $index == activeProject}"
+                        ng-click="openProject($index)"
+                        >{{ project.name }}</li>
+            </ul>
+
+            <loader when="!projects.$resolved"></loader>
+
         </div>
     </div>
     <div class="col-xs-9">
-        <div class="page-header" style="margin: 10px 0;">
-            <h3 style="margin-top: 0">
-                {{ getProject().name }} <small>{{ getProject().description }}</small>
-                <p class="pull-right">
-                    <a class="btn btn-default btn-xs" title="Delete project" style="margin-right: 30px" ng-click="createEntry()">
-                        Add new key
-                    </a>
-                    <a class="btn btn-danger btn-xs" title="Delete project">
-                        <i class="glyphicon glyphicon-trash"></i>
-                    </a>
-                    <a class="btn btn-warning btn-xs" title="Edit project">
-                        <i class="glyphicon glyphicon-edit"></i>
-                    </a>
-                    <a class="btn btn-success btn-xs" title="Add new project" ng-click="createProject()">
-                        <i class="glyphicon glyphicon-plus"></i>
-                    </a>
-                </p>
-            </h3>
-        </div>
-asdasd
-        {{entries}}
+        <div ng-if="activeProject == -1" ng-include="'/t/home/recentlyUsed.html'"></div>
+        <div ng-if="activeProject != -1" ng-include="'/t/home/entriesList.html'"></div>
     </div>
 </div>
