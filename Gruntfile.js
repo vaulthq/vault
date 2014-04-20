@@ -42,7 +42,9 @@ module.exports = function(grunt) {
                         'js_vendor/ui-bs-0.10.min.js',
                         'js_vendor/loader.min.js',
                         'js_vendor/moment.min.js',
-                        'js_vendor/angular-moment.min.js'
+                        'js_vendor/angular-moment.min.js',
+                        'js_vendor/ZeroClipboard.min.js',
+                        //'js_vendor/ng-clip.js'
                     ]
                 }
             }

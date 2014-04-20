@@ -7,7 +7,7 @@ var xApp = angular.module('xApp', [
     'flash',
     'ui.bootstrap',
     'chieffancypants.loadingBar',
-    'angularMoment'
+    'angularMoment',
 ]);
 
 xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', function($routeProvider, $httpProvider, cfpLoadingBarProvider) {

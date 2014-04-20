@@ -33,7 +33,7 @@
         <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
         <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}"></span></td>
         <td class="text-right display-hover">
-            <a ng-click="openAccess($index)" class="btn btn-info btn-xs" title="Manage Access">
+            <a ng-click="getPassword($index)" class="btn btn-info btn-xs" title="Copy Password">
                 <i class="glyphicon glyphicon-lock"></i>
             </a>
             <a ng-click="updateEntry($index)" class="btn btn-warning btn-xs" title="Update">

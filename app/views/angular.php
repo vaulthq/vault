@@ -27,12 +27,6 @@
             position: absolute;
             width: 100%;
         }
-        tr .display-hover > * {
-            opacity: 0
-        }
-        tr:hover .display-hover > * {
-            opacity: 1;
-        }
     </style>
     <link rel="stylesheet" href="/css/loader.css">
 </head>

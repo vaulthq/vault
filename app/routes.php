@@ -19,6 +19,7 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
         Route::resource('user', 'UserController');
         Route::resource('project', 'ProjectController');
+        Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::resource('entry', 'EntryController');
     });
 });

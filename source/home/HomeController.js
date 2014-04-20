@@ -1,5 +1,5 @@
 xApp
-    .controller('HomeController',function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory) {
+    .controller('HomeController',function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory) {
         $scope.projects = projects;
         $scope.entries = [];
 
@@ -114,19 +114,18 @@ xApp
             $scope.entries.splice(index, 1);
         }
 
-        $scope.openAccess = function(index) {
+        $scope.getPassword = function(index) {
             var modalInstance = $modal.open({
-                templateUrl: '/t/entry/access.html',
-                controller: 'ModalOpenAccessController',
+                templateUrl: '/t/entry/password.html',
+                controller: 'ModalGetPasswordController',
                 resolve: {
-                    entry: function() {
-                        return $scope.entries[index]
+                    password: function(EntryPasswordFactory) {
+                        return EntryPasswordFactory.password({id: $scope.entries[index].id});
                     }
                 }
             });
 
             modalInstance.result.then(function (model) {
-                $scope.entries[index] = model;
                 flash([]);
             }, function() {
                 flash([]);
