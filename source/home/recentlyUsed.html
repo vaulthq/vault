@@ -18,7 +18,7 @@
         <td>{{ entry.id }}</td>
         <td>{{ entry.name }}</td>
         <td>{{ entry.url }}</td>
-        <td>{{ entry.created_at }}</td>
+        <td><span am-time-ago="entry.created_at"></span></td>
         <td>{{ entry.updated_at }}</td>
     </tr>
 </table>

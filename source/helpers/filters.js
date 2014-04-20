@@ -1,13 +1,6 @@
 xApp.
-    filter('userGroup', function() {
+    filter('userGroup', function(GROUPS) {
         return function(input) {
-            var inputs = {
-                admin: 'Administrator',
-                dev: 'Developer',
-                tester: 'Tester',
-                pm: 'Project Manager'
-            };
-
-            return inputs[input];
+            return GROUPS[input];
         }
     });

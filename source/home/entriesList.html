@@ -5,35 +5,44 @@
             <a class="btn btn-default btn-xs" title="Delete project" style="margin-right: 30px" ng-click="createEntry()">
                 Add new key
             </a>
-            <a class="btn btn-danger btn-xs" title="Delete project">
+            <a class="btn btn-danger btn-xs" title="Delete project" ng-click="deleteProject()">
                 <i class="glyphicon glyphicon-trash"></i>
             </a>
-            <a class="btn btn-warning btn-xs" title="Edit project">
+            <a class="btn btn-warning btn-xs" title="Edit project" ng-click="updateProject()">
                 <i class="glyphicon glyphicon-edit"></i>
-            </a>
-            <a class="btn btn-success btn-xs" title="Add new project" ng-click="createProject()">
-                <i class="glyphicon glyphicon-plus"></i>
             </a>
         </p>
     </h3>
 </div>
 
-<table class="table" ng-show="!loading.entries && entries.length > 0">
+<table class="table table-hover" ng-show="!loading.entries && entries.length > 0">
     <thead>
-    <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>URL</th>
-        <th>Created</th>
-        <th>Updated</th>
-    </tr>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>URL</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th></th>
+        </tr>
     </thead>
     <tr ng-repeat="entry in entries">
         <td>{{ entry.id }}</td>
         <td>{{ entry.name }}</td>
         <td>{{ entry.url }}</td>
-        <td>{{ entry.created_at }}</td>
-        <td>{{ entry.updated_at }}</td>
+        <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
+        <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}"></span></td>
+        <td class="text-right display-hover">
+            <a ng-click="openAccess($index)" class="btn btn-info btn-xs" title="Manage Access">
+                <i class="glyphicon glyphicon-lock"></i>
+            </a>
+            <a ng-click="updateEntry($index)" class="btn btn-warning btn-xs" title="Update">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+            <a ng-click="deleteEntry($index)" class="btn btn-danger btn-xs" title="Remove">
+                <i class="glyphicon glyphicon-trash"></i>
+            </a>
+        </td>
     </tr>
 </table>
 

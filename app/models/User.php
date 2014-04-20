@@ -12,7 +12,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 
     protected $softDelete = true;
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'updated_at', 'created_at', 'deleted_at'];
 	/**
 	 * The database table used by the model.
 	 *

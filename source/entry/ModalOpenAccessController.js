@@ -1,10 +1,9 @@
 xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, flash, GROUPS) {
-        $scope.user = {};
-        $scope.groups = GROUPS;
+    .controller('ModalOpenAccessController', function($scope, $modalInstance, EntryFactory, flash, entry) {
+        $scope.entry = entry;
 
         $scope.ok = function () {
-            UsersFactory.create($scope.user,
+            EntryFactory.updateGroupAccess($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
                 },

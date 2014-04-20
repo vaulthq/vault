@@ -17,10 +17,7 @@
                     <label class="control-label" for="iGroup">User Group *</label>
                     <select class="form-control" id="iGroup" ng-model="user.group" required>
                         <option value="">select...</option>
-                        <option value="admin">Administrator</option>
-                        <option value="dev">Developer</option>
-                        <option value="tester">Tester</option>
-                        <option value="pm">Project Manager</option>
+                        <option ng-repeat="(key, value) in groups" value="{{ key }}">{{ value }}</option>
                     </select>
                 </div>
             </div>

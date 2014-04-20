@@ -19,7 +19,7 @@
 */
 
 require __DIR__ . '/../bootstrap/autoload.php';
-sleep(1);
+//sleep(1);
 /*
 |--------------------------------------------------------------------------
 | Turn On The Lights

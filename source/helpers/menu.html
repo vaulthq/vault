@@ -18,7 +18,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#" ng-click="logout()">Logout</a></li>
             </ul>
-            <p class="navbar-text pull-right">Signed in as <strong>{{login.user.email}}</strong></p>
+            <p class="navbar-text pull-right">Signed in as <strong>{{login.user.email}}</strong> ({{ login.user.group | userGroup }})</p>
         </div>
     </div>
 </nav>

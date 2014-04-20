@@ -16,8 +16,10 @@
             </ul>
 
             <loader when="!projects.$resolved"></loader>
-
         </div>
+        <a class="btn btn-xs btn-default btn-block" title="Add a new project" ng-click="createProject()">
+            Add a new project
+        </a>
     </div>
     <div class="col-xs-9">
         <div ng-if="activeProject == -1" ng-include="'/t/home/recentlyUsed.html'"></div>

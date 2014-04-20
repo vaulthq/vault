@@ -29,14 +29,14 @@
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>
             <td>{{ user.group | userGroup }} </td>
-            <th class="text-right">
+            <td class="text-right">
                 <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
                 <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
-            </th>
+            </td>
         </tr>
     </tbody>
 </table>

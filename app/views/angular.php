@@ -2,6 +2,7 @@
 <html ng-app="xApp">
 <head>
     <meta charset="utf-8" />
+    <title>Password Safe</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <script src="js/vendor.js"></script>
     <script src="js/app.js"></script>
@@ -25,6 +26,12 @@
             z-index: 1060;
             position: absolute;
             width: 100%;
+        }
+        tr .display-hover > * {
+            opacity: 0
+        }
+        tr:hover .display-hover > * {
+            opacity: 1;
         }
     </style>
     <link rel="stylesheet" href="/css/loader.css">

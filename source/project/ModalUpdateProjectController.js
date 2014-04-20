@@ -1,12 +1,11 @@
 xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, flash, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
+    .controller('ModalUpdateProjectController', function($scope, $modalInstance, ProjectFactory, flash, project) {
+        $scope.project = project;
 
         $scope.ok = function () {
-            UserFactory.update($scope.user,
+            ProjectFactory.update($scope.project,
                 function() {
-                    $modalInstance.close($scope.user);
+                    $modalInstance.close($scope.project);
                 },
                 function(err) {
                     flash('danger', err.data);

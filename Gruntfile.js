@@ -41,7 +41,8 @@ module.exports = function(grunt) {
                         'js_vendor/angular/angular-animate.min.js',
                         'js_vendor/ui-bs-0.10.min.js',
                         'js_vendor/loader.min.js',
-                     //   'js_vendor/xtForm.js'
+                        'js_vendor/moment.min.js',
+                        'js_vendor/angular-moment.min.js'
                     ]
                 }
             }

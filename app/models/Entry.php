@@ -4,7 +4,7 @@ class Entry extends Eloquent
 {
     protected $softDelete = true;
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	/**
 	 * The database table used by the model.
 	 *
@@ -24,5 +24,10 @@ class Entry extends Eloquent
     public function getPasswordAttribute($value)
     {
         return Crypt::decrypt($value);
+    }
+
+    public function groupAccess()
+    {
+        return $this->hasOne('GroupAccess', 'entry_id');
     }
 }

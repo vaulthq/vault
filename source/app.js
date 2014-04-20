@@ -7,7 +7,7 @@ var xApp = angular.module('xApp', [
     'flash',
     'ui.bootstrap',
     'chieffancypants.loadingBar',
-    //'xtForm'
+    'angularMoment'
 ]);
 
 xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', function($routeProvider, $httpProvider, cfpLoadingBarProvider) {
@@ -31,6 +31,12 @@ xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', functio
             resolve: {
                 projects: function(ProjectsFactory) {
                     return ProjectsFactory.query();
+                },
+                entries: function() {
+                    return [];
+                },
+                activeProject: function() {
+                    return -1;
                 }
             }
         })

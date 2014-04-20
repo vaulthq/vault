@@ -4,7 +4,7 @@ class Project extends Eloquent
 {
     protected $softDelete = true;
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	/**
 	 * The database table used by the model.
 	 *
