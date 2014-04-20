@@ -3,6 +3,7 @@
 class GroupAccess extends Eloquent
 {
     protected $guarded = ['id', 'created_at', 'updated_at',' admin', 'dev', 'tester', 'pm'];
+    protected $hidden = ['created_at', 'updated_at'];
 	/**
 	 * The database table used by the model.
 	 *

@@ -1,4 +1,4 @@
-xApp.factory('AuthInterceptor', function($q, $injector, $location, flash) {
+xApp.factory('AuthInterceptor', function($q, $injector, $location, flash, $rootScope) {
     return {
         'response': function(response) {
             return response || $q.when(response);
@@ -10,6 +10,9 @@ xApp.factory('AuthInterceptor', function($q, $injector, $location, flash) {
                 AuthFactory.logout();
                 flash('warning', 'Session has expired, please try again.');
                 $location.path('/login');
+            }
+            if (rejection.status === 403) {
+                flash('danger', 'You cannot access this resource.');
             }
             return $q.reject(rejection);
         }

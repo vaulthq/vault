@@ -1,5 +1,5 @@
 xApp
-    .controller('HomeController',function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory) {
+    .controller('HomeController',function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory, AuthFactory) {
         $scope.projects = projects;
         $scope.entries = [];
 
@@ -123,12 +123,6 @@ xApp
                         return EntryPasswordFactory.password({id: $scope.entries[index].id});
                     }
                 }
-            });
-
-            modalInstance.result.then(function (model) {
-                flash([]);
-            }, function() {
-                flash([]);
             });
         }
     })

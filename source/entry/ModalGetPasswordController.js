@@ -2,23 +2,23 @@ xApp
     .controller('ModalGetPasswordController', function($scope, $modalInstance, flash, password) {
         $scope.password = password;
         $scope.hidden = {
-            password: '*',
-            hash: '*'
+            password: '',
+            hash: ''
         };
         $scope.shown = false;
 
         password.$promise.then(function(promise) {
-            console.log(promise);
             var pass = '';
             for (var i=0; i<promise.password.length; i++) {
                 pass += '*';
             }
             $scope.hidden.password = pass;
             $scope.hidden.hash = pass;
+        }, function() {
+            $modalInstance.close();
         });
 
         $scope.ok = function () {
-            console.log($scope.password);
             $modalInstance.close();
         };
 

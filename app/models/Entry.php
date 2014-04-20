@@ -16,6 +16,13 @@ class Entry extends Eloquent
         'deleted_at', 'password'
     ];
 
+    protected $appends = ['can_edit'];
+
+    public function getCanEditAttribute()
+    {
+        return $this->user_id == Auth::user()->id || $this->groupAccess->{Auth::user()->group} == true;
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Crypt::encrypt($value);
