@@ -9,6 +9,7 @@ class AuthController extends \BaseController
         ];
 
         if (Auth::attempt($credentials)) {
+            History::make('auth', Auth::user()->email . ' logged in.', null);
             return Response::json([
                 'user' => Auth::user()->toArray(),
             ], 202);
@@ -21,6 +22,7 @@ class AuthController extends \BaseController
 
     public function getIndex()
     {
+        History::make('auth', Auth::user()->email . ' logged out.', null);
         Auth::logout();
 
         return Response::json([

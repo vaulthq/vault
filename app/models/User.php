@@ -11,10 +11,10 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     const GROUP_PM = 'pm';
 
     public static $groups = [
-        self::GROUP_ADMIN,
-        self::GROUP_DEV,
-        self::GROUP_TESTER,
-        self::GROUP_PM
+        self::GROUP_ADMIN => 'Administrator',
+        self::GROUP_DEV => 'Developer',
+        self::GROUP_TESTER => 'Tester',
+        self::GROUP_PM => 'Project Manager'
     ];
 
     protected $softDelete = true;

@@ -1,14 +1,6 @@
 <?php
 class UserController extends \BaseController
 {
-/*index
-create
-store
-show
-edit
-update
-destroy*/
-
     public function index()
     {
         return User::all();
@@ -25,6 +17,8 @@ destroy*/
         $model = User::create(Input::all());
         $model->password = Hash::make(Input::get('password'));
         $model->save();
+
+        History::make('user', 'Created new user. (' . $model->email . ', ' . User::$groups[$model->group] . ').', $model->id);
 
         return $model;
     }
@@ -45,7 +39,10 @@ destroy*/
         $model->surname = $data->surname;
         $model->group = $data->group;
 
+        History::make('user', 'Updated user details.', $model->id);
+
         if (isset($data->password)) {
+            History::make('user', 'Changed user password.', $model->id);
             $model->password = Hash::make($data->password);
         }
 
@@ -54,6 +51,10 @@ destroy*/
 
     public function destroy($id)
     {
-        User::findOrFail($id)->delete();
+        $model = User::findOrFail($id);
+
+        History::make('user', 'Deleted user #' . $id . ' ('.$model->email.').', $id);
+
+        $model->delete();
     }
 }

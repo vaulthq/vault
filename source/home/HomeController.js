@@ -1,7 +1,8 @@
 xApp
-    .controller('HomeController',function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory, AuthFactory) {
+    .controller('HomeController', function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory, AuthFactory, recent) {
         $scope.projects = projects;
         $scope.entries = [];
+        $scope.recent = recent;
 
         $scope.activeProject = -1;
 
@@ -19,6 +20,16 @@ xApp
             } else {
                 $scope.entries = [];
             }
+        }
+
+        $scope.openProjectById = function(id) {
+            for (var i=0; i<projects.length; i++) {
+                if (projects[i].id == id) {
+                    $scope.openProject(i);
+                    return;
+                }
+            }
+            flash('danger', 'Project was removed.');
         }
 
         $scope.getProject = function() {
@@ -125,4 +136,9 @@ xApp
                 }
             });
         }
+    })
+    .factory('RecentFactory', function ($resource) {
+        return $resource("/api/recent", {}, {
+            query: { method: 'GET', isArray: true }
+        });
     })

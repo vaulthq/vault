@@ -1,7 +1,7 @@
 <div class="page-header" style="margin: 10px 0;">
     <h3 style="margin-top: 0">
         {{ getProject().name }} <small>{{ getProject().description }}</small>
-        <p class="pull-right">
+        <p class="pull-right" ng-if="getProject().can_edit">
             <a class="btn btn-default btn-xs" title="Delete project" style="margin-right: 30px" ng-click="createEntry()">
                 Add new key
             </a>

@@ -9,18 +9,19 @@ Route::get('/', function()
     }
 	return View::make('angular');
 });
-
-Route::group(['before' => 'ngcsrf'], function() {
+//'before' => 'ngcsrf'
+Route::group([], function() {
     Route::group(['prefix' => 'internal'], function() {
         Route::controller('auth', 'AuthController');
     });
-
-    Route::group(array('prefix' => 'api', 'before' => 'ngauth'), function() {
+//'before' => 'ngauth'
+    Route::group(array('prefix' => 'api', ), function() {
         Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
         Route::resource('user', 'UserController');
         Route::resource('project', 'ProjectController');
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::resource('entry', 'EntryController');
+        Route::resource('recent', 'RecentController');
     });
 });
 

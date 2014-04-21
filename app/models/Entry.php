@@ -20,7 +20,7 @@ class Entry extends Eloquent
 
     public function getCanEditAttribute()
     {
-        return $this->user_id == Auth::user()->id || $this->groupAccess->{Auth::user()->group} == true;
+        return $this->user_id == Auth::user()->id || (isset($this->groupAccess) && $this->groupAccess->{Auth::user()->group} == true);
     }
 
     public function setPasswordAttribute($value)
@@ -36,5 +36,10 @@ class Entry extends Eloquent
     public function groupAccess()
     {
         return $this->hasOne('GroupAccess', 'entry_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('Project', 'project_id');
     }
 }

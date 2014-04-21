@@ -12,6 +12,10 @@ class Project extends Eloquent
 	 */
 	protected $table = 'project';
 
+    protected $appends = ['can_edit'];
+
+
+
     protected $hidden = [
         'deleted_at'
     ];
@@ -23,5 +27,10 @@ class Project extends Eloquent
     public function keys()
     {
         return $this->hasMany('Entry', 'project_id');
+    }
+
+    public function getCanEditAttribute()
+    {
+        return $this->user_id == Auth::user()->id;
     }
 }
