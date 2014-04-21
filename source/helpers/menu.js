@@ -9,7 +9,11 @@ xApp
                 $scope.login = login;
             });
 
-            $scope.logout = function (){
+            $scope.recently = function() {
+                $rootScope.$broadcast('clear:project');
+            }
+
+            $scope.logout = function () {
                 AuthFactory.api().get({},function(response) {
                     AuthFactory.logout();
                     flash('info', 'You have been logged out!');
@@ -17,7 +21,6 @@ xApp
                 })
             }
         }];
-
 
         return directive;
     }]);

@@ -1,5 +1,5 @@
 xApp
-    .controller('HomeController', function($scope, projects, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, EntryPasswordFactory, AuthFactory, recent) {
+    .controller('HomeController', function($scope, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, AuthFactory, projects, recent, RecentFactory) {
         $scope.projects = projects;
         $scope.entries = [];
         $scope.recent = recent;
@@ -7,6 +7,11 @@ xApp
         $scope.activeProject = -1;
 
         $scope.loading = {entries: false};
+
+        $scope.$on('clear:project', function() {
+            $scope.openProject(-1);
+            $scope.recent = RecentFactory.query();
+        });
 
         $scope.openProject = function(index) {
             $scope.activeProject = index;
@@ -144,6 +149,17 @@ xApp
                 resolve: {
                     password: function(EntryPasswordFactory) {
                         return EntryPasswordFactory.password({id: $scope.entries[index].id});
+                    }
+                }
+            });
+        }
+        $scope.entryAccessInfo = function(index) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/entry/access.html',
+                controller: 'ModalAccessController',
+                resolve: {
+                    access: function(EntryAccessFactory) {
+                        return EntryAccessFactory.query({id: $scope.entries[index].id});
                     }
                 }
             });

@@ -21,6 +21,6 @@ class History extends Eloquent
             'message' => $message,
             'model_id' => $modelId,
             'user_id' => Auth::user()->id
-        ])->save();
+        ]);
     }
 }

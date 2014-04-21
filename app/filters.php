@@ -45,7 +45,12 @@ Route::filter('ngauth', function()
     }
 });
 
-
+Route::filter('admin', function()
+{
+    if (Auth::user()->group != User::GROUP_ADMIN) {
+        return Response::json(['flash' => 'You cannot access this resource.'], 403);
+    }
+});
 
 Route::filter('auth.basic', function()
 {

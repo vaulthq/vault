@@ -17,4 +17,9 @@ xApp
         return $resource("/api/entry/password/:id", {}, {
             password: { method: 'GET', params: {id: '@id'} }
         })
+    })
+    .factory('EntryAccessFactory', function ($resource) {
+        return $resource("/api/entry/access/:id", {}, {
+            query: { method: 'GET', params: {id: '@id'}, isArray: true }
+        })
     });

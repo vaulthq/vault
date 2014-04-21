@@ -9,19 +9,25 @@ Route::get('/', function()
     }
 	return View::make('angular');
 });
-//'before' => 'ngcsrf'
-Route::group([], function() {
+
+Route::group(['before' => 'ngcsrf'], function() {
     Route::group(['prefix' => 'internal'], function() {
         Route::controller('auth', 'AuthController');
     });
-//'before' => 'ngauth'
-    Route::group(array('prefix' => 'api', ), function() {
+
+    Route::group(array('prefix' => 'api', 'before' => 'ngauth'), function() {
         Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
-        Route::resource('user', 'UserController');
         Route::resource('project', 'ProjectController');
+
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
+        Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
         Route::resource('entry', 'EntryController');
+
         Route::resource('recent', 'RecentController');
+
+        Route::group(['before' => 'admin'], function() {
+            Route::resource('user', 'UserController');
+        });
     });
 });
 

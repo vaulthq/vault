@@ -1,28 +1,22 @@
 <div class="modal-header">
-    <h3>Enter Entry Details</h3>
+    <h3>Users With Access</h3>
 </div>
-<form>
-    <div class="modal-body">
-        <div class="form-group">
-            <label class="control-label" for="iName">Name</label>
-            <input type="text" name="name" class="form-control" id="iName" ng-model="entry.name">
-        </div>
-        <div class="form-group">
-            <label class="control-label" for="iUrl">URL/IP</label>
-            <input type="text" name="url" class="form-control" id="iUrl" ng-model="entry.url">
-        </div>
-        <div class="form-group">
-            <label class="control-label" for="iPassword">Password</label>
-            <input type="password" name="password" class="form-control" id="iPassword" ng-model="entry.password">
-        </div>
-        <div class="form-group">
-            <label class="control-label" for="iNote">Note</label>
-            <input type="text" name="note" class="form-control" id="iNote" ng-model="entry.note">
-        </div>
-        <input type="hidden" ng-model="entry.project_id">
-    </div>
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    </div>
-</form>
+<div class="modal-body">
+    <table class="table">
+        <thead>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Email</th>
+        </thead>
+        <tbody>
+        <tr ng-repeat="user in access">
+            <td>{{user.name}}</td>
+            <td>{{user.surname}}</td>
+            <td>{{user.email}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>
