@@ -107,6 +107,18 @@ xApp
             });
         }
 
+        $scope.projectOwnerInfo = function() {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/project/owner.html',
+                controller: 'ModalProjectOwnerController',
+                resolve: {
+                    owner: function(UserFactory) {
+                        return UserFactory.show({id: $scope.getProject().user_id});
+                    }
+                }
+            });
+        }
+
         $scope.deleteProject = function() {
             if (!confirm('Are you sure?')) {
                 return;
