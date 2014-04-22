@@ -20,7 +20,10 @@ class Entry extends Eloquent
 
     public function getCanEditAttribute()
     {
-        return $this->user_id == Auth::user()->id || (isset($this->groupAccess->id) && $this->groupAccess->{Auth::user()->group} == true);
+        $userId = Auth::user()->id;
+        return $this->user_id == $userId
+            || (isset($this->groupAccess->id) && $this->groupAccess->{Auth::user()->group} == true)
+            || Share::where('user_id', $userId)->where('entry_id', $this->id)->count() > 0;
     }
 
     public function setPasswordAttribute($value)

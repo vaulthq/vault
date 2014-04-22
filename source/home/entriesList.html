@@ -31,8 +31,8 @@
     </thead>
     <tr ng-repeat="entry in entries" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
         <td>{{ entry.id }}</td>
-        <td>{{ entry.name }}</td>
-        <td>{{ entry.url }}</td>
+        <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
+        <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
         <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
         <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}"></span></td>
         <td class="text-right">
