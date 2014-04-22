@@ -6,14 +6,14 @@
 
         <div class="navbar-collapse" id="menu-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/#/user/list" ng-if="login.user.group == 'admin'">Manage Users</a></li>
-                <li><a href="/#/history" ng-if="login.user.group == 'admin'">Action History</a></li>
                 <li><a href="/#/home" ng-click="recently()">Recently Accessed</a></li>
+                <li><a href="/#/user/list" ng-if="login.user.group == 'admin'">Manage Users</a></li>
+                <li><a href="/#/history" ng-if="login.user.group == 'admin'">History</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#" ng-click="logout()">Logout</a></li>
             </ul>
-            <p class="navbar-text pull-right">Signed in as <strong>{{login.user.email}}</strong> ({{ login.user.group | userGroup }})</p>
+            <p class="navbar-text pull-right">Signed in as <strong><a ng-click="profile()" style="cursor: pointer">{{login.user.email}}</a></strong> ({{ login.user.group | userGroup }})</p>
         </div>
     </div>
 </nav>

@@ -1,9 +1,9 @@
 <div class="page-header" style="margin: 10px 0;">
     <h3 style="margin-top: 0">
-        User List
+        Manage Users
         <p class="pull-right">
             <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
-                Add new user
+                Add a new user
             </a>
         </p>
     </h3>
@@ -24,7 +24,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="user in users">
-            <td>{{ $index + 1 }}</td>
+            <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>

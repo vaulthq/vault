@@ -22,4 +22,12 @@ xApp
         return $resource("/api/entry/access/:id", {}, {
             query: { method: 'GET', params: {id: '@id'}, isArray: true }
         })
-    });
+    })
+    .factory('ShareFactory', function ($resource) {
+        return $resource("/api/share/:id", {}, {
+            show: { method: 'GET', isArray: true  },
+            create: { method: 'POST' },
+            update: { method: 'PUT', params: {id: '@id'} },
+            delete: { method: 'DELETE', params: {id: '@id'} }
+        })
+    })

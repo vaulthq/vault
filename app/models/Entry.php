@@ -47,4 +47,9 @@ class Entry extends Eloquent
     {
         return $this->belongsTo('User', 'user_id');
     }
+
+    public function shares()
+    {
+        return $this->hasMany('Share', 'entry_id');
+    }
 }

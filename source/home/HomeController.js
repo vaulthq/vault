@@ -164,6 +164,24 @@ xApp
                 }
             });
         }
+
+        $scope.shareEntry = function(index) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/entry/share.html',
+                controller: 'ModalShareController',
+                resolve: {
+                    users: function(UsersFactory) {
+                        return UsersFactory.query();
+                    },
+                    access: function(ShareFactory) {
+                        return ShareFactory.show({id: $scope.entries[index].id});
+                    },
+                    entry: function() {
+                        return $scope.entries[index];
+                    }
+                }
+            });
+        }
     })
     .factory('RecentFactory', function ($resource) {
         return $resource("/api/recent", {}, {

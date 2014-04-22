@@ -1,6 +1,12 @@
 <?php
 class UserController extends \BaseController
 {
+    public function __construct()
+    {
+        $this->beforeFilter('admin', [
+            'only' => ['store', 'update', 'destroy']
+        ]);
+    }
     public function index()
     {
         return User::all();
@@ -54,6 +60,18 @@ class UserController extends \BaseController
         $model = User::findOrFail($id);
 
         History::make('user', 'Deleted user #' . $id . ' ('.$model->email.').', $id);
+
+        foreach (Project::where('user_id', $model->id)->get() as $item) {
+            $item->user_id = Auth::user()->id;
+            $item->save();
+            History::make('reassign', 'Assigning project #'.$item->id.'.', $item->id);
+        }
+
+        foreach (Entry::where('user_id', $model->id)->get() as $item) {
+            $item->user_id = Auth::user()->id;
+            $item->save();
+            History::make('reassign', 'Assigning entry #'.$item->id.'.', $item->id);
+        }
 
         $model->delete();
     }

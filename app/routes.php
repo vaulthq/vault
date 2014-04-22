@@ -5,7 +5,7 @@ Route::get('/', function()
     $existing = Cookie::get('XSRF-TOKEN');
     if (is_null($existing)) {
         $value = md5(Session::token());
-        setcookie('XSRF-TOKEN', $value, time()+3600, '/', null, false, 0);
+        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'x.project.kalvaitis.eu', true, false);
     }
 	return View::make('angular');
 });
@@ -19,14 +19,19 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
         Route::resource('project', 'ProjectController');
 
+        Route::resource('profile', 'ProfileController');
+        Route::resource('user', 'UserController');
+        Route::resource('recent', 'RecentController');
+        Route::resource('share', 'ShareController');
+
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
         Route::resource('entry', 'EntryController');
 
-        Route::resource('recent', 'RecentController');
+
 
         Route::group(['before' => 'admin'], function() {
-            Route::resource('user', 'UserController');
+            Route::resource('history', 'HistoryController');
         });
     });
 });

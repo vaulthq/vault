@@ -37,6 +37,15 @@ xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', functio
                 }
             }
         })
+        .when('/history', {
+            templateUrl: '/t/history/list.html',
+            controller: 'HistoryController',
+            resolve: {
+                history: function(HistoryFactory) {
+                    return HistoryFactory.query();
+                }
+            }
+        })
         .otherwise({
             redirectTo: '/login'
         });

@@ -55,4 +55,9 @@ xApp
             update: { method: 'PUT', params: {id: '@id'} },
             delete: { method: 'DELETE', params: {id: '@id'} }
         })
+    })
+    .factory('ProfileFactory', function ($resource) {
+        return $resource("/api/profile", {}, {
+            update: { method: 'POST' }
+        })
     });

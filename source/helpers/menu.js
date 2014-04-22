@@ -3,7 +3,7 @@ xApp
         var directive = { restrict: 'EA', replace: true };
         directive.template = '<div ng-include="\'/t/helpers/menu.html\'"></div>';
 
-        directive.controller = ['$scope', '$rootScope', 'AuthFactory', '$location', 'flash', function($scope, $rootScope, AuthFactory, $location, flash) {
+        directive.controller = ['$scope', '$rootScope', 'AuthFactory', '$location', 'flash', '$modal', function($scope, $rootScope, AuthFactory, $location, flash, $modal) {
             $scope.login = AuthFactory.getUser();
             $rootScope.$on('auth:login', function(_, login) {
                 $scope.login = login;
@@ -20,7 +20,19 @@ xApp
                     $location.path('/');
                 })
             }
+
+            $scope.profile = function() {
+                var modalInstance = $modal.open({
+                    templateUrl: '/t/user/profile.html',
+                    controller: 'ProfileController'
+                });
+
+                modalInstance.result.then(function () {
+                    flash([]);
+                }, function() {
+                    flash([]);
+                });
+            }
         }];
 
-        return directive;
-    }]);
+        return directive;    }]);
