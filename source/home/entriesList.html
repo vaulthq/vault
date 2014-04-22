@@ -29,7 +29,7 @@
             <th></th>
         </tr>
     </thead>
-    <tr ng-repeat="entry in entries">
+    <tr ng-repeat="entry in entries" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
         <td>{{ entry.id }}</td>
         <td>{{ entry.name }}</td>
         <td>{{ entry.url }}</td>

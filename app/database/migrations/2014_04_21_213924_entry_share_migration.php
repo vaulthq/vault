@@ -37,7 +37,7 @@ class EntryShareMigration extends Migration {
 	 */
 	public function down()
 	{
-		//
+        Schema::dropIfExists('share');
 	}
 
 }

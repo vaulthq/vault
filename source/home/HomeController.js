@@ -1,8 +1,9 @@
 xApp
-    .controller('HomeController', function($scope, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, AuthFactory, projects, recent, RecentFactory) {
+    .controller('HomeController', function($scope, $modal, flash, ProjectKeysFactory, EntryFactory, ProjectFactory, AuthFactory, projects, recent, RecentFactory, unsafe, UnsafeFactory) {
         $scope.projects = projects;
         $scope.entries = [];
         $scope.recent = recent;
+        $scope.unsafe = unsafe;
 
         $scope.activeProject = -1;
 
@@ -12,6 +13,16 @@ xApp
             $scope.openProject(-1);
             $scope.recent = RecentFactory.query();
         });
+
+        $scope.isUnsafe = function(id) {
+            for (var i=0; i< $scope.unsafe.length; i++) {
+                if ($scope.unsafe[i].id == id) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         $scope.openProject = function(index) {
             $scope.activeProject = index;
@@ -73,6 +84,11 @@ xApp
 
             modalInstance.result.then(function (model) {
                 $scope.entries[index] = model;
+
+                if ($scope.unsafe.length > 0) {
+                    $scope.unsafe = UnsafeFactory.query();
+                }
+
                 flash([]);
             }, function() {
                 flash([]);

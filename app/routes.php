@@ -23,12 +23,11 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::resource('user', 'UserController');
         Route::resource('recent', 'RecentController');
         Route::resource('share', 'ShareController');
+        Route::resource('unsafe', 'UnsafeController');
 
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
         Route::resource('entry', 'EntryController');
-
-
 
         Route::group(['before' => 'admin'], function() {
             Route::resource('history', 'HistoryController');

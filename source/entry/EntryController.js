@@ -31,3 +31,8 @@ xApp
             delete: { method: 'DELETE', params: {id: '@id'} }
         })
     })
+    .factory('UnsafeFactory', function ($resource) {
+        return $resource("/api/unsafe", {}, {
+            query: { method: 'GET', isArray: true  }
+        })
+    })

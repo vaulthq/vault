@@ -34,6 +34,9 @@ xApp.config(['$routeProvider', '$httpProvider', 'cfpLoadingBarProvider', functio
                 },
                 recent: function(RecentFactory) {
                     return RecentFactory.query();
+                },
+                unsafe: function(UnsafeFactory) {
+                    return UnsafeFactory.query();
                 }
             }
         })

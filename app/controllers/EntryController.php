@@ -74,7 +74,7 @@ class EntryController extends \BaseController
         History::make('entry', 'Updated entry details.', $model->id);
 
         if (isset($data->password)) {
-            History::make('entry', 'Updated entry password.', $model->id);
+            History::make('entry_p', 'Updated entry password.', $model->id);
             $model->password = $data->password;
         }
 
