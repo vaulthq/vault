@@ -197,6 +197,13 @@ xApp
                     }
                 }
             });
+
+            modalInstance.result.then(function (model) {
+                flash([]);
+            }, function() {
+                $scope.openProject($scope.activeProject);
+                flash([]);
+            });
         }
     })
     .factory('RecentFactory', function ($resource) {

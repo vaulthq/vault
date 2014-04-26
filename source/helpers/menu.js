@@ -17,7 +17,7 @@ xApp
                 AuthFactory.api().get({},function(response) {
                     AuthFactory.logout();
                     flash('info', 'You have been logged out!');
-                    $location.path('/');
+                    $location.path('/login');
                 })
             }
 

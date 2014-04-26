@@ -75,6 +75,9 @@ class EntryController extends \BaseController
 
         if (isset($data->password)) {
             History::make('entry_p', 'Updated entry password.', $model->id);
+
+            $this->sendUpdateNotification($model);
+
             $model->password = $data->password;
         }
 
@@ -100,6 +103,31 @@ class EntryController extends \BaseController
 
         return $model;
 	}
+
+    private function sendUpdateNotification(Entry $entry)
+    {
+        $users = DB::table('history')
+            ->select('user.email')
+            ->distinct()
+            ->leftJoin('user', 'user.id', '=', 'history.user_id')
+            ->where('history.model', 'password')
+            ->where('history.model_id', $entry->id)
+            ->whereNull('user.deleted_at')
+            ->get();
+
+        foreach ($users as $user) {
+            $validator = Validator::make(['email' => $user->email], ['email' => 'email']);
+
+            if ($validator->fails()) {
+                continue;
+            }
+
+            Mail::send('emails.entry', ['model' => $entry], function($message) use ($entry, $user)
+            {
+                $message->to($user->email)->subject('Entry #' . $entry->id . ' had password changed!');
+            });
+        }
+    }
 
 	/**
 	 * Remove the specified resource from storage.

@@ -39,8 +39,9 @@ xApp
             if (!confirm('Are you sure?')) {
                 return;
             }
-            UserFactory.delete({id: $scope.users[index].id});
-            $scope.users.splice(index, 1);
+            UserFactory.delete({id: $scope.users[index].id}, function() {
+                $scope.users.splice(index, 1);
+            });
         }
     })
     .factory('UsersFactory', function ($resource) {

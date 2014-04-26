@@ -14,6 +14,7 @@ xApp
         var logout = function() {
             $cookieStore.remove(cookieName);
             $rootScope.$broadcast('auth:login', null);
+            console.log(getUser());
         }
 
         var getUser = function() {

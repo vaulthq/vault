@@ -59,6 +59,10 @@ class UserController extends \BaseController
     {
         $model = User::findOrFail($id);
 
+        if ($model->id == 1) { // trying to delete admin acc
+            return Response::make('Unauthorized', 403);
+        }
+
         History::make('user', 'Deleted user #' . $id . ' ('.$model->email.').', $id);
 
         foreach (Project::where('user_id', $model->id)->get() as $item) {
