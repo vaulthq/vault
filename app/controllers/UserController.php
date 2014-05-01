@@ -43,7 +43,13 @@ class UserController extends \BaseController
         $model->email = $data->email;
         $model->name = $data->name;
         $model->surname = $data->surname;
-        $model->group = $data->group;
+
+        if (isset($data->group) && $model->group != $data->group && $model->group == User::GROUP_ADMIN) {
+            if ($this->isLastAdmin($model)) {
+                return Response::make('You cannot change this user group.', 419);
+            }
+            $model->group = $data->group;
+        }
 
         History::make('user', 'Updated user details.', $model->id);
 
@@ -59,7 +65,7 @@ class UserController extends \BaseController
     {
         $model = User::findOrFail($id);
 
-        if ($model->id == 1) { // trying to delete admin acc
+        if ($this->isLastAdmin($model)) {
             return Response::make('Unauthorized', 403);
         }
 
@@ -78,5 +84,16 @@ class UserController extends \BaseController
         }
 
         $model->delete();
+    }
+
+    private function isLastAdmin(\User $user)
+    {
+        $adminCount = DB::table('user')
+            ->where('id', '<>', $user->id)
+            ->where('group', \User::GROUP_ADMIN)
+            ->whereNull('deleted_at')
+            ->count();
+
+        return $adminCount <= 0;
     }
 }
