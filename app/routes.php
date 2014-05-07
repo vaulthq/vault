@@ -5,7 +5,7 @@ Route::get('/', function()
     $existing = Cookie::get('XSRF-TOKEN');
     if (is_null($existing)) {
         $value = md5(Session::token());
-        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'x.project.kalvaitis.eu', true, false);
+        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'vault.datajob.lt', true, false);
     }
 	return View::make('angular');
 });
