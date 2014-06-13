@@ -1,0 +1,42 @@
+<div class="page-header" style="margin: 10px 0;">
+    <h3 style="margin-top: 0">
+        Manage Users
+        <p class="pull-right">
+            <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
+                Add a new user
+            </a>
+        </p>
+    </h3>
+</div>
+
+<loader when="!users.$resolved"></loader>
+
+<table ng-if="users.length > 0" class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Group</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="user in users">
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.surname }} </td>
+            <td>{{ user.group | userGroup }} </td>
+            <td class="text-right">
+                <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
+                    <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
