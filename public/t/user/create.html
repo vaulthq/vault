@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h3>Enter User Details</h3>
+</div>
+<form>
+    <div class="modal-body">
+       <div class="row">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="control-label" for="iEmail">Email *</label>
+                    <input type="text" name="email" class="form-control" id="iEmail" ng-model="user.email" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="iPassword">Password *</label>
+                    <input type="password" class="form-control" id="iPassword" ng-model="user.password">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="iGroup">User Group *</label>
+                    <select class="form-control" id="iGroup" ng-model="user.group" required>
+                        <option value="">select...</option>
+                        <option ng-repeat="(key, value) in groups" value="{{ key }}">{{ value }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="control-label" for="iName">Name</label>
+                    <input type="text" class="form-control" id="iName" ng-model="user.name">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="iSurname">Surname</label>
+                    <input type="text" class="form-control" id="iSurname" ng-model="user.surname">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    </div>
+</form>
