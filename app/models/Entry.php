@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
 class Entry extends Eloquent
 {
-    protected $softDelete = true;
+    use SoftDeletingTrait;
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	/**

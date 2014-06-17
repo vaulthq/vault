@@ -17,8 +17,8 @@ class UserTable extends Migration {
 		    $table->increments('id');
 		    $table->string('email', 255)->unique();
 		    $table->string('password', 60);
-		    $table->string('name', 255);
-		    $table->string('surname', 255);
+		    $table->string('name', 255)->nullable();
+		    $table->string('surname', 255)->nullable();
 		    $table->timestamps();
             $table->softDeletes();
 		});

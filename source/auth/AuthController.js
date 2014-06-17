@@ -1,15 +1,12 @@
 xApp
     .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, flash) {
-       /* if (AuthFactory.getUser() !== undefined) {
-            $location.path('/home');
-        }*/
         $scope.login = function() {
             AuthFactory.api().save({
                 'email':    $sanitize($scope.email),
                 'password': $sanitize($scope.password)
             }, function(response) {
                 AuthFactory.login(response);
-                $location.path('/home');
+                $location.path('/recent');
             }, function(response) {
                 flash('danger', response.data.flash);
             })

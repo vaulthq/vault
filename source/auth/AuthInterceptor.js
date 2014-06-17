@@ -7,8 +7,10 @@ xApp.factory('AuthInterceptor', function($q, $injector, $location, flash, $rootS
         'responseError': function(rejection) {
             if (rejection.status === 401) {
                 var AuthFactory = $injector.get('AuthFactory');
+                if (AuthFactory.getUser().length > 0) {
+                    flash('warning', 'Session has expired, please try again.');
+                }
                 AuthFactory.logout();
-                flash('warning', 'Session has expired, please try again.');
                 $location.path('/login');
             }
             if (rejection.status === 403) {

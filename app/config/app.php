@@ -2,6 +2,7 @@
 
 return array(
 
+    'cipher' => MCRYPT_RIJNDAEL_256,
 	/*
 	|--------------------------------------------------------------------------
 	| Application Debug Mode
@@ -106,6 +107,8 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+
+        'Vault\Storage\StorageServiceProvider'
 
 	),
 

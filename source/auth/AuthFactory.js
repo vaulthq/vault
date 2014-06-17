@@ -14,11 +14,11 @@ xApp
         var logout = function() {
             $cookieStore.remove(cookieName);
             $rootScope.$broadcast('auth:login', null);
-            console.log(getUser());
         }
 
         var getUser = function() {
-            return $cookieStore.get(cookieName) ;
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
         }
 
         return {

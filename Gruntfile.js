@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                         'js_vendor/moment.min.js',
                         'js_vendor/angular-moment.min.js',
                         'js_vendor/ZeroClipboard.min.js',
-                        //'js_vendor/ng-clip.js'
+                        'js_vendor/angular-ui-router.min.js'
                     ]
                 }
             }

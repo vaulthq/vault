@@ -1,8 +1,11 @@
 <?php
 
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
+
+
 class Share extends Eloquent
 {
-    protected $softDelete = true;
+    use SoftDeletingTrait;
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at', 'user_by_id'];
 

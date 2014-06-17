@@ -2,9 +2,12 @@
 
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class User extends Eloquent implements UserInterface, RemindableInterface
 {
+    use SoftDeletingTrait;
+
     const GROUP_ADMIN = 'admin';
     const GROUP_DEV = 'dev';
     const GROUP_TESTER = 'tester';
@@ -73,5 +76,20 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     public function share()
     {
         return $this->hasMany('Share', 'user_id');
+    }
+
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
+
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
     }
 }

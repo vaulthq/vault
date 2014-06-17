@@ -5,13 +5,10 @@ xApp
 
         directive.controller = ['$scope', '$rootScope', 'AuthFactory', '$location', 'flash', '$modal', function($scope, $rootScope, AuthFactory, $location, flash, $modal) {
             $scope.login = AuthFactory.getUser();
+
             $rootScope.$on('auth:login', function(_, login) {
                 $scope.login = login;
             });
-
-            $scope.recently = function() {
-                $rootScope.$broadcast('clear:project');
-            }
 
             $scope.logout = function () {
                 AuthFactory.api().get({},function(response) {
@@ -35,4 +32,5 @@ xApp
             }
         }];
 
-        return directive;    }]);
+        return directive;
+    }]);

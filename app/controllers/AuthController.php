@@ -4,7 +4,7 @@ class AuthController extends \BaseController
     public function postIndex()
     {
         $credentials = [
-            'email' => Input::get('email'),
+            'email'    => Input::get('email'),
             'password' => Input::get('password')
         ];
 

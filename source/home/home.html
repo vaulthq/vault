@@ -10,9 +10,8 @@
                 <li
                         ng-repeat="project in projects | filter:projectFilter"
                         class="list-group-item"
-                        ng-class="{'list-group-item-info': $index == activeProject}"
-                        ng-click="openProject($index)"
-                        >{{ project.name }}</li>
+                        ng-class="{'list-group-item-info': false}"
+                        ><a href="/#/project/{{ project.id }}">{{ project.name }}</a></li>
             </ul>
 
             <loader when="!projects.$resolved"></loader>
@@ -22,7 +21,6 @@
         </a>
     </div>
     <div class="col-xs-9">
-        <div ng-if="activeProject == -1" ng-include="'/t/home/recentlyUsed.html'"></div>
-        <div ng-if="activeProject != -1" ng-include="'/t/home/entriesList.html'"></div>
+        <ui-view/>
     </div>
 </div>

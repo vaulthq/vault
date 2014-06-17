@@ -5,12 +5,12 @@ Route::get('/', function()
     $existing = Cookie::get('XSRF-TOKEN');
     if (is_null($existing)) {
         $value = md5(Session::token());
-        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'vault.datajob.lt', true, false);
+        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'x.dev', false, false);
     }
 	return View::make('angular');
 });
 
-Route::group(['before' => 'ngcsrf'], function() {
+//Route::group(['before' => 'ngcsrf'], function() {
     Route::group(['prefix' => 'internal'], function() {
         Route::controller('auth', 'AuthController');
     });
@@ -24,6 +24,7 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::resource('recent', 'RecentController');
         Route::resource('share', 'ShareController');
         Route::resource('unsafe', 'UnsafeController');
+        Route::resource('group', 'GroupController');
 
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
@@ -33,6 +34,6 @@ Route::group(['before' => 'ngcsrf'], function() {
             Route::resource('history', 'HistoryController');
         });
     });
-});
+//});
 
 

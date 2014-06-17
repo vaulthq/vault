@@ -14,10 +14,10 @@ class GroupAccessMigration extends Migration {
 	{
 		Schema::create('group_access', function($table) {
             $table->increments('id');
-            $table->boolean('admin');
-            $table->boolean('dev');
-            $table->boolean('tester');
-            $table->boolean('pm');
+            $table->boolean('admin')->default('0');
+            $table->boolean('dev')->default('0');
+            $table->boolean('tester')->default('0');
+            $table->boolean('pm')->default('0');
             $table->integer('entry_id')->unsigned();
             $table->foreign('entry_id')->references('id')->on('entry');
             $table->timestamps();
