@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, flash, project_id, GROUPS) {
+    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id, GROUPS) {
         $scope.entry = {
             project_id: project_id,
             group_access: {}
@@ -12,7 +12,7 @@ xApp
                     $modalInstance.close(response);
                 },
                 function(err) {
-                    flash('danger', err.data);
+                    shareFlash('danger', err.data);
                 }
             );
         };

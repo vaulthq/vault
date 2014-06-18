@@ -1,5 +1,5 @@
-angular.module('flash', [])
-    .factory('flash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+angular.module('shareFlash', [])
+    .factory('shareFlash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
         var messages = [];
 
         var reset;

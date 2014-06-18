@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalGetPasswordController', function($scope, $modalInstance, flash, password) {
+    .controller('ModalGetPasswordController', function($scope, $modalInstance, password) {
         $scope.password = password;
         $scope.hidden = {
             password: '',

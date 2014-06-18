@@ -21,10 +21,15 @@ xApp
             return fromCookie.user || [];
         }
 
+        var isLoggedIn = function() {
+            return getUser().id > 0;
+        }
+
         return {
             api: apiEndpoint,
             login: login,
             logout: logout,
-            getUser: getUser
+            getUser: getUser,
+            isLoggedIn: isLoggedIn
         }
     });

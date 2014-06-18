@@ -1,5 +1,5 @@
 xApp.
-    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, flash) {
+    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
         $scope.profile = {
             old: '',
             new: '',
@@ -12,7 +12,7 @@ xApp.
                     $modalInstance.close();
                 },
                 function(err) {
-                    flash('danger', err.data);
+                    shareFlash('danger', err.data);
                 }
             );
         };

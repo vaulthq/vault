@@ -1,5 +1,5 @@
 xApp
-    .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, flash) {
+    .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, shareFlash) {
         $scope.login = function() {
             AuthFactory.api().save({
                 'email':    $sanitize($scope.email),
@@ -8,7 +8,7 @@ xApp
                 AuthFactory.login(response);
                 $location.path('/recent');
             }, function(response) {
-                flash('danger', response.data.flash);
+                shareFlash('danger', response.data.flash);
             })
         }
     })

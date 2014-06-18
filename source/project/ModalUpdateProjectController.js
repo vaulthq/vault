@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalUpdateProjectController', function($scope, $modalInstance, ProjectFactory, flash, project) {
+    .controller('ModalUpdateProjectController', function($scope, $modalInstance, ProjectFactory, shareFlash, project) {
         $scope.project = project;
 
         $scope.ok = function () {
@@ -8,7 +8,7 @@ xApp
                     $modalInstance.close($scope.project);
                 },
                 function(err) {
-                    flash('danger', err.data);
+                    shareFlash('danger', err.data);
                 }
             );
         };

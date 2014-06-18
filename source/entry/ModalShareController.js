@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalShareController', function($scope, $modalInstance, flash, users, access, ShareFactory, entry) {
+    .controller('ModalShareController', function($scope, $modalInstance, users, access, ShareFactory, entry) {
         $scope.users = users;
         $scope.access = access;
         $scope.entry = entry;
