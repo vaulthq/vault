@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalProjectOwnerController', function($scope, $modalInstance, flash, owner) {
+    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
         $scope.owner = owner;
 
         $scope.cancel = function () {

@@ -1,5 +1,5 @@
 xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, flash) {
+    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
         $scope.users = users;
 
         $scope.createUser = function() {
@@ -10,9 +10,9 @@ xApp
 
             modalInstance.result.then(function (model) {
                 $scope.users.push(model);
-                flash([]);
+                shareFlash([]);
             }, function() {
-                flash([]);
+                shareFlash([]);
             });
         }
 
@@ -29,9 +29,9 @@ xApp
 
             modalInstance.result.then(function (model) {
                 $scope.users[index] = model;
-                flash([]);
+                shareFlash([]);
             }, function() {
-                flash([]);
+                shareFlash([]);
             });
         }
 

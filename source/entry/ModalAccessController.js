@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalAccessController', function($scope, $modalInstance, flash, access) {
+    .controller('ModalAccessController', function($scope, $modalInstance, access) {
         $scope.access = access;
 
         $scope.cancel = function () {

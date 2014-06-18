@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, flash, user, GROUPS) {
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
         $scope.user = user;
         $scope.groups = GROUPS;
 
@@ -9,7 +9,7 @@ xApp
                     $modalInstance.close($scope.user);
                 },
                 function(err) {
-                    flash('danger', err.data);
+                    shareFlash('danger', err.data);
                 }
             );
         };

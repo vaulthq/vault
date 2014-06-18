@@ -4,7 +4,7 @@ var xApp = angular.module('xApp', [
     'ngResource',
     'ngAnimate',
     'ngCookies',
-    'flash',
+    'shareFlash',
     'ui.bootstrap',
     'ui.router',
     'chieffancypants.loadingBar',
@@ -29,7 +29,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
         .state('anon.check', {
             url: '',
             controller: function($location, AuthFactory) {
-                if (AuthFactory.getUser().id > 0) {
+                if (AuthFactory.isLoggedIn()) {
                     $location.path('/recent');
                 } else {
                     $location.path('/login');
@@ -49,7 +49,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, flash, $modal, projects) {
+            controller: function($scope, shareFlash, $modal, projects) {
                 $scope.projects = projects;
 
                 $scope.createProject = function() {
@@ -60,9 +60,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
 
                     modalInstance.result.then(function (model) {
                         $scope.projects.push(model);
-                        flash([]);
+                        shareFlash([]);
                     }, function() {
-                        flash([]);
+                        shareFlash([]);
                     });
                 }
             },
@@ -84,17 +84,27 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
         })
         .state('user.project', {
             url: '/project/:projectId',
-            templateUrl: '/t/project/entriesList.html',
-            controller: 'ProjectController',
-            resolve: {
-                projectId: function($stateParams) {
-                    return $stateParams.projectId;
+            views: {
+                'head': {
+                    templateUrl: '/t/project/pageHeader.html',
+                    controller: 'ProjectController',
+                    resolve: {
+                        projectId: function($stateParams) {
+                            return $stateParams.projectId;
+                        },
+                        projects: function(projects) {
+                            return projects;
+                        }
+                    }
                 },
-                entries: function(ProjectKeysFactory, $stateParams) {
-                    return ProjectKeysFactory.keys({id: $stateParams.projectId});
-                },
-                unsafe: function(UnsafeFactory) {
-                    return UnsafeFactory.query();
+                'content': {
+                    templateUrl: '/t/entry/list.html',
+                    controller: 'EntryController',
+                    resolve: {
+                        entries: function(ProjectKeysFactory, $stateParams) {
+                            return ProjectKeysFactory.keys({id: $stateParams.projectId});
+                        }
+                    }
                 }
             }
         });
