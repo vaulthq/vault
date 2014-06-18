@@ -1,5 +1,5 @@
 xApp
-    .controller('ProjectController', function($scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
+    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
 
         $scope.projects = projects;
         $scope.projectId = projectId;
@@ -59,6 +59,10 @@ xApp
             $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
 
             $location.path('/recent');
+        }
+
+        $scope.createEntry = function() {
+            $rootScope.$broadcast('entry:create');
         }
     })
     .factory('ProjectsFactory', function ($resource) {

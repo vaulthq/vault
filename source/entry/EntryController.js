@@ -1,7 +1,12 @@
 xApp
-    .controller('EntryController', function($scope, $modal, shareFlash, entries) {
+    .controller('EntryController', function($scope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
         $scope.entries = entries;
+        $scope.projectId = projectId;
+
+        $scope.$on('entry:create', function() {
+            $scope.createEntry();
+        });
 
         $scope.createEntry = function() {
             var modalInstance = $modal.open({
@@ -93,7 +98,7 @@ xApp
             modalInstance.result.then(function (model) {
                 shareFlash([]);
             }, function() {
-                $scope.openProject($scope.activeProject);
+                $state.reload();
                 shareFlash([]);
             });
         }
