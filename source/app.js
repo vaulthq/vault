@@ -49,8 +49,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, shareFlash, $modal, projects) {
+            controller: function($scope, shareFlash, $modal, projects, projectId) {
                 $scope.projects = projects;
+                $scope.projectId = projectId;
 
                 $scope.createProject = function() {
                     var modalInstance = $modal.open({
@@ -69,6 +70,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
             resolve: {
                 projects: function(ProjectsFactory) {
                     return ProjectsFactory.query();
+                },
+                projectId: function() {
+                    return 0;
                 }
             }
         })
@@ -101,8 +105,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
                     templateUrl: '/t/entry/list.html',
                     controller: 'EntryController',
                     resolve: {
-                        entries: function(ProjectKeysFactory, $stateParams) {
-                            return ProjectKeysFactory.keys({id: $stateParams.projectId});
+                        projectId: function($stateParams) {
+                            return $stateParams.projectId;
+                        },
+                        entries: function(ProjectKeysFactory, projectId) {
+                            return ProjectKeysFactory.keys({id: projectId});
                         }
                     }
                 }
