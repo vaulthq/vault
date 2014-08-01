@@ -49,9 +49,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, shareFlash, $modal, projects, projectId) {
+            controller: function($scope, $rootScope, shareFlash, $modal, projects, projectId) {
                 $scope.projects = projects;
-                $scope.projectId = projectId;
+                $rootScope.projectId = projectId;
 
                 $scope.createProject = function() {
                     var modalInstance = $modal.open({
@@ -93,11 +93,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
                     templateUrl: '/t/project/pageHeader.html',
                     controller: 'ProjectController',
                     resolve: {
-                        projectId: function($stateParams) {
-                            return $stateParams.projectId;
-                        },
                         projects: function(projects) {
                             return projects;
+                        },
+                        projectId: function ($stateParams) {
+                            return $stateParams.projectId;
                         }
                     }
                 },
@@ -105,11 +105,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
                     templateUrl: '/t/entry/list.html',
                     controller: 'EntryController',
                     resolve: {
-                        projectId: function($stateParams) {
-                            return $stateParams.projectId;
-                        },
                         entries: function(ProjectKeysFactory, projectId) {
                             return ProjectKeysFactory.keys({id: projectId});
+                        },
+                        projectId: function ($stateParams) {
+                            return $stateParams.projectId;
                         }
                     }
                 }

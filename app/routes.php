@@ -5,7 +5,7 @@ Route::get('/', function()
     $existing = Cookie::get('XSRF-TOKEN');
     if (is_null($existing)) {
         $value = md5(Session::token());
-        setcookie('XSRF-TOKEN', $value, time()+3600, '/', 'x.dev', false, false);
+        setcookie('XSRF-TOKEN', $value, time()+3600, '/', Config::get('app.domain'), Config::get('app.https'), false);
     }
 	return View::make('angular');
 });

@@ -55,7 +55,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'share',
+			'database'  => 'vault',
 			'username'  => 'dev',
 			'password'  => 'pass',
 			'charset'   => 'utf8',
