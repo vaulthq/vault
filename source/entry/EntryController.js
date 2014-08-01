@@ -1,8 +1,8 @@
 xApp
-    .controller('EntryController', function($scope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
+    .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
         $scope.entries = entries;
-        $scope.projectId = projectId;
+        $rootScope.projectId = projectId;
 
         $scope.$on('entry:create', function() {
             $scope.createEntry();

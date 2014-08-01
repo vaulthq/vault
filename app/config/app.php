@@ -2,6 +2,9 @@
 
 return array(
 
+    'domain' => 'vault.datajob.lt',
+    'https' => true,
+
     'cipher' => MCRYPT_RIJNDAEL_256,
 	/*
 	|--------------------------------------------------------------------------

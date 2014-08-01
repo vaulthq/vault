@@ -4,6 +4,8 @@ xApp
         $scope.projects = projects;
         $scope.projectId = projectId;
 
+        $rootScope.projectId = projectId;
+
         $scope.getProject = function() {
             return $scope.projects[getProjectIndexById($scope.projectId)];
         }
