@@ -13,9 +13,7 @@
 
 <div ui-view></div>
 
-<div id="footer">
-    <flash:messages></flash:messages>
-</div>
+<flash:messages></flash:messages>
 
 <script type="text/ng-template" id="template/modal/backdrop.html">
     <div class="modal-backdrop fade"

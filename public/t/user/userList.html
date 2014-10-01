@@ -1,7 +1,7 @@
 <div class="page-header">
     <h3>
         Manage Users
-        <p class="pull-right">
+        <p class="pull-right" ng-show="login.group == 'admin'">
             <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
                 Add a new user
             </a>
@@ -20,7 +20,7 @@
             <th>Last Name</th>
             <th>Username</th>
             <th>Group</th>
-            <th></th>
+            <th ng-show="login.group == 'admin'"></th>
         </tr>
         </thead>
         <tbody>
@@ -30,7 +30,7 @@
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>
             <td>{{ user.group | userGroup }} </td>
-            <td class="text-right">
+            <td class="text-right" ng-show="login.group == 'admin'">
                 <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>

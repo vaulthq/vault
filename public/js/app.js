@@ -597,6 +597,7 @@ angular.module('shareFlash', [])
         };
 
         $rootScope.$on('$locationChangeSuccess', emit);
+        $rootScope.$on('closeFlash', emit);
 
         var asMessage = function(level, text) {
             if (!text) {
@@ -630,13 +631,17 @@ angular.module('shareFlash', [])
 
     .directive('flashMessages', [function() {
         var directive = { restrict: 'EA', replace: true };
-        directive.template = '<div ng-repeat="m in messages" class="alert alert-{{m.level}} text-center">{{m.text}}</div>';
+        directive.template = '<div class="flash-message" ng-if="messages.length > 0"><div ng-repeat="m in messages" class="alert alert-{{m.level}} text-center" ng-click="closeFlash()">{{m.text}}</div></div>';
 
         directive.controller = ['$scope', '$rootScope', function($scope, $rootScope) {
             $rootScope.$on('flash:message', function(_, messages, done) {
                 $scope.messages = messages;
                 done();
             });
+
+            $scope.closeFlash = function() {
+                $rootScope.$emit('closeFlash');
+            }
         }];
 
         return directive;
