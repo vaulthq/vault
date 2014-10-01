@@ -21,10 +21,10 @@
                 <td>{{user.surname}}</td>
                 <td>{{user.email}}</td>
                 <td class="text-right">
-                    <a ng-click="grant($index)" class="btn btn-success btn-xs" title="Grant Access" ng-show="!canAccess($index)">
+                    <a ng-click="grant(user.id)" class="btn btn-success btn-xs" title="Grant Access" ng-show="!canAccess(user.id)">
                         <i class="glyphicon glyphicon-plus"></i>
                     </a>
-                    <a ng-click="revoke($index)" class="btn btn-danger btn-xs" title="Revoke Access" ng-show="canAccess($index)">
+                    <a ng-click="revoke(user.id)" class="btn btn-danger btn-xs" title="Revoke Access" ng-show="canAccess(user.id)">
                         <i class="glyphicon glyphicon-minus"></i>
                     </a>
                 </td>

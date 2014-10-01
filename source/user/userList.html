@@ -1,5 +1,5 @@
-<div class="page-header" style="margin: 10px 0;">
-    <h3 style="margin-top: 0">
+<div class="page-header">
+    <h3>
         Manage Users
         <p class="pull-right">
             <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
@@ -11,8 +11,9 @@
 
 <loader when="!users.$resolved"></loader>
 
-<table ng-if="users.length > 0" class="table table-hover">
-    <thead>
+<div class="content">
+    <table ng-if="users.length > 0" class="table table-hover">
+        <thead>
         <tr>
             <th>#</th>
             <th>First Name</th>
@@ -21,8 +22,8 @@
             <th>Group</th>
             <th></th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         <tr ng-repeat="user in users">
             <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
@@ -38,5 +39,6 @@
                 </a>
             </td>
         </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

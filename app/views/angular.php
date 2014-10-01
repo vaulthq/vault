@@ -3,41 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <title>Password Safe</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <script src="js/vendor.js"></script>
-    <script src="js/app.js"></script>
-    <style>
-        html {
-            position: relative;
-            min-height: 100%;
-        }
-        body {
-            margin-bottom: 52px;
-        }
-        #footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 52px;
-        }
-        #footer .alert {
-            margin: 0;
-            border-radius: 0;
-            z-index: 1060;
-            position: absolute;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/vendor_styles.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="/js/vendor.js"></script>
+    <script src="/js/app.js"></script>
     <link rel="stylesheet" href="/css/loader.css">
 </head>
 <body>
 
-<div menu></div>
-
-
-<div class="container">
-    <div ui-view></div>
-</div>
+<div ui-view></div>
 
 <div id="footer">
     <flash:messages></flash:messages>

@@ -1,5 +1,6 @@
 vendor
-key
 node_modules
 .git
 .idea
+bower_components
+node_modules

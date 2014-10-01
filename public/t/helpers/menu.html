@@ -1,19 +1,11 @@
-<nav class="navbar navbar-default navbar-static-top" role="navigation" ng-show="login.id > 0">
-    <div class="container-fluid">
+<div ng-show="login.id > 0">
         <div class="navbar-header">
-            <a class="navbar-brand" href="/#/recent">Password Safe</a>
+
         </div>
 
-        <div class="navbar-collapse" id="menu-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/#/recent">Recently Accessed</a></li>
-                <li><a href="/#/users" ng-if="login.group == 'admin'">Manage Users</a></li>
-                <li><a href="/#/history" ng-if="login.group == 'admin'">History</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#" ng-click="logout()">Logout</a></li>
-            </ul>
-            <p class="navbar-text pull-right">Signed in as <strong><a ng-click="profile()" style="cursor: pointer">{{login.email}}</a></strong> ({{ login.group | userGroup }})</p>
-        </div>
-    </div>
-</nav>
+        <ul class="nav navbar-nav">
+            <li><a href="/#/recent">Recently Accessed</a></li>
+
+
+        <p class="navbar-text pull-right">Signed in as <strong><a style="cursor: pointer"></a></strong> ()</p>
+</div>

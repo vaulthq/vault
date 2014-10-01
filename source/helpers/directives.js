@@ -5,7 +5,7 @@ xApp.
             scope: {
                 when: '='
             },
-            template: '<img src="/img/loader.gif" ng-show="when">'
+            template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
         };
     })
     .directive('clipCopy', function () {

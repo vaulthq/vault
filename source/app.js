@@ -7,7 +7,7 @@ var xApp = angular.module('xApp', [
     'shareFlash',
     'ui.bootstrap',
     'ui.router',
-    'chieffancypants.loadingBar',
+ //   'chieffancypants.loadingBar',
     'angularMoment'
 ]);
 
@@ -15,8 +15,8 @@ xApp.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$httpProvider',
-    'cfpLoadingBarProvider',
-function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvider) {
+ //   'cfpLoadingBarProvider',
+function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     $stateProvider
         .state('anon', {
@@ -49,9 +49,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, shareFlash, $modal, projects, projectId) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory) {
                 $scope.projects = projects;
                 $rootScope.projectId = projectId;
+
+                $scope.login = AuthFactory.getUser();
 
                 $scope.createProject = function() {
                     var modalInstance = $modal.open({
@@ -61,6 +63,27 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
 
                     modalInstance.result.then(function (model) {
                         $scope.projects.push(model);
+                        shareFlash([]);
+                    }, function() {
+                        shareFlash([]);
+                    });
+                }
+
+                $scope.logout = function () {
+                    AuthFactory.api().get({},function(response) {
+                        AuthFactory.logout();
+                        shareFlash('info', 'You have been logged out!');
+                        $location.path('/login');
+                    })
+                }
+
+                $scope.profile = function() {
+                    var modalInstance = $modal.open({
+                        templateUrl: '/t/user/profile.html',
+                        controller: 'ProfileController'
+                    });
+
+                    modalInstance.result.then(function () {
                         shareFlash([]);
                     }, function() {
                         shareFlash([]);
@@ -114,17 +137,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
                     }
                 }
             }
-        });
-
-    $stateProvider
-        .state('admin', {
-            abstract: true,
-            template: "<ui-view/>",
-            data: {
-                access: ['admin']
-            }
         })
-        .state('admin.users', {
+        .state('user.list', {
             url: '/users',
             templateUrl: '/t/user/userList.html',
             controller: 'UserListController',
@@ -134,7 +148,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
                 }
             }
         })
-        .state('admin.history', {
+        .state('user.history', {
             url: '/history',
             templateUrl: '/t/history/list.html',
             controller: 'HistoryController',
@@ -148,5 +162,5 @@ function($stateProvider, $urlRouterProvider, $httpProvider, cfpLoadingBarProvide
     $urlRouterProvider.otherwise('/404');
 
     $httpProvider.interceptors.push('AuthInterceptor');
-    cfpLoadingBarProvider.includeSpinner = false;
+   // cfpLoadingBarProvider.includeSpinner = false;
 }]);

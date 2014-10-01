@@ -4,13 +4,13 @@ xApp
         $scope.access = access;
         $scope.entry = entry;
 
-        $scope.canAccess = function(index) {
-            return $scope.getAccessIndex(index) != -1;
+        $scope.canAccess = function(userId) {
+            return $scope.getAccessIndex(userId) != -1;
         }
 
-        $scope.getAccessIndex = function(index) {
+        $scope.getAccessIndex = function(userId) {
             for (var i=0; i<$scope.access.length; i++) {
-                if ($scope.access[i].user_id == $scope.users[index].id) {
+                if ($scope.access[i].user_id == userId) {
                     return i;
                 }
             }
@@ -18,17 +18,17 @@ xApp
             return -1;
         }
 
-        $scope.grant = function(index) {
+        $scope.grant = function(userId) {
             ShareFactory.create({
-                user_id: $scope.users[index].id,
+                user_id: userId,
                 id: $scope.entry.id
             }, function(response) {
                 $scope.access.push(response);
             });
         }
 
-        $scope.revoke = function(index) {
-            var scopeIndex = $scope.getAccessIndex(index);
+        $scope.revoke = function(userId) {
+            var scopeIndex = $scope.getAccessIndex(userId);
             ShareFactory.delete({
                 id: $scope.access[scopeIndex].id
             }, function(response) {

@@ -1,0 +1,137 @@
+@sidebar-width: 230px;
+
+html, body {
+margin: 0;
+padding: 0;
+}
+body {
+min-width: 970px;
+}
+#footer {
+position: absolute;
+bottom: 0;
+width: 100%;
+height: 52px;
+}
+#footer .alert {
+margin: 0;
+border-radius: 0;
+z-index: 1060;
+position: absolute;
+width: 100%;
+}
+.right-content {
+position: absolute;
+left: @sidebar-width;
+top: 0;
+right: 0;
+min-width: 700px;
+}
+.no-margin {
+  margin: 0;
+}
+.project-list {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: @sidebar-width;
+  background: #3B424C;
+  border-right: 1px solid #4F565E;
+  z-index: 1;
+  .nav li {
+    line-height: 1em;
+    a {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      margin-right: 10px;
+      color: #E7EDEA;
+      text-shadow: 1px 1px 2px #373B44;
+    }
+    &.active a {
+      background: #4F565E;
+      color: #E7EDEA;
+    }
+    a:hover {
+      background: #373B44;
+    }
+  }
+  .heading {
+    text-align: center;
+    height: 56px;
+    background: #373B44;
+    border-bottom: 1px solid #4F565E;
+    padding: 1.1em;
+    a {
+      font-size: 1.3em;
+      text-transform: uppercase;
+      color: #E7EDEA;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+  .filter-input {
+    margin: 10px;
+    width: @sidebar-width - 20px;
+    background: #3B424C;
+    border: 1px solid #4F565E;
+  }
+  .ending {
+    position: absolute;
+    width: @sidebar-width;
+    bottom: 1px;
+    height: 56px;
+    border-top: 1px solid #4F565E;
+    z-index: 5;
+    a {
+      display: block;
+      height: 56px;
+      background: #373B44;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-align: center;
+      color: #E7EDEA;
+      padding-top: 18px;
+      &:hover {
+        background: #4F565E;
+        text-decoration: none;
+      }
+    }
+    ul {
+      font-size: 0;
+      padding: 0;
+      list-style-type: none;
+      margin: 0;
+      li {
+        font-size: 14px;
+        display: inline-block;
+        width: 20%;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.page-header {
+  margin: 0;
+  background: #F1F1F1;
+  padding: 15px 30px;
+  height: 56px;
+  border-bottom: 1px solid #E0E0E0;
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    color: #1A1B1F;
+  }
+}
+
+.content {
+  margin: 30px;
+}
+
+.loader {
+  margin-left: -32px;
+  margin-top: 5%;
+  padding-left: 50%;
+}

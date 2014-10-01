@@ -1,34 +1,36 @@
-<div class="page-header" style="margin: 10px 0;">
-    <h3 style="margin-top: 0">
-        Recently Accessed Items
-    </h3>
+<div class="page-header">
+    <h3>Recently Accessed Items</h3>
 </div>
 
-<table class="table table-hover" ng-show="recent.length > 0">
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Project</th>
-        <th>URL</th>
-        <th>Accessed</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tr ng-repeat="entry in recent">
-        <td>{{ entry.id }}</td>
-        <td>{{ entry.name }}</td>
-        <td>{{ entry.project_name }}</td>
-        <td>{{ entry.url }}</td>
-        <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
-        <td class="text-right">
-            <a ng-href="/#/project/{{ entry.project_id }}" class="btn btn-info btn-xs" title="Go to entry">
-                <i class="glyphicon glyphicon-chevron-right"></i>
-            </a>
-        </td>
-    </tr>
-</table>
+<div class="content">
+    <loader when="!recent.$resolved"></loader>
 
-<div ng-show="recent.length == 0">
-    There are no recently accessed items.
+    <table class="table table-hover" ng-show="recent.length > 0">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Project</th>
+            <th>URL</th>
+            <th>Accessed</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tr ng-repeat="entry in recent">
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.project_name }}</td>
+            <td>{{ entry.url }}</td>
+            <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
+            <td class="text-right">
+                <a ng-href="/#/project/{{ entry.project_id }}" class="btn btn-info btn-xs" title="Go to entry">
+                    <i class="glyphicon glyphicon-chevron-right"></i>
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <div ng-show="recent.$resolved && recent.length == 0">
+        There are no recently accessed items.
+    </div>
 </div>
