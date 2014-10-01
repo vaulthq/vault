@@ -2,7 +2,7 @@
 <html ng-app="xApp">
 <head>
     <meta charset="utf-8" />
-    <title>Password Safe</title>
+    <title>Password Vault</title>
     <link rel="stylesheet" href="/css/vendor_styles.css">
     <link rel="stylesheet" href="/css/app.css">
     <script src="/js/vendor.js"></script>
@@ -21,7 +21,6 @@
     ng-style="{'z-index': 1040 + (index && 1 || 0) + index*10}"
     ></div>
 </script>
-
 
 <script type="text/ng-template" id="template/modal/window.html">
     <div tabindex="-1" class="modal fade {{ windowClass }}" ng-class="{in: animate}" ng-style="{'z-index': 1050 + index*10, display: 'block'}" ng-click="close($event)">

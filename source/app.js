@@ -72,7 +72,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 $scope.logout = function () {
                     AuthFactory.api().get({},function(response) {
                         AuthFactory.logout();
-                        shareFlash('info', 'You have been logged out!');
                         $location.path('/login');
                     })
                 }
