@@ -8,6 +8,7 @@ var xApp = angular.module('xApp', [
     'ui.bootstrap',
     'ui.router',
  //   'chieffancypants.loadingBar',
+    'ngScrollbar',
     'angularMoment'
 ]);
 
@@ -55,6 +56,14 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                 $scope.login = AuthFactory.getUser();
 
+                $scope.projects.$promise.then(function() {
+                    $scope.broadcastProjectList();
+                });3
+
+                $scope.broadcastProjectList = function() {
+                    $scope.$broadcast('rebuild:scrollbar');
+                }
+
                 $scope.createProject = function() {
                     var modalInstance = $modal.open({
                         templateUrl: '/t/project/form.html',
@@ -63,6 +72,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                     modalInstance.result.then(function (model) {
                         $scope.projects.push(model);
+                        $scope.broadcastProjectList();
                         shareFlash([]);
                     }, function() {
                         shareFlash([]);

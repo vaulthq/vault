@@ -3,14 +3,16 @@
         <a href="/#/recent">Password Vault</a>
     </div>
 
-    <input type="text" placeholder="Filter..." class="form-control filter-input" ng-model="projectFilter.name">
+    <input type="text" placeholder="Filter..." class="form-control filter-input" ng-model="projectFilter.name" ng-change="broadcastProjectList()">
 
-    <ul class="nav nav-pills nav-stacked">
-        <li
-                ng-repeat="project in projects | filter:projectFilter"
-                ng-class="{'active': projectId == project.id}"
-                ><a href="/#/project/{{ project.id }}">{{ project.name }}</a></li>
-    </ul>
+    <div ng-scrollbar rebuild-on-resize rebuild-on="rebuild:scrollbar" class="project-scrollbar">
+        <ul class="nav nav-pills nav-stacked">
+            <li ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
+                <a href="/#/project/{{ project.id }}">{{ project.name }}</a>
+            </li>
+        </ul>
+    </div>
+
 
     <div class="ending">
         <ul>
@@ -25,12 +27,7 @@
                 </a>
             </li>
             <li>
-                <a href="/#/history" title="History">
-                    <span class="glyphicon glyphicon-flag"></span>
-                </a>
-            </li>
-            <li>
-                <a href="/#/users" title="Manage Users">
+                <a href="/#/users" title="Users & Groups">
                     <span class="glyphicon glyphicon-user"></span>
                 </a>
             </li>

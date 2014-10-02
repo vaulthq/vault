@@ -8,6 +8,7 @@ var xApp = angular.module('xApp', [
     'ui.bootstrap',
     'ui.router',
  //   'chieffancypants.loadingBar',
+    'ngScrollbar',
     'angularMoment'
 ]);
 
@@ -55,6 +56,14 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                 $scope.login = AuthFactory.getUser();
 
+                $scope.projects.$promise.then(function() {
+                    $scope.broadcastProjectList();
+                });3
+
+                $scope.broadcastProjectList = function() {
+                    $scope.$broadcast('rebuild:scrollbar');
+                }
+
                 $scope.createProject = function() {
                     var modalInstance = $modal.open({
                         templateUrl: '/t/project/form.html',
@@ -63,6 +72,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                     modalInstance.result.then(function (model) {
                         $scope.projects.push(model);
+                        $scope.broadcastProjectList();
                         shareFlash([]);
                     }, function() {
                         shareFlash([]);
@@ -163,6 +173,116 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     $httpProvider.interceptors.push('AuthInterceptor');
    // cfpLoadingBarProvider.includeSpinner = false;
 }]);
+xApp
+    .factory('Api', function($resource) {
+        var enableCustom = {
+            update: {
+                method: 'PUT', params: {id: '@id'}
+            },
+            delete: {
+                method: 'DELETE', params: {id: '@id'}
+            }
+        };
+
+        return {
+            project: $resource("/api/project/:id", null, enableCustom),
+            user: $resource("/api/user/:id", null, enableCustom)
+        }
+    });
+
+/*
+
+.factory('UsersFactory', function ($resource) {
+    return $resource("/api/user", {}, {
+        query: { method: 'GET', isArray: true },
+        create: { method: 'POST' }
+    })
+})
+    .factory('UserFactory', function ($resource) {
+        return $resource("/api/user/:id", {}, {
+            show: { method: 'GET' },
+            update: { method: 'PUT', params: {id: '@id'} },
+            delete: { method: 'DELETE', params: {id: '@id'} }
+        })
+    })
+    .factory('ProfileFactory', function ($resource) {
+        return $resource("/api/profile", {}, {
+            update: { method: 'POST' }
+        })
+    });*/
+
+xApp
+    .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, shareFlash) {
+        $scope.login = function() {
+            AuthFactory.api().save({
+                'email':    $sanitize($scope.email),
+                'password': $sanitize($scope.password)
+            }, function(response) {
+                AuthFactory.login(response);
+                $location.path('/recent');
+            }, function(response) {
+                shareFlash('danger', response.data.flash);
+            })
+        }
+    })
+
+xApp
+    .factory('AuthFactory', function($resource, $cookieStore, $rootScope) {
+        var cookieName = 'user';
+
+        var apiEndpoint = function() {
+            return $resource("/internal/auth");
+        }
+
+        var login = function(response) {
+            $cookieStore.put(cookieName, response);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        var logout = function() {
+            $cookieStore.remove(cookieName);
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        var getUser = function() {
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
+        }
+
+        var isLoggedIn = function() {
+            return getUser().id > 0;
+        }
+
+        return {
+            api: apiEndpoint,
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn
+        }
+    });
+xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
+    return {
+        'response': function(response) {
+            return response || $q.when(response);
+        },
+
+        'responseError': function(rejection) {
+            if (rejection.status === 401) {
+                var AuthFactory = $injector.get('AuthFactory');
+                if (AuthFactory.isLoggedIn()) {
+                    shareFlash('warning', 'Session has expired, please try again.');
+                }
+                AuthFactory.logout();
+                $location.path('/login');
+            }
+            if (rejection.status === 403) {
+                shareFlash('danger', 'You cannot access this resource.');
+            }
+            return $q.reject(rejection);
+        }
+    };
+});
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
@@ -437,87 +557,6 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-xApp
-    .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, shareFlash) {
-        $scope.login = function() {
-            AuthFactory.api().save({
-                'email':    $sanitize($scope.email),
-                'password': $sanitize($scope.password)
-            }, function(response) {
-                AuthFactory.login(response);
-                $location.path('/recent');
-            }, function(response) {
-                shareFlash('danger', response.data.flash);
-            })
-        }
-    })
-
-xApp
-    .factory('AuthFactory', function($resource, $cookieStore, $rootScope) {
-        var cookieName = 'user';
-
-        var apiEndpoint = function() {
-            return $resource("/internal/auth");
-        }
-
-        var login = function(response) {
-            $cookieStore.put(cookieName, response);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        var logout = function() {
-            $cookieStore.remove(cookieName);
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        var getUser = function() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
-        }
-
-        var isLoggedIn = function() {
-            return getUser().id > 0;
-        }
-
-        return {
-            api: apiEndpoint,
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn
-        }
-    });
-xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
-    return {
-        'response': function(response) {
-            return response || $q.when(response);
-        },
-
-        'responseError': function(rejection) {
-            if (rejection.status === 401) {
-                var AuthFactory = $injector.get('AuthFactory');
-                if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, please try again.');
-                }
-                AuthFactory.logout();
-                $location.path('/login');
-            }
-            if (rejection.status === 403) {
-                shareFlash('danger', 'You cannot access this resource.');
-            }
-            return $q.reject(rejection);
-        }
-    };
-});
-xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    })
 xApp.
     controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
         $scope.profile = {
@@ -655,6 +694,15 @@ angular.module('shareFlash', [])
         return directive;
     }]);
 xApp
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    })
+xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
     })
@@ -691,11 +739,12 @@ xApp
         };
     });
 xApp
-    .controller('ModalUpdateProjectController', function($scope, $modalInstance, ProjectFactory, shareFlash, project) {
+    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, shareFlash, project) {
         $scope.project = project;
 
-        $scope.ok = function () {
-            ProjectFactory.update($scope.project,
+        $scope.ok = function() {
+            Api.project.update(
+                $scope.project,
                 function() {
                     $modalInstance.close($scope.project);
                 },
@@ -738,8 +787,8 @@ xApp
                 templateUrl: '/t/project/form.html',
                 controller: 'ModalUpdateProjectController',
                 resolve: {
-                    project: function(ProjectFactory) {
-                        return ProjectFactory.show({id: $scope.getProject().id});
+                    project: function(Api) {
+                        return Api.project.get({id: $scope.getProject().id});
                     }
                 }
             });
@@ -770,6 +819,7 @@ xApp
             }
             ProjectFactory.delete({id: $scope.projectId});
             $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
+            $rootScope.$broadcast('rebuild:scrollbar');
 
             $location.path('/recent');
         }

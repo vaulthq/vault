@@ -27,8 +27,8 @@ xApp
                 templateUrl: '/t/project/form.html',
                 controller: 'ModalUpdateProjectController',
                 resolve: {
-                    project: function(ProjectFactory) {
-                        return ProjectFactory.show({id: $scope.getProject().id});
+                    project: function(Api) {
+                        return Api.project.get({id: $scope.getProject().id});
                     }
                 }
             });
@@ -59,6 +59,7 @@ xApp
             }
             ProjectFactory.delete({id: $scope.projectId});
             $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
+            $rootScope.$broadcast('rebuild:scrollbar');
 
             $location.path('/recent');
         }

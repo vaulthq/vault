@@ -2,8 +2,8 @@
     <h3>
         Manage Users
         <p class="pull-right" ng-show="login.group == 'admin'">
-            <a class="btn btn-default btn-xs" title="Add new user" ng-click="createUser()">
-                Add a new user
+            <a class="btn btn-default btn-xs" title="Add User" ng-click="createUser()">
+                Add User
             </a>
         </p>
     </h3>
@@ -15,7 +15,6 @@
     <table ng-if="users.length > 0" class="table table-hover">
         <thead>
         <tr>
-            <th>#</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
@@ -25,7 +24,6 @@
         </thead>
         <tbody>
         <tr ng-repeat="user in users">
-            <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>

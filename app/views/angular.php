@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/css/app.css">
     <script src="/js/vendor.js"></script>
     <script src="/js/app.js"></script>
-    <link rel="stylesheet" href="/css/loader.css">
 </head>
 <body>
 

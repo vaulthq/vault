@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var less = require('gulp-less');
 
@@ -8,7 +7,9 @@ var del = require('del');
 
 var paths = {
     vendor_styles: [
-        'bower_components/bootstrap/dist/css/bootstrap.min.css'
+        'bower_components/bootstrap/dist/css/bootstrap.min.css',
+        'js_vendor/ng-scrollbar/ng-scrollbar.css',
+        'styles/loader.css'
     ],
     html_templates: [
         'source/**/*.html'
@@ -25,7 +26,8 @@ var paths = {
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js',
-        'js_vendor/angular-ui-router.min.js'
+        'js_vendor/angular-ui-router.min.js',
+        'js_vendor/ng-scrollbar/ng-scrollbar.js'
     ],
     scripts: [
         'source/**/*.js'

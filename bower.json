@@ -1,0 +1,21 @@
+{
+  "name": "password-vault",
+  "version": "0.0.2",
+  "description": "Password Storage System",
+  "authors": [
+    "Valdas Kalvaitis"
+  ],
+  "license": "MIT",
+  "homepage": "www.kalvaitis.eu",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
