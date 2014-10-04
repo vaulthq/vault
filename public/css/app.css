@@ -72,31 +72,58 @@ body {
   border-top: 1px solid #4F565E;
   z-index: 5;
 }
-.project-list .ending a {
-  display: block;
-  height: 56px;
-  background: #373B44;
-  cursor: pointer;
-  text-transform: uppercase;
-  text-align: center;
-  color: #E7EDEA;
-  padding-top: 18px;
-}
-.project-list .ending a:hover {
-  background: #4F565E;
-  text-decoration: none;
-}
-.project-list .ending ul {
+.project-list .ending ul.bottom-nav {
   font-size: 0;
   padding: 0;
   list-style-type: none;
   margin: 0;
 }
-.project-list .ending ul li {
+.project-list .ending ul.bottom-nav > li {
   font-size: 14px;
   display: inline-block;
-  width: 25%;
+  width: 33%;
   margin: 0;
+}
+.project-list .ending ul.bottom-nav > li a {
+  display: block;
+  height: 56px;
+  background: #373B44;
+  cursor: pointer;
+  text-align: center;
+  color: #E7EDEA;
+  padding-top: 18px;
+}
+.project-list .ending ul.bottom-nav > li a:hover {
+  background: #4F565E;
+  text-decoration: none;
+}
+.project-list .ending ul.bottom-nav > li span.dropdown.open > a {
+  background: #4F565E;
+}
+.project-list .ending ul.bottom-nav > li:last-child {
+  width: 34%;
+}
+.project-list .ending ul.dropdown-menu {
+  bottom: 57px;
+  top: inherit;
+  position: fixed;
+  left: 0;
+  padding: 0;
+  border-radius: 0;
+  margin: 0;
+  border: none;
+  border-top: 1px solid #4F565E;
+  width: 230px;
+  background: #373B44;
+  box-shadow: none;
+}
+.project-list .ending ul.dropdown-menu li a {
+  height: 40px;
+  padding-top: 10px;
+}
+.project-list .ending ul.dropdown-menu li.divider {
+  background-color: #4F565E;
+  margin: 3px 0;
 }
 .project-scrollbar {
   height: calc(100% - 170px);

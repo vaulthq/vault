@@ -166,6 +166,10 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                     return HistoryFactory.query();
                 }
             }
+        })
+        .state('user.404', {
+            url: '/404',
+            templateUrl: '/t/error/404.html'
         });
 
     $urlRouterProvider.otherwise('/404');

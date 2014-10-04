@@ -15,23 +15,51 @@
 
 
     <div class="ending">
-        <ul>
+        <ul class="bottom-nav">
             <li>
-                <a title="Log Out ({{login.email}})" ng-click="logout()">
-                    <span class="glyphicon glyphicon-off"></span>
-                </a>
+                <span class="dropdown">
+                    <a title="Settings" class="dropdown-toggle">
+                        <span class="glyphicon glyphicon-wrench"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a title="Log Out ({{login.email}})" ng-click="logout()">
+                                <span class="glyphicon glyphicon-off"></span> Log Out
+                            </a>
+                        </li>
+                        <li>
+                            <a title="Change Account Password" ng-click="profile()">
+                                <span class="glyphicon glyphicon-asterisk"></span> Change Password
+                            </a>
+                        </li>
+                    </ul>
+                </span>
             </li>
             <li>
-                <a title="Account Settings ({{ login.group | userGroup }})" ng-click="profile()">
-                    <span class="glyphicon glyphicon-wrench"></span>
-                </a>
+                <span class="dropdown">
+                    <a title="Management" class="dropdown-toggle">
+                        <span class="glyphicon glyphicon-certificate"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li ng-show="login.group == 'admin'">
+                            <a href="/#/history" title="Action History">
+                                <span class="glyphicon glyphicon-flag"></span> Action History
+                            </a>
+                        </li>
+                        <li ng-show="login.group == 'admin'">
+                            <a href="/#/users" title="Manage Users">
+                                <span class="glyphicon glyphicon-user"></span> Manage Users
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/#/teams" title="Manage Teams">
+                                <span class="glyphicon glyphicon-text-width"></span> Manage Teams
+                            </a>
+                        </li>
+                    </ul>
+                </span>
             </li>
-            <li>
-                <a href="/#/users" title="Users & Groups">
-                    <span class="glyphicon glyphicon-user"></span>
-                </a>
-            </li>
-            <li>
+            <li class="double">
                 <a title="Create Project" ng-click="createProject()">
                     <span class="glyphicon glyphicon-plus"></span>
                 </a>
