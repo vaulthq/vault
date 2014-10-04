@@ -30,7 +30,7 @@ class Csrf
         return \Config::get('app.csrf', true);
     }
 
-    public function tokenMatches($token)
+    protected function tokenMatches($token)
     {
         if (empty($token)) {
             return false;
