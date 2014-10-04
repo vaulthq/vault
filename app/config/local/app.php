@@ -3,5 +3,5 @@
 return array(
     'domain' => 'vault.dev',
     'https' => false,
-    'csrf' => false
+    'csrf' => true
 );

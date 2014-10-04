@@ -272,10 +272,18 @@ xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
         },
 
         'responseError': function(rejection) {
-            if (rejection.status === 401) {
-                var AuthFactory = $injector.get('AuthFactory');
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 420) {
                 if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, please try again.');
+                    shareFlash('warning', 'Session has expired, re-logging in...');
+                }
+                AuthFactory.logout();
+                location.reload();
+            }
+            if (rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    shareFlash('warning', 'Session has expired, please log in.');
                 }
                 AuthFactory.logout();
                 $location.path('/login');

@@ -56,7 +56,7 @@ Route::filter('ngcsrf', function($route, $request)
     $csrf = App::make('Vault\Security\Csrf');
 
     if (!$csrf->isRequestValid($request)) {
-        return Response::json(['flash' => 'Session token expired.'], 401);
+        return Response::json(['flash' => 'Session token expired.'], 420);
     }
 });
 
