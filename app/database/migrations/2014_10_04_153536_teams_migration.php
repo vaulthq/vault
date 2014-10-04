@@ -19,7 +19,7 @@ class TeamsMigration extends Migration {
             $table->string('name', 255)->nullable();
 
             $table->integer('user_id')->unsigned();
-            $table->foreign('user_by_id')->references('id')->on('user');
+            $table->foreign('user_id')->references('id')->on('user');
 
             $table->softDeletes();
             $table->timestamps();

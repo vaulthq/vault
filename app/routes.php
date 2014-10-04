@@ -2,15 +2,12 @@
 
 Route::get('/', function()
 {
-    $existing = Cookie::get('XSRF-TOKEN');
-    if (is_null($existing)) {
-        $value = md5(Session::token());
-        setcookie('XSRF-TOKEN', $value, time()+3600, '/', Config::get('app.domain'), Config::get('app.https'), false);
-    }
+    App::make('Vault\Security\Csrf')->createCsfrCookie();
+
 	return View::make('angular');
 });
 
-//Route::group(['before' => 'ngcsrf'], function() {
+Route::group(['before' => 'ngcsrf'], function() {
     Route::group(['prefix' => 'internal'], function() {
         Route::controller('auth', 'AuthController');
     });
@@ -34,6 +31,6 @@ Route::get('/', function()
             Route::resource('history', 'HistoryController');
         });
     });
-//});
+});
 
 

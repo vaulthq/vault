@@ -1,16 +1,4 @@
 <?php
-
-/*
-|--------------------------------------------------------------------------
-| Application & Route Filters
-|--------------------------------------------------------------------------
-|
-| Below you will find the "before" and "after" events for the application
-| which may be used to do any work before or after a request into your
-| application. Here you may also register your custom route filters.
-|
-*/
-
 App::before(function($request)
 {
 	//
@@ -22,16 +10,6 @@ App::after(function($request, $response)
 	//
 });
 
-/*
-|--------------------------------------------------------------------------
-| Authentication Filters
-|--------------------------------------------------------------------------
-|
-| The following filters are used to verify that the user of the current
-| session is logged into this application. The "basic" filter easily
-| integrates HTTP Basic authentication for quick, simple checking.
-|
-*/
 
 Route::filter('auth', function()
 {
@@ -75,12 +53,10 @@ Route::filter('guest', function()
 
 Route::filter('ngcsrf', function($route, $request)
 {
-    $token = md5(Session::token());
-    $supplied = $request->header('X-XSRF-TOKEN');
+    $csrf = App::make('Vault\Security\Csrf');
 
-    if (empty($supplied) || $token != $supplied) {
+    if (!$csrf->isRequestValid($request)) {
         return Response::json(['flash' => 'Session token expired.'], 401);
-        throw new Illuminate\Session\TokenMismatchException('CSRF detected, please check your cookies.');
     }
 });
 
