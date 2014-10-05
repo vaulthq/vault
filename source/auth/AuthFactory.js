@@ -1,34 +1,48 @@
-xApp
-    .factory('AuthFactory', function($cookieStore, $rootScope) {
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', authFactory);
+
+    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
         var cookieName = 'user';
-
-        var login = function(response) {
-            $cookieStore.put(cookieName, response);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        var logout = function() {
-            $cookieStore.remove(cookieName);
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        var getUser = function() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
-        }
-
-        var isLoggedIn = function() {
-            var cookie = getUser().id > 0;
-
-            if (cookie) {
-                return true;
-            }
-        }
 
         return {
             login: login,
             logout: logout,
             getUser: getUser,
-            isLoggedIn: isLoggedIn
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin
+        };
+
+        function login(response) {
+            $cookieStore.put(cookieName, response);
+            $rootScope.$broadcast('auth:login', getUser());
         }
-    });
+
+        function logout() {
+            $cookieStore.remove(cookieName);
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password)
+            }, function (response) {
+                login(response);
+                $location.path('/recent');
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+    }
+})();

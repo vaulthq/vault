@@ -231,15 +231,56 @@ xApp
         .module('xApp')
         .controller('AuthController', authController);
 
-    function authController($scope, $location, $sanitize, Api, AuthFactory, toaster) {
+    function authController($scope, AuthFactory) {
         $scope.login = login;
 
         function login() {
+            AuthFactory.initLogin($scope.email, $scope.password);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', authFactory);
+
+    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
+        var cookieName = 'user';
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin
+        };
+
+        function login(response) {
+            $cookieStore.put(cookieName, response);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            $cookieStore.remove(cookieName);
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password) {
             Api.auth.save({
-                'email': $sanitize($scope.email),
-                'password': $sanitize($scope.password)
+                email: $sanitize(username),
+                password: $sanitize(password)
             }, function (response) {
-                AuthFactory.login(response);
+                login(response);
                 $location.path('/recent');
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
@@ -248,69 +289,48 @@ xApp
     }
 })();
 
-xApp
-    .factory('AuthFactory', function($cookieStore, $rootScope) {
-        var cookieName = 'user';
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
 
-        var login = function(response) {
-            $cookieStore.put(cookieName, response);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        var logout = function() {
-            $cookieStore.remove(cookieName);
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        var getUser = function() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
-        }
-
-        var isLoggedIn = function() {
-            var cookie = getUser().id > 0;
-
-            if (cookie) {
-                return true;
-            }
-        }
-
+    function authInterceptor($q, $injector, $location, toaster) {
         return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn
-        }
-    });
-xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
-    return {
-        'response': function(response) {
-            return response || $q.when(response);
-        },
+            response: response,
+            responseError: error
+        };
 
-        'responseError': function(rejection) {
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
             var AuthFactory = $injector.get('AuthFactory');
 
             if (rejection.status === 420) {
                 if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, re-logging in...');
+                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
                 }
                 location.reload();
             }
+
             if (rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, please log in.');
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
                 }
                 AuthFactory.logout();
                 $location.path('/login');
             }
+
             if (rejection.status === 403) {
-                shareFlash('danger', 'You cannot access this resource.');
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
             }
+
             return $q.reject(rejection);
         }
-    };
-});
+    }
+
+})();
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 

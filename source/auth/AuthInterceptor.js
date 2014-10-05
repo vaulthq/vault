@@ -1,29 +1,42 @@
-xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
-    return {
-        'response': function(response) {
-            return response || $q.when(response);
-        },
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
 
-        'responseError': function(rejection) {
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
             var AuthFactory = $injector.get('AuthFactory');
 
             if (rejection.status === 420) {
                 if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, re-logging in...');
+                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
                 }
                 location.reload();
             }
+
             if (rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
-                    shareFlash('warning', 'Session has expired, please log in.');
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
                 }
                 AuthFactory.logout();
                 $location.path('/login');
             }
+
             if (rejection.status === 403) {
-                shareFlash('danger', 'You cannot access this resource.');
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
             }
+
             return $q.reject(rejection);
         }
-    };
-});
+    }
+
+})();
