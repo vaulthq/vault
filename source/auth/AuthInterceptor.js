@@ -11,7 +11,6 @@ xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
                 if (AuthFactory.isLoggedIn()) {
                     shareFlash('warning', 'Session has expired, re-logging in...');
                 }
-                AuthFactory.logout();
                 location.reload();
             }
             if (rejection.status === 401) {

@@ -29,12 +29,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, AuthFactory) {
-                if (AuthFactory.isLoggedIn()) {
+            controller: function($location, Api, AuthFactory) {
+                Api.authStatus.get({}, function(response) {
+                    AuthFactory.login(response);
                     $location.path('/recent');
-                } else {
+                }, function() {
                     $location.path('/login');
-                }
+                });
             }
         })
         .state('anon.login', {
@@ -190,7 +191,8 @@ xApp
 
         return {
             project: $resource("/api/project/:id", null, enableCustom),
-            user: $resource("/api/user/:id", null, enableCustom)
+            user: $resource("/api/user/:id", null, enableCustom),
+            authStatus: $resource("/internal/auth/status", null)
         }
     });
 
@@ -254,7 +256,11 @@ xApp
         }
 
         var isLoggedIn = function() {
-            return getUser().id > 0;
+            var cookie = getUser().id > 0;
+
+            if (cookie) {
+                return true;
+            }
         }
 
         return {
@@ -278,7 +284,6 @@ xApp.factory('AuthInterceptor', function($q, $injector, $location, shareFlash) {
                 if (AuthFactory.isLoggedIn()) {
                     shareFlash('warning', 'Session has expired, re-logging in...');
                 }
-                AuthFactory.logout();
                 location.reload();
             }
             if (rejection.status === 401) {
@@ -715,15 +720,6 @@ xApp
         })
     })
 xApp
-    .controller('HomeController', function($scope, recent) {
-        $scope.recent = recent;
-    })
-    .factory('RecentFactory', function ($resource) {
-        return $resource("/api/recent", {}, {
-            query: { method: 'GET', isArray: true }
-        });
-    })
-xApp
     .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, shareFlash) {
         $scope.project = {};
 
@@ -859,6 +855,15 @@ xApp
             keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });
+xApp
+    .controller('HomeController', function($scope, recent) {
+        $scope.recent = recent;
+    })
+    .factory('RecentFactory', function ($resource) {
+        return $resource("/api/recent", {}, {
+            query: { method: 'GET', isArray: true }
+        });
+    })
 xApp
     .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
         $scope.user = {};

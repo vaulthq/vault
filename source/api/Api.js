@@ -11,7 +11,8 @@ xApp
 
         return {
             project: $resource("/api/project/:id", null, enableCustom),
-            user: $resource("/api/user/:id", null, enableCustom)
+            user: $resource("/api/user/:id", null, enableCustom),
+            authStatus: $resource("/internal/auth/status", null)
         }
     });
 

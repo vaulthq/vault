@@ -29,12 +29,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, AuthFactory) {
-                if (AuthFactory.isLoggedIn()) {
+            controller: function($location, Api, AuthFactory) {
+                Api.authStatus.get({}, function(response) {
+                    AuthFactory.login(response);
                     $location.path('/recent');
-                } else {
+                }, function() {
                     $location.path('/login');
-                }
+                });
             }
         })
         .state('anon.login', {

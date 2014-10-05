@@ -22,7 +22,11 @@ xApp
         }
 
         var isLoggedIn = function() {
-            return getUser().id > 0;
+            var cookie = getUser().id > 0;
+
+            if (cookie) {
+                return true;
+            }
         }
 
         return {

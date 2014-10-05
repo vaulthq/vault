@@ -20,6 +20,17 @@ class AuthController extends \BaseController
         ], 401);
     }
 
+    public function getStatus()
+    {
+        if (!Auth::guest()) {
+            return Response::json([
+                'user' => Auth::user()->toArray(),
+            ], 202);
+        }
+
+        return Response::json([], 419);
+    }
+
     public function getIndex()
     {
         History::make('auth', Auth::user()->email . ' logged out.', null);
