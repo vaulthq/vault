@@ -27,6 +27,8 @@
     </div>
 </script>
 
+<toaster-container toaster-options="{'position-class': 'toast-top-right'}"></toaster-container>
+
 </body>
 </html>
 

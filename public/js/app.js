@@ -1,5 +1,4 @@
 var xApp = angular.module('xApp', [
-    'ngRoute',
     'ngSanitize',
     'ngResource',
     'ngAnimate',
@@ -7,16 +6,15 @@ var xApp = angular.module('xApp', [
     'shareFlash',
     'ui.bootstrap',
     'ui.router',
- //   'chieffancypants.loadingBar',
     'ngScrollbar',
-    'angularMoment'
+    'angularMoment',
+    'toaster'
 ]);
 
 xApp.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$httpProvider',
- //   'cfpLoadingBarProvider',
 function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     $stateProvider
@@ -51,7 +49,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api) {
                 $scope.projects = projects;
                 $rootScope.projectId = projectId;
 
@@ -59,7 +57,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                 $scope.projects.$promise.then(function() {
                     $scope.broadcastProjectList();
-                });3
+                });
 
                 $scope.broadcastProjectList = function() {
                     $scope.$broadcast('rebuild:scrollbar');
@@ -81,7 +79,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.logout = function () {
-                    AuthFactory.api().get({},function(response) {
+                    Api.auth.get({}, function() {
                         AuthFactory.logout();
                         $location.path('/login');
                     })
@@ -168,6 +166,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
             }
         })
+        .state('user.teams', {
+            url: '/teams',
+            templateUrl: '/t/team/teamList.html',
+            controller: 'TeamListController',
+            resolve: {
+                teams: function(Api) {
+                    return Api.team.query();
+                }
+            }
+        })
         .state('user.404', {
             url: '/404',
             templateUrl: '/t/error/404.html'
@@ -176,7 +184,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     $urlRouterProvider.otherwise('/404');
 
     $httpProvider.interceptors.push('AuthInterceptor');
-   // cfpLoadingBarProvider.includeSpinner = false;
 }]);
 xApp
     .factory('Api', function($resource) {
@@ -190,8 +197,10 @@ xApp
         };
 
         return {
+            auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
+            team: $resource("/api/team/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
     });
@@ -217,28 +226,31 @@ xApp
         })
     });*/
 
-xApp
-    .controller('AuthController',function($scope, $location, $sanitize, AuthFactory, shareFlash) {
-        $scope.login = function() {
-            AuthFactory.api().save({
-                'email':    $sanitize($scope.email),
+(function() {
+    angular
+        .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, $location, $sanitize, Api, AuthFactory, toaster) {
+        $scope.login = login;
+
+        function login() {
+            Api.auth.save({
+                'email': $sanitize($scope.email),
                 'password': $sanitize($scope.password)
-            }, function(response) {
+            }, function (response) {
                 AuthFactory.login(response);
                 $location.path('/recent');
-            }, function(response) {
-                shareFlash('danger', response.data.flash);
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
             })
         }
-    })
+    }
+})();
 
 xApp
-    .factory('AuthFactory', function($resource, $cookieStore, $rootScope) {
+    .factory('AuthFactory', function($cookieStore, $rootScope) {
         var cookieName = 'user';
-
-        var apiEndpoint = function() {
-            return $resource("/internal/auth");
-        }
 
         var login = function(response) {
             $cookieStore.put(cookieName, response);
@@ -264,7 +276,6 @@ xApp
         }
 
         return {
-            api: apiEndpoint,
             login: login,
             logout: logout,
             getUser: getUser,
@@ -720,6 +731,15 @@ xApp
         })
     })
 xApp
+    .controller('HomeController', function($scope, recent) {
+        $scope.recent = recent;
+    })
+    .factory('RecentFactory', function ($resource) {
+        return $resource("/api/recent", {}, {
+            query: { method: 'GET', isArray: true }
+        });
+    })
+xApp
     .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, shareFlash) {
         $scope.project = {};
 
@@ -856,14 +876,62 @@ xApp
         })
     });
 xApp
-    .controller('HomeController', function($scope, recent) {
-        $scope.recent = recent;
-    })
-    .factory('RecentFactory', function ($resource) {
-        return $resource("/api/recent", {}, {
-            query: { method: 'GET', isArray: true }
-        });
-    })
+    .controller('ModalCreateTeamController', function($scope, $modalInstance, shareFlash, Api) {
+        $scope.team = {};
+
+        $scope.ok = function () {
+            Api.team.save($scope.team,
+                function(response) {
+                    $modalInstance.close(response);
+                },
+                function(err) {
+                    shareFlash('danger', err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
+        $scope.user = user;
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            UserFactory.update($scope.user,
+                function() {
+                    $modalInstance.close($scope.user);
+                },
+                function(err) {
+                    shareFlash('danger', err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp
+    .controller('TeamListController', function($scope, $resource, $modal, teams, shareFlash) {
+        $scope.teams = teams;
+
+        $scope.createTeam = function() {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/team/create.html',
+                controller: 'ModalCreateTeamController'
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.teams.push(model);
+                shareFlash([]);
+            }, function() {
+                shareFlash([]);
+            });
+        }
+    });
 xApp
     .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
         $scope.user = {};

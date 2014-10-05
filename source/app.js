@@ -1,5 +1,4 @@
 var xApp = angular.module('xApp', [
-    'ngRoute',
     'ngSanitize',
     'ngResource',
     'ngAnimate',
@@ -7,16 +6,15 @@ var xApp = angular.module('xApp', [
     'shareFlash',
     'ui.bootstrap',
     'ui.router',
- //   'chieffancypants.loadingBar',
     'ngScrollbar',
-    'angularMoment'
+    'angularMoment',
+    'toaster'
 ]);
 
 xApp.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$httpProvider',
- //   'cfpLoadingBarProvider',
 function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     $stateProvider
@@ -51,7 +49,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api) {
                 $scope.projects = projects;
                 $rootScope.projectId = projectId;
 
@@ -59,7 +57,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
                 $scope.projects.$promise.then(function() {
                     $scope.broadcastProjectList();
-                });3
+                });
 
                 $scope.broadcastProjectList = function() {
                     $scope.$broadcast('rebuild:scrollbar');
@@ -81,7 +79,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.logout = function () {
-                    AuthFactory.api().get({},function(response) {
+                    Api.auth.get({}, function() {
                         AuthFactory.logout();
                         $location.path('/login');
                     })
@@ -168,6 +166,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
             }
         })
+        .state('user.teams', {
+            url: '/teams',
+            templateUrl: '/t/team/teamList.html',
+            controller: 'TeamListController',
+            resolve: {
+                teams: function(Api) {
+                    return Api.team.query();
+                }
+            }
+        })
         .state('user.404', {
             url: '/404',
             templateUrl: '/t/error/404.html'
@@ -176,5 +184,4 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     $urlRouterProvider.otherwise('/404');
 
     $httpProvider.interceptors.push('AuthInterceptor');
-   // cfpLoadingBarProvider.includeSpinner = false;
 }]);

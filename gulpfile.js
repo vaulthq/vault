@@ -9,25 +9,24 @@ var paths = {
     vendor_styles: [
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
         'js_vendor/ng-scrollbar/ng-scrollbar.css',
-        'styles/loader.css'
+        'bower_components/AngularJS-Toaster/toaster.css'
     ],
     html_templates: [
         'source/**/*.html'
     ],
     vendor_scripts: [
-        'js_vendor/angular/angular.min.js',
-        'js_vendor/angular/angular-route.min.js',
-        'js_vendor/angular/angular-sanitize.min.js',
-        'js_vendor/angular/angular-resource.min.js',
-        'js_vendor/angular/angular-cookies.min.js',
-        'js_vendor/angular/angular-animate.min.js',
+        'bower_components/angular/angular.min.js',
+        'bower_components/angular-sanitize/angular-sanitize.min.js',
+        'bower_components/angular-resource/angular-resource.min.js',
+        'bower_components/angular-cookies/angular-cookies.min.js',
+        'bower_components/angular-animate/angular-animate.min.js',
         'js_vendor/ui-bs-0.10.min.js',
-        'js_vendor/loader.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js',
-        'js_vendor/angular-ui-router.min.js',
-        'js_vendor/ng-scrollbar/ng-scrollbar.js'
+        'bower_components/angular-ui-router/release/angular-ui-router.min.js',
+        'js_vendor/ng-scrollbar/ng-scrollbar.js',
+        'bower_components/AngularJS-Toaster/toaster.js'
     ],
     scripts: [
         'source/**/*.js'

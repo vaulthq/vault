@@ -1,10 +1,6 @@
 xApp
-    .factory('AuthFactory', function($resource, $cookieStore, $rootScope) {
+    .factory('AuthFactory', function($cookieStore, $rootScope) {
         var cookieName = 'user';
-
-        var apiEndpoint = function() {
-            return $resource("/internal/auth");
-        }
 
         var login = function(response) {
             $cookieStore.put(cookieName, response);
@@ -30,7 +26,6 @@ xApp
         }
 
         return {
-            api: apiEndpoint,
             login: login,
             logout: logout,
             getUser: getUser,

@@ -15,9 +15,7 @@ class AuthController extends \BaseController
             ], 202);
         }
 
-        return Response::json([
-            'flash' => trans('auth.flash.bad_credentials')
-        ], 401);
+        return Response::json(['Invalid username or password'], 401);
     }
 
     public function getStatus()

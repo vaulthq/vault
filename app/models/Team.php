@@ -20,6 +20,10 @@ class Team extends Eloquent
 
     protected $appends = ['can_edit'];
 
+    public static $rules = [
+        'name' => 'required',
+    ];
+
     public function getCanEditAttribute()
     {
         $userId = Auth::user()->id;
