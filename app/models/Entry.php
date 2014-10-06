@@ -30,7 +30,7 @@ class Entry extends Eloquent
 
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = Crypt::encrypt($value);
+        $this->attributes['password'] = Crypt::encrypt($this->fixNewLines($value));
     }
 
     public function getPasswordAttribute($value)
@@ -56,5 +56,10 @@ class Entry extends Eloquent
     public function shares()
     {
         return $this->hasMany('Share', 'entry_id');
+    }
+
+    private function fixNewLines($str)
+    {
+        return preg_replace('~\r\n?~', "\r\n", $str);
     }
 }

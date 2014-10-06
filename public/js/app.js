@@ -226,111 +226,6 @@ xApp
         })
     });*/
 
-(function() {
-    angular
-        .module('xApp')
-        .controller('AuthController', authController);
-
-    function authController($scope, AuthFactory) {
-        $scope.login = login;
-
-        function login() {
-            AuthFactory.initLogin($scope.email, $scope.password);
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthFactory', authFactory);
-
-    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
-        var cookieName = 'user';
-
-        return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn,
-            initLogin: initLogin
-        };
-
-        function login(response) {
-            $cookieStore.put(cookieName, response);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        function logout() {
-            $cookieStore.remove(cookieName);
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        function getUser() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
-        }
-
-        function isLoggedIn() {
-            return getUser().id > 0;
-        }
-
-        function initLogin(username, password) {
-            Api.auth.save({
-                email: $sanitize(username),
-                password: $sanitize(password)
-            }, function (response) {
-                login(response);
-                $location.path('/recent');
-            }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
-            })
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthInterceptor', authInterceptor);
-
-    function authInterceptor($q, $injector, $location, toaster) {
-        return {
-            response: response,
-            responseError: error
-        };
-
-        function response(response) {
-            return response || $q.when(response);
-        }
-
-        function error(rejection) {
-            var AuthFactory = $injector.get('AuthFactory');
-
-            if (rejection.status === 420) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
-                }
-                location.reload();
-            }
-
-            if (rejection.status === 401) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Please log in.');
-                }
-                AuthFactory.logout();
-                $location.path('/login');
-            }
-
-            if (rejection.status === 403) {
-                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
-            }
-
-            return $q.reject(rejection);
-        }
-    }
-
-})();
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
@@ -508,34 +403,18 @@ xApp
 xApp
     .controller('ModalGetPasswordController', function($scope, $modalInstance, password) {
         $scope.password = password;
-        $scope.hidden = {
-            password: '',
-            hash: ''
-        };
-        $scope.shown = false;
 
-        password.$promise.then(function(promise) {
-            var pass = '';
-            for (var i=0; i<promise.password.length; i++) {
-                pass += '*';
-            }
-            $scope.hidden.password = pass;
-            $scope.hidden.hash = pass;
-        }, function() {
-            $modalInstance.close();
-        });
+        $scope.shown = false;
 
         $scope.ok = function () {
             $modalInstance.close();
         };
 
         $scope.show = function() {
-            $scope.hidden.password = $scope.password.password;
             $scope.shown = true;
         }
 
         $scope.hide = function() {
-            $scope.hidden.password = $scope.hidden.hash;
             $scope.shown = false;
         }
 
@@ -605,6 +484,111 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+(function() {
+    angular
+        .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, AuthFactory) {
+        $scope.login = login;
+
+        function login() {
+            AuthFactory.initLogin($scope.email, $scope.password);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', authFactory);
+
+    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
+        var cookieName = 'user';
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin
+        };
+
+        function login(response) {
+            $cookieStore.put(cookieName, response);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            $cookieStore.remove(cookieName);
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password)
+            }, function (response) {
+                login(response);
+                $location.path('/recent');
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
+
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 420) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
+                }
+                location.reload();
+            }
+
+            if (rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
+                }
+                AuthFactory.logout();
+                $location.path('/login');
+            }
+
+            if (rejection.status === 403) {
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+})();
 xApp.
     controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
         $scope.profile = {

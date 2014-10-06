@@ -35,7 +35,8 @@ var paths = {
         'styles/**/*.less'
     ],
     vendor_fonts: [
-        'bower_components/bootstrap/dist/fonts/*'
+        'bower_components/bootstrap/dist/fonts/*',
+        'styles/fonts/*'
     ],
     cleanup: [
         'public/t',
