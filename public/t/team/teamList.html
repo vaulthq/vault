@@ -1,0 +1,40 @@
+<div class="page-header">
+    <h3>
+        Manage Teams
+        <p class="pull-right">
+            <a class="btn btn-default btn-xs" title="Create New Team" ng-click="createTeam()">
+                Create New Team
+            </a>
+        </p>
+    </h3>
+</div>
+
+<loader when="!teams.$resolved"></loader>
+
+<div class="content">
+    <table ng-if="teams.length > 0" class="table table-hover">
+        <thead>
+        <tr>
+            <th>Team Name</th>
+            <th>Owner</th>
+            <th>Created</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="team in teams">
+            <td>{{ team.name }}</td>
+            <td>{{ team.owner.email }}</td>
+            <td><span am-time-ago="team.created_at" title="{{ team.created_at }}"></span></td>
+            <td class="text-right">
+                <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
+                    <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
