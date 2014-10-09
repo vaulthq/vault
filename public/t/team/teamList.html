@@ -40,10 +40,13 @@
             </td>
             <td><span am-time-ago="team.created_at" title="{{ team.created_at }}"></span></td>
             <td class="text-right">
-                <a ng-click="update(team.id, $index)" class="btn btn-warning btn-xs" title="Update">
+                <a ng-click="members(team.id, $index)" class="btn btn-success btn-xs" title="Team Members" ng-if="team.can_edit">
+                    Manage Members
+                </a>
+                <a ng-click="update(team.id, $index)" class="btn btn-warning btn-xs" title="Update" ng-if="team.can_edit">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
-                <a ng-click="remove(team.id, $index)" class="btn btn-danger btn-xs" title="Remove">
+                <a ng-click="remove(team.id, $index)" class="btn btn-danger btn-xs" title="Remove" ng-if="team.can_edit">
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </td>

@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h3>Team Members</h3>
+</div>
+<div class="modal-body">
+    <table class="table">
+        <thead>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Email</th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.surname"></td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.email"></td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="user in users | filter:search">
+                <td>{{user.name}}</td>
+                <td>{{user.surname}}</td>
+                <td>{{user.email}}</td>
+                <td class="text-right">
+                    <a ng-click="grant(user.id)" class="btn btn-success btn-xs" title="Grant Access" ng-show="!canAccess(user.id)">
+                        <i class="glyphicon glyphicon-plus"></i>
+                    </a>
+                    <a ng-click="revoke(user.id)" class="btn btn-danger btn-xs" title="Revoke Access" ng-show="canAccess(user.id)">
+                        <i class="glyphicon glyphicon-minus"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>

@@ -9,6 +9,7 @@
             project: $resource("/api/project/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
+            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
     }

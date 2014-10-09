@@ -23,6 +23,7 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::resource('unsafe', 'UnsafeController');
         Route::resource('group', 'GroupController');
         Route::resource('team', 'TeamController');
+        Route::resource('teamMembers', 'TeamMembersController');
 
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);

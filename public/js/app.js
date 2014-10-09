@@ -185,6 +185,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             project: $resource("/api/project/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
+            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
     }
@@ -890,6 +891,7 @@ xApp
         $scope.create = create;
         $scope.update = update;
         $scope.remove = remove;
+        $scope.members = members;
 
         function create() {
             $modal.open({
@@ -923,6 +925,72 @@ xApp
                 $scope.teams.splice(index, 1);
             });
         }
+
+        function members(teamId, index) {
+            $modal.open({
+                templateUrl: '/t/team/members.html',
+                controller: 'teamMembersController',
+                resolve: {
+                    users: function(UsersFactory) {
+                        return UsersFactory.query();
+                    },
+                    access: function(Api) {
+                        return Api.teamMembers.query({id: teamId});
+                    },
+                    team: function() {
+                        return $scope.teams[index];
+                    }
+                }
+            });
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('teamMembersController', teamMembersController);
+
+    function teamMembersController($scope, $modalInstance, Api, users, access, team) {
+        $scope.users = users;
+        $scope.access = access;
+        $scope.team = team;
+
+        $scope.canAccess = function(userId) {
+            return $scope.getAccessIndex(userId) != -1;
+        }
+
+        $scope.getAccessIndex = function(userId) {
+            for (var i=0; i<$scope.access.length; i++) {
+                if ($scope.access[i].user_id == userId) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        $scope.grant = function(userId) {
+            Api.teamMembers.save({
+                user_id: userId,
+                id: $scope.team.id
+            }, function(response) {
+                $scope.access.push(response);
+            });
+        }
+
+        $scope.revoke = function(userId) {
+            var scopeIndex = $scope.getAccessIndex(userId);
+            Api.teamMembers.delete({
+                id: $scope.access[scopeIndex].id
+            }, function() {
+                $scope.access.splice(scopeIndex, 1);
+            });
+        }
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
     }
 })();
 

@@ -27,7 +27,17 @@ class Team extends Eloquent
     public function getCanEditAttribute()
     {
         $userId = Auth::user()->id;
-        return $this->user_id == $userId;
+        if ($this->user_id == $userId) { // user is owner
+            return true;
+        }
+
+        foreach ($this->users as $user) { // user belongs to team
+            if ($user->id == $userId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function owner()

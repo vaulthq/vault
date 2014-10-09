@@ -9,6 +9,7 @@
         $scope.create = create;
         $scope.update = update;
         $scope.remove = remove;
+        $scope.members = members;
 
         function create() {
             $modal.open({
@@ -40,6 +41,24 @@
             Api.team.delete({id: teamId}, function() {
                 toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
                 $scope.teams.splice(index, 1);
+            });
+        }
+
+        function members(teamId, index) {
+            $modal.open({
+                templateUrl: '/t/team/members.html',
+                controller: 'teamMembersController',
+                resolve: {
+                    users: function(UsersFactory) {
+                        return UsersFactory.query();
+                    },
+                    access: function(Api) {
+                        return Api.teamMembers.query({id: teamId});
+                    },
+                    team: function() {
+                        return $scope.teams[index];
+                    }
+                }
             });
         }
     }
