@@ -64,17 +64,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.createProject = function() {
-                    var modalInstance = $modal.open({
+                    $modal.open({
                         templateUrl: '/t/project/form.html',
                         controller: 'ModalCreateProjectController'
-                    });
-
-                    modalInstance.result.then(function (model) {
+                    }).result.then(function (model) {
                         $scope.projects.push(model);
                         $scope.broadcastProjectList();
-                        shareFlash([]);
-                    }, function() {
-                        shareFlash([]);
                     });
                 }
 
@@ -86,15 +81,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.profile = function() {
-                    var modalInstance = $modal.open({
+                    $modal.open({
                         templateUrl: '/t/user/profile.html',
                         controller: 'ProfileController'
-                    });
-
-                    modalInstance.result.then(function () {
-                        shareFlash([]);
-                    }, function() {
-                        shareFlash([]);
                     });
                 }
             },
@@ -185,17 +174,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
-xApp
-    .factory('Api', function($resource) {
-        var enableCustom = {
-            update: {
-                method: 'PUT', params: {id: '@id'}
-            },
-            delete: {
-                method: 'DELETE', params: {id: '@id'}
-            }
-        };
+(function() {
+    angular
+        .module('xApp')
+        .factory('Api', apiFactory);
 
+    function apiFactory($resource) {
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
@@ -203,28 +187,17 @@ xApp
             team: $resource("/api/team/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
-    });
+    }
 
-/*
-
-.factory('UsersFactory', function ($resource) {
-    return $resource("/api/user", {}, {
-        query: { method: 'GET', isArray: true },
-        create: { method: 'POST' }
-    })
-})
-    .factory('UserFactory', function ($resource) {
-        return $resource("/api/user/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('ProfileFactory', function ($resource) {
-        return $resource("/api/profile", {}, {
-            update: { method: 'POST' }
-        })
-    });*/
+    var enableCustom = {
+        update: {
+            method: 'PUT', params: {id: '@id'}
+        },
+        delete: {
+            method: 'DELETE', params: {id: '@id'}
+        }
+    };
+})();
 
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
@@ -744,7 +717,7 @@ xApp
         });
     })
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, shareFlash) {
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, toaster) {
         $scope.project = {};
 
         $scope.ok = function () {
@@ -753,13 +726,13 @@ xApp
                     $modalInstance.close(response);
                 },
                 function(err) {
-                    shareFlash('danger', err.data);
+                    toaster.pop('warning', 'Validation Error', err.data);
                 }
             );
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $modalInstance.dismiss();
         };
     });
 xApp
@@ -880,63 +853,6 @@ xApp
         })
     });
 xApp
-    .controller('ModalCreateTeamController', function($scope, $modalInstance, shareFlash, Api) {
-        $scope.team = {};
-
-        $scope.ok = function () {
-            Api.team.save($scope.team,
-                function(response) {
-                    $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            UserFactory.update($scope.user,
-                function() {
-                    $modalInstance.close($scope.user);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('TeamListController', function($scope, $resource, $modal, teams, shareFlash) {
-        $scope.teams = teams;
-
-        $scope.createTeam = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/team/create.html',
-                controller: 'ModalCreateTeamController'
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.teams.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        }
-    });
-xApp
     .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
@@ -1040,3 +956,108 @@ xApp
             update: { method: 'POST' }
         })
     });
+xApp
+    .controller('ModalCreateTeamController', function($scope, $modalInstance, toaster, Api) {
+        $scope.team = {};
+
+        $scope.ok = function () {
+            Api.team.save($scope.team,
+                function(response) {
+                    $modalInstance.close(response);
+                },
+                function(err) {
+                    toaster.pop('warning', 'Validation Error', err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    });
+xApp
+    .controller('ModalUpdateTeamController', function($scope, $modalInstance, Api, team, toaster) {
+        $scope.team = team;
+
+        $scope.ok = function() {
+            Api.team.update(
+                $scope.team,
+                function() {
+                    $modalInstance.close($scope.team);
+                },
+                function(err) {
+                    toaster.pop('warning', "Validation Error", err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss();
+        }
+    });
+xApp
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
+        $scope.user = user;
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            UserFactory.update($scope.user,
+                function() {
+                    $modalInstance.close($scope.user);
+                },
+                function(err) {
+                    shareFlash('danger', err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+(function() {
+    angular
+        .module('xApp')
+        .controller('TeamListController', teamListController);
+
+    function teamListController($scope, $modal, Api, toaster, teams) {
+        $scope.teams = teams;
+
+        $scope.create = create;
+        $scope.update = update;
+        $scope.remove = remove;
+
+        function create() {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'ModalCreateTeamController'
+            }).result.then(function (model) {
+                $scope.teams.push(model);
+            });
+        }
+
+        function update(teamId, index) {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'ModalUpdateTeamController',
+                resolve: {
+                    team: function(Api) {
+                        return Api.team.get({id: teamId});
+                    }
+                }
+            }).result.then(function (model) {
+                $scope.teams[index] = model;
+            });
+        }
+
+        function remove(teamId, index) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            Api.team.delete({id: teamId}, function() {
+                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
+                $scope.teams.splice(index, 1);
+            });
+        }
+    }
+})();

@@ -20,7 +20,7 @@ var paths = {
         'bower_components/angular-resource/angular-resource.min.js',
         'bower_components/angular-cookies/angular-cookies.min.js',
         'bower_components/angular-animate/angular-animate.min.js',
-        'js_vendor/ui-bs-0.10.min.js',
+        'bower_components/angular-bootstrap/ui-bootstrap.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js',

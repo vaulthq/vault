@@ -73,11 +73,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 		return $this->email;
 	}
 
-    public function share()
-    {
-        return $this->hasMany('Share', 'user_id');
-    }
-
     public function getRememberToken()
     {
         return $this->remember_token;
@@ -91,5 +86,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     public function getRememberTokenName()
     {
         return 'remember_token';
+    }
+
+    public function share()
+    {
+        return $this->hasMany('Share', 'user_id');
+    }
+
+    public function teams()
+    {
+        $this->belongsToMany('Team', 'user_team', 'team_id', 'user_id');
     }
 }

@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalCreateTeamController', function($scope, $modalInstance, shareFlash, Api) {
+    .controller('ModalCreateTeamController', function($scope, $modalInstance, toaster, Api) {
         $scope.team = {};
 
         $scope.ok = function () {
@@ -8,12 +8,12 @@ xApp
                     $modalInstance.close(response);
                 },
                 function(err) {
-                    shareFlash('danger', err.data);
+                    toaster.pop('warning', 'Validation Error', err.data);
                 }
             );
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $modalInstance.dismiss();
         };
     });

@@ -1,14 +1,9 @@
-xApp
-    .factory('Api', function($resource) {
-        var enableCustom = {
-            update: {
-                method: 'PUT', params: {id: '@id'}
-            },
-            delete: {
-                method: 'DELETE', params: {id: '@id'}
-            }
-        };
+(function() {
+    angular
+        .module('xApp')
+        .factory('Api', apiFactory);
 
+    function apiFactory($resource) {
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
@@ -16,25 +11,14 @@ xApp
             team: $resource("/api/team/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
-    });
+    }
 
-/*
-
-.factory('UsersFactory', function ($resource) {
-    return $resource("/api/user", {}, {
-        query: { method: 'GET', isArray: true },
-        create: { method: 'POST' }
-    })
-})
-    .factory('UserFactory', function ($resource) {
-        return $resource("/api/user/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('ProfileFactory', function ($resource) {
-        return $resource("/api/profile", {}, {
-            update: { method: 'POST' }
-        })
-    });*/
+    var enableCustom = {
+        update: {
+            method: 'PUT', params: {id: '@id'}
+        },
+        delete: {
+            method: 'DELETE', params: {id: '@id'}
+        }
+    };
+})();

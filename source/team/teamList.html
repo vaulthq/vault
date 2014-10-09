@@ -2,7 +2,7 @@
     <h3>
         Manage Teams
         <p class="pull-right">
-            <a class="btn btn-default btn-xs" title="Create New Team" ng-click="createTeam()">
+            <a class="btn btn-default btn-xs" title="Create New Team" ng-click="create()">
                 Create New Team
             </a>
         </p>
@@ -17,20 +17,33 @@
         <tr>
             <th>Team Name</th>
             <th>Owner</th>
+            <th>Members</th>
             <th>Created</th>
             <th></th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="team in teams">
+        <tr>
+            <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr ng-repeat="team in teams | filter:search">
             <td>{{ team.name }}</td>
             <td>{{ team.owner.email }}</td>
+            <td>
+                <ul class="list-inline">
+                    <li ng-repeat="user in team.users">{{ user.email }}</li>
+                </ul>
+            </td>
             <td><span am-time-ago="team.created_at" title="{{ team.created_at }}"></span></td>
             <td class="text-right">
-                <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
+                <a ng-click="update(team.id, $index)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
-                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
+                <a ng-click="remove(team.id, $index)" class="btn btn-danger btn-xs" title="Remove">
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </td>

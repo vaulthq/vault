@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, shareFlash) {
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, toaster) {
         $scope.project = {};
 
         $scope.ok = function () {
@@ -8,12 +8,12 @@ xApp
                     $modalInstance.close(response);
                 },
                 function(err) {
-                    shareFlash('danger', err.data);
+                    toaster.pop('warning', 'Validation Error', err.data);
                 }
             );
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $modalInstance.dismiss();
         };
     });

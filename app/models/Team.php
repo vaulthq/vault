@@ -34,4 +34,9 @@ class Team extends Eloquent
     {
         return $this->belongsTo('User', 'user_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany('User', 'user_team', 'team_id', 'user_id');
+    }
 }

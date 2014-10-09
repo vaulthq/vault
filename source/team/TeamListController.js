@@ -1,18 +1,46 @@
-xApp
-    .controller('TeamListController', function($scope, $resource, $modal, teams, shareFlash) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('TeamListController', teamListController);
+
+    function teamListController($scope, $modal, Api, toaster, teams) {
         $scope.teams = teams;
 
-        $scope.createTeam = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/team/create.html',
-                controller: 'ModalCreateTeamController'
-            });
+        $scope.create = create;
+        $scope.update = update;
+        $scope.remove = remove;
 
-            modalInstance.result.then(function (model) {
+        function create() {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'ModalCreateTeamController'
+            }).result.then(function (model) {
                 $scope.teams.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
             });
         }
-    });
+
+        function update(teamId, index) {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'ModalUpdateTeamController',
+                resolve: {
+                    team: function(Api) {
+                        return Api.team.get({id: teamId});
+                    }
+                }
+            }).result.then(function (model) {
+                $scope.teams[index] = model;
+            });
+        }
+
+        function remove(teamId, index) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            Api.team.delete({id: teamId}, function() {
+                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
+                $scope.teams.splice(index, 1);
+            });
+        }
+    }
+})();

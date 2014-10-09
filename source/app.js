@@ -64,17 +64,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.createProject = function() {
-                    var modalInstance = $modal.open({
+                    $modal.open({
                         templateUrl: '/t/project/form.html',
                         controller: 'ModalCreateProjectController'
-                    });
-
-                    modalInstance.result.then(function (model) {
+                    }).result.then(function (model) {
                         $scope.projects.push(model);
                         $scope.broadcastProjectList();
-                        shareFlash([]);
-                    }, function() {
-                        shareFlash([]);
                     });
                 }
 
@@ -86,15 +81,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
                 }
 
                 $scope.profile = function() {
-                    var modalInstance = $modal.open({
+                    $modal.open({
                         templateUrl: '/t/user/profile.html',
                         controller: 'ProfileController'
-                    });
-
-                    modalInstance.result.then(function () {
-                        shareFlash([]);
-                    }, function() {
-                        shareFlash([]);
                     });
                 }
             },

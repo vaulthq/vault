@@ -23,6 +23,8 @@
     "angular-resource": "~1.2.26",
     "angular-cookies": "~1.2.26",
     "angular-sanitize": "~1.2.26",
-    "AngularJS-Toaster": "~0.4.8"
+    "AngularJS-Toaster": "~0.4.8",
+    "angular-modal-service": "~0.3.0",
+    "angular-bootstrap": "~0.11.2"
   }
 }
