@@ -35,6 +35,10 @@
                 toaster.pop('error', "Forbidden", 'You cannot access this resource.');
             }
 
+            if (rejection.status === 419) {
+                toaster.pop('warning', "Validation Error", rejection.data);
+            }
+
             return $q.reject(rejection);
         }
     }

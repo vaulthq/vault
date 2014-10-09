@@ -91,7 +91,7 @@ class TeamController extends \BaseController {
         $model = Team::findOrFail($data->id);
 
         if (!$model->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+            return Response::json('', 403);
         }
 
         $model->name = $data->name;

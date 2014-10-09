@@ -199,6 +199,115 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     };
 })();
 
+(function() {
+    angular
+        .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, AuthFactory) {
+        $scope.login = login;
+
+        function login() {
+            AuthFactory.initLogin($scope.email, $scope.password);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', authFactory);
+
+    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
+        var cookieName = 'user';
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin
+        };
+
+        function login(response) {
+            $cookieStore.put(cookieName, response);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            $cookieStore.remove(cookieName);
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var fromCookie = $cookieStore.get(cookieName) || [];
+            return fromCookie.user || [];
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password)
+            }, function (response) {
+                login(response);
+                $location.path('/recent');
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
+
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 420) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
+                }
+                location.reload();
+            }
+
+            if (rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
+                }
+                AuthFactory.logout();
+                $location.path('/login');
+            }
+
+            if (rejection.status === 403) {
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
+            }
+
+            if (rejection.status === 419) {
+                toaster.pop('warning', "Validation Error", rejection.data);
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+})();
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
@@ -457,111 +566,6 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-(function() {
-    angular
-        .module('xApp')
-        .controller('AuthController', authController);
-
-    function authController($scope, AuthFactory) {
-        $scope.login = login;
-
-        function login() {
-            AuthFactory.initLogin($scope.email, $scope.password);
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthFactory', authFactory);
-
-    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
-        var cookieName = 'user';
-
-        return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn,
-            initLogin: initLogin
-        };
-
-        function login(response) {
-            $cookieStore.put(cookieName, response);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        function logout() {
-            $cookieStore.remove(cookieName);
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        function getUser() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
-        }
-
-        function isLoggedIn() {
-            return getUser().id > 0;
-        }
-
-        function initLogin(username, password) {
-            Api.auth.save({
-                email: $sanitize(username),
-                password: $sanitize(password)
-            }, function (response) {
-                login(response);
-                $location.path('/recent');
-            }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
-            })
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthInterceptor', authInterceptor);
-
-    function authInterceptor($q, $injector, $location, toaster) {
-        return {
-            response: response,
-            responseError: error
-        };
-
-        function response(response) {
-            return response || $q.when(response);
-        }
-
-        function error(rejection) {
-            var AuthFactory = $injector.get('AuthFactory');
-
-            if (rejection.status === 420) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
-                }
-                location.reload();
-            }
-
-            if (rejection.status === 401) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Please log in.');
-                }
-                AuthFactory.logout();
-                $location.path('/login');
-            }
-
-            if (rejection.status === 403) {
-                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
-            }
-
-            return $q.reject(rejection);
-        }
-    }
-
-})();
 xApp.
     controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
         $scope.profile = {
@@ -852,6 +856,99 @@ xApp
             keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });
+(function() {
+    angular
+        .module('xApp')
+        .controller('createTeamController', createTeamController);
+
+    function createTeamController($scope, $modalInstance, Api) {
+        $scope.team = {};
+
+        $scope.ok = save;
+        $scope.cancel = cancel;
+
+        function save() {
+            Api.team.save($scope.team, function(response) {
+                $modalInstance.close(response);
+            });
+        }
+
+        function cancel() {
+            $modalInstance.dismiss();
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('TeamListController', teamListController);
+
+    function teamListController($scope, $modal, Api, toaster, teams) {
+        $scope.teams = teams;
+
+        $scope.create = create;
+        $scope.update = update;
+        $scope.remove = remove;
+
+        function create() {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'createTeamController'
+            }).result.then(function (model) {
+                $scope.teams.push(model);
+            });
+        }
+
+        function update(teamId, index) {
+            $modal.open({
+                templateUrl: '/t/team/form.html',
+                controller: 'updateTeamController',
+                resolve: {
+                    team: function(Api) {
+                        return Api.team.get({id: teamId});
+                    }
+                }
+            }).result.then(function (model) {
+                $scope.teams[index] = model;
+            });
+        }
+
+        function remove(teamId, index) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            Api.team.delete({id: teamId}, function() {
+                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
+                $scope.teams.splice(index, 1);
+            });
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('updateTeamController', updateTeamController);
+
+    function updateTeamController($scope, $modalInstance, Api, team) {
+        $scope.team = team;
+
+        $scope.ok = update;
+        $scope.cancel = cancel;
+
+        function update() {
+            Api.team.update($scope.team, function() {
+                $modalInstance.close($scope.team);
+            });
+        }
+
+        function cancel() {
+            $modalInstance.dismiss();
+        }
+    }
+})();
+
 xApp
     .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
         $scope.user = {};
@@ -956,108 +1053,3 @@ xApp
             update: { method: 'POST' }
         })
     });
-xApp
-    .controller('ModalCreateTeamController', function($scope, $modalInstance, toaster, Api) {
-        $scope.team = {};
-
-        $scope.ok = function () {
-            Api.team.save($scope.team,
-                function(response) {
-                    $modalInstance.close(response);
-                },
-                function(err) {
-                    toaster.pop('warning', 'Validation Error', err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    });
-xApp
-    .controller('ModalUpdateTeamController', function($scope, $modalInstance, Api, team, toaster) {
-        $scope.team = team;
-
-        $scope.ok = function() {
-            Api.team.update(
-                $scope.team,
-                function() {
-                    $modalInstance.close($scope.team);
-                },
-                function(err) {
-                    toaster.pop('warning', "Validation Error", err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function() {
-            $modalInstance.dismiss();
-        }
-    });
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            UserFactory.update($scope.user,
-                function() {
-                    $modalInstance.close($scope.user);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-(function() {
-    angular
-        .module('xApp')
-        .controller('TeamListController', teamListController);
-
-    function teamListController($scope, $modal, Api, toaster, teams) {
-        $scope.teams = teams;
-
-        $scope.create = create;
-        $scope.update = update;
-        $scope.remove = remove;
-
-        function create() {
-            $modal.open({
-                templateUrl: '/t/team/form.html',
-                controller: 'ModalCreateTeamController'
-            }).result.then(function (model) {
-                $scope.teams.push(model);
-            });
-        }
-
-        function update(teamId, index) {
-            $modal.open({
-                templateUrl: '/t/team/form.html',
-                controller: 'ModalUpdateTeamController',
-                resolve: {
-                    team: function(Api) {
-                        return Api.team.get({id: teamId});
-                    }
-                }
-            }).result.then(function (model) {
-                $scope.teams[index] = model;
-            });
-        }
-
-        function remove(teamId, index) {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-            Api.team.delete({id: teamId}, function() {
-                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
-                $scope.teams.splice(index, 1);
-            });
-        }
-    }
-})();

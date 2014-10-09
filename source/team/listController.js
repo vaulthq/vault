@@ -13,7 +13,7 @@
         function create() {
             $modal.open({
                 templateUrl: '/t/team/form.html',
-                controller: 'ModalCreateTeamController'
+                controller: 'createTeamController'
             }).result.then(function (model) {
                 $scope.teams.push(model);
             });
@@ -22,7 +22,7 @@
         function update(teamId, index) {
             $modal.open({
                 templateUrl: '/t/team/form.html',
-                controller: 'ModalUpdateTeamController',
+                controller: 'updateTeamController',
                 resolve: {
                     team: function(Api) {
                         return Api.team.get({id: teamId});
