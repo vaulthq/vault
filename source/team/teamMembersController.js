@@ -3,45 +3,42 @@
         .module('xApp')
         .controller('teamMembersController', teamMembersController);
 
-    function teamMembersController($scope, $modalInstance, Api, users, access, team) {
+    function teamMembersController($rootScope, $scope, $modalInstance, Api, users, access, team) {
         $scope.users = users;
         $scope.access = access;
         $scope.team = team;
 
-        $scope.canAccess = function(userId) {
-            return $scope.getAccessIndex(userId) != -1;
+        $scope.canAccess = function(user) {
+            return getAccessIndexForUserId(user.id) != -1;
         }
 
-        $scope.getAccessIndex = function(userId) {
-            for (var i=0; i<$scope.access.length; i++) {
-                if ($scope.access[i].user_id == userId) {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        $scope.grant = function(userId) {
+        $scope.grant = function(user) {
             Api.teamMembers.save({
-                user_id: userId,
+                user_id: user.id,
                 id: $scope.team.id
             }, function(response) {
                 $scope.access.push(response);
+                $rootScope.$broadcast('teamMemberAdded', {member: user, team: $scope.team});
             });
         }
 
-        $scope.revoke = function(userId) {
-            var scopeIndex = $scope.getAccessIndex(userId);
+        $scope.revoke = function(user) {
+            var accessIndex = getAccessIndexForUserId(user.id);
+
             Api.teamMembers.delete({
-                id: $scope.access[scopeIndex].id
+                id: $scope.access[accessIndex].id
             }, function() {
-                $scope.access.splice(scopeIndex, 1);
+                $scope.access.splice(accessIndex, 1);
+                $rootScope.$broadcast('teamMemberRemoved', {userId: user.id, team: $scope.team});
             });
         }
 
         $scope.cancel = function () {
             $modalInstance.dismiss();
         };
+
+        function getAccessIndexForUserId(userId) {
+            return $scope.access.map(function (e) { return e.user_id; }).indexOf(userId);
+        }
     }
 })();

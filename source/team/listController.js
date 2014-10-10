@@ -3,13 +3,16 @@
         .module('xApp')
         .controller('TeamListController', teamListController);
 
-    function teamListController($scope, $modal, Api, toaster, teams) {
+    function teamListController($rootScope, $scope, $modal, $filter, Api, toaster, teams) {
         $scope.teams = teams;
 
         $scope.create = create;
         $scope.update = update;
         $scope.remove = remove;
         $scope.members = members;
+
+        $rootScope.$on('teamMemberAdded', onTeamMemberAdded);
+        $rootScope.$on('teamMemberRemoved', onTeamMemberRemoved);
 
         function create() {
             $modal.open({
@@ -34,13 +37,13 @@
             });
         }
 
-        function remove(teamId, index) {
+        function remove(team) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            Api.team.delete({id: teamId}, function() {
-                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[index].name + '" has been deleted.');
-                $scope.teams.splice(index, 1);
+            Api.team.delete({id: team.id}, function() {
+                toaster.pop('info', "Team Deleted", 'Team "' + team.name + '" has been deleted.');
+                $scope.teams.splice($scope.teams.indexOf(team), 1);
             });
         }
 
@@ -60,6 +63,16 @@
                     }
                 }
             });
+        }
+
+        function onTeamMemberAdded(event, data) {
+            $scope.teams[$scope.teams.indexOf(data.team)].users.push(data.member);
+        }
+
+        function onTeamMemberRemoved(event, data) {
+            var teamIndex = $scope.teams.indexOf(data.team);
+            var users = $scope.teams[teamIndex].users;
+            users.splice(users.map(function (e) { return e.id; }).indexOf(data.userId), 1);
         }
     }
 })();

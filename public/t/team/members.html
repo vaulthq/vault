@@ -2,29 +2,32 @@
     <h3>Team Members</h3>
 </div>
 <div class="modal-body">
-    <table class="table">
+
+    <loader when="!users.$resolved || !access.$resolved"></loader>
+
+    <table class="table" ng-show="users.$resolved && access.$resolved">
         <thead>
+            <th>Email</th>
             <th>Name</th>
             <th>Surname</th>
-            <th>Email</th>
             <th></th>
         </thead>
         <tbody>
             <tr>
+                <td><input type="text" class="form-control input-sm" ng-model="search.email"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.surname"></td>
-                <td><input type="text" class="form-control input-sm" ng-model="search.email"></td>
                 <td></td>
             </tr>
             <tr ng-repeat="user in users | filter:search">
+                <td>{{user.email}}</td>
                 <td>{{user.name}}</td>
                 <td>{{user.surname}}</td>
-                <td>{{user.email}}</td>
                 <td class="text-right">
-                    <a ng-click="grant(user.id)" class="btn btn-success btn-xs" title="Grant Access" ng-show="!canAccess(user.id)">
+                    <a ng-click="grant(user)" class="btn btn-success btn-xs" title="Grant Access" ng-show="!canAccess(user)">
                         <i class="glyphicon glyphicon-plus"></i>
                     </a>
-                    <a ng-click="revoke(user.id)" class="btn btn-danger btn-xs" title="Revoke Access" ng-show="canAccess(user.id)">
+                    <a ng-click="revoke(user)" class="btn btn-danger btn-xs" title="Revoke Access" ng-show="canAccess(user)">
                         <i class="glyphicon glyphicon-minus"></i>
                     </a>
                 </td>
