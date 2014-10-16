@@ -704,15 +704,6 @@ angular.module('shareFlash', [])
         return directive;
     }]);
 xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    })
-xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
     })
@@ -722,44 +713,40 @@ xApp
         });
     })
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory, toaster) {
-        $scope.project = {};
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    })
+xApp
+    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
+        $scope.user = {};
+        $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            ProjectsFactory.create($scope.project,
+            UsersFactory.create($scope.user,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    toaster.pop('warning', 'Validation Error', err.data);
                 }
             );
         };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    });
-xApp
-    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
-        $scope.owner = owner;
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
     });
 xApp
-    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, shareFlash, project) {
-        $scope.project = project;
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, user, GROUPS) {
+        $scope.user = user;
+        $scope.groups = GROUPS;
 
-        $scope.ok = function() {
-            Api.project.update(
-                $scope.project,
+        $scope.ok = function () {
+            UserFactory.update($scope.user,
                 function() {
-                    $modalInstance.close($scope.project);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
+                    $modalInstance.close($scope.user);
                 }
             );
         };
@@ -769,92 +756,67 @@ xApp
         };
     });
 xApp
-    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
+    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
+        $scope.users = users;
 
-        $scope.projects = projects;
-        $scope.projectId = projectId;
-
-        $rootScope.projectId = projectId;
-
-        $scope.getProject = function() {
-            return $scope.projects[getProjectIndexById($scope.projectId)];
-        }
-
-        var getProjectIndexById = function(projectId) {
-            for (var p in $scope.projects) {
-                if ($scope.projects[p].id == projectId) {
-                    return p;
-                }
-            }
-        }
-
-        $scope.setProject = function(model) {
-            return $scope.projects[getProjectIndexById(model.id)] = model;
-        }
-
-        $scope.updateProject = function() {
+        $scope.createUser = function() {
             var modalInstance = $modal.open({
-                templateUrl: '/t/project/form.html',
-                controller: 'ModalUpdateProjectController',
-                resolve: {
-                    project: function(Api) {
-                        return Api.project.get({id: $scope.getProject().id});
-                    }
-                }
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalCreateUserController'
             });
 
             modalInstance.result.then(function (model) {
-                $scope.setProject(model);
+                $scope.users.push(model);
                 shareFlash([]);
             }, function() {
                 shareFlash([]);
             });
         }
 
-        $scope.projectOwnerInfo = function() {
-            $modal.open({
-                templateUrl: '/t/project/owner.html',
-                controller: 'ModalProjectOwnerController',
+        $scope.updateUser = function(index) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalUpdateUserController',
                 resolve: {
-                    owner: function(UserFactory) {
-                        return UserFactory.show({id: $scope.getProject().user_id});
+                    user: function(UserFactory) {
+                        return UserFactory.show({id: $scope.users[index].id});
                     }
                 }
             });
+
+            modalInstance.result.then(function (model) {
+                $scope.users[index] = model;
+                shareFlash([]);
+            }, function() {
+                shareFlash([]);
+            });
         }
 
-        $scope.deleteProject = function() {
+        $scope.deleteUser = function(index) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            ProjectFactory.delete({id: $scope.projectId});
-            $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $rootScope.$broadcast('rebuild:scrollbar');
-
-            $location.path('/recent');
-        }
-
-        $scope.createEntry = function() {
-            $rootScope.$broadcast('entry:create');
+            UserFactory.delete({id: $scope.users[index].id}, function() {
+                $scope.users.splice(index, 1);
+            });
         }
     })
-    .factory('ProjectsFactory', function ($resource) {
-        return $resource("/api/project", {}, {
+    .factory('UsersFactory', function ($resource) {
+        return $resource("/api/user", {}, {
             query: { method: 'GET', isArray: true },
             create: { method: 'POST' }
         })
     })
-    .factory('ProjectFactory', function ($resource) {
-        return $resource("/api/project/:id", {}, {
+    .factory('UserFactory', function ($resource) {
+        return $resource("/api/user/:id", {}, {
             show: { method: 'GET' },
             update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} },
-            keys: { method: 'GET', params: {id: '@id'} }
+            delete: { method: 'DELETE', params: {id: '@id'} }
         })
     })
-    .factory('ProjectKeysFactory', function ($resource) {
-        return $resource("/api/project/keys/:id", {}, {
-            keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
+    .factory('ProfileFactory', function ($resource) {
+        return $resource("/api/profile", {}, {
+            update: { method: 'POST' }
         })
     });
 (function() {
@@ -1028,37 +990,38 @@ xApp
 })();
 
 xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
-        $scope.user = {};
-        $scope.groups = GROUPS;
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory) {
+        $scope.project = {};
 
         $scope.ok = function () {
-            UsersFactory.create($scope.user,
+            ProjectsFactory.create($scope.project,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    });
+xApp
+    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
+        $scope.owner = owner;
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
     });
 xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, shareFlash, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
+    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, project) {
+        $scope.project = project;
 
-        $scope.ok = function () {
-            UserFactory.update($scope.user,
+        $scope.ok = function() {
+            Api.project.update(
+                $scope.project,
                 function() {
-                    $modalInstance.close($scope.user);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
+                    $modalInstance.close($scope.project);
                 }
             );
         };
@@ -1068,66 +1031,91 @@ xApp
         };
     });
 xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
-        $scope.users = users;
+    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
 
-        $scope.createUser = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalCreateUserController'
-            });
+        $scope.projects = projects;
+        $scope.projectId = projectId;
 
-            modalInstance.result.then(function (model) {
-                $scope.users.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
+        $rootScope.projectId = projectId;
+
+        $scope.getProject = function() {
+            return $scope.projects[getProjectIndexById($scope.projectId)];
         }
 
-        $scope.updateUser = function(index) {
+        var getProjectIndexById = function(projectId) {
+            for (var p in $scope.projects) {
+                if ($scope.projects[p].id == projectId) {
+                    return p;
+                }
+            }
+        }
+
+        $scope.setProject = function(model) {
+            return $scope.projects[getProjectIndexById(model.id)] = model;
+        }
+
+        $scope.updateProject = function() {
             var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalUpdateUserController',
+                templateUrl: '/t/project/form.html',
+                controller: 'ModalUpdateProjectController',
                 resolve: {
-                    user: function(UserFactory) {
-                        return UserFactory.show({id: $scope.users[index].id});
+                    project: function(Api) {
+                        return Api.project.get({id: $scope.getProject().id});
                     }
                 }
             });
 
             modalInstance.result.then(function (model) {
-                $scope.users[index] = model;
+                $scope.setProject(model);
                 shareFlash([]);
             }, function() {
                 shareFlash([]);
             });
         }
 
-        $scope.deleteUser = function(index) {
+        $scope.projectOwnerInfo = function() {
+            $modal.open({
+                templateUrl: '/t/project/owner.html',
+                controller: 'ModalProjectOwnerController',
+                resolve: {
+                    owner: function(UserFactory) {
+                        return UserFactory.show({id: $scope.getProject().user_id});
+                    }
+                }
+            });
+        }
+
+        $scope.deleteProject = function() {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            UserFactory.delete({id: $scope.users[index].id}, function() {
-                $scope.users.splice(index, 1);
-            });
+            ProjectFactory.delete({id: $scope.projectId});
+            $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
+            $rootScope.$broadcast('rebuild:scrollbar');
+
+            $location.path('/recent');
+        }
+
+        $scope.createEntry = function() {
+            $rootScope.$broadcast('entry:create');
         }
     })
-    .factory('UsersFactory', function ($resource) {
-        return $resource("/api/user", {}, {
+    .factory('ProjectsFactory', function ($resource) {
+        return $resource("/api/project", {}, {
             query: { method: 'GET', isArray: true },
             create: { method: 'POST' }
         })
     })
-    .factory('UserFactory', function ($resource) {
-        return $resource("/api/user/:id", {}, {
+    .factory('ProjectFactory', function ($resource) {
+        return $resource("/api/project/:id", {}, {
             show: { method: 'GET' },
             update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
+            delete: { method: 'DELETE', params: {id: '@id'} },
+            keys: { method: 'GET', params: {id: '@id'} }
         })
     })
-    .factory('ProfileFactory', function ($resource) {
-        return $resource("/api/profile", {}, {
-            update: { method: 'POST' }
+    .factory('ProjectKeysFactory', function ($resource) {
+        return $resource("/api/project/keys/:id", {}, {
+            keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });

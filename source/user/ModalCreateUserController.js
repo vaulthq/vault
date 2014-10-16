@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, shareFlash, GROUPS) {
+    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
 
@@ -7,9 +7,6 @@ xApp
             UsersFactory.create($scope.user,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };
