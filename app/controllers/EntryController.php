@@ -22,21 +22,6 @@ class EntryController extends \BaseController
 
         History::make('entry', 'Created new entry.', $model->id);
 
-        if (Input::has('group_access')) {
-            $access = new GroupAccess();
-            $access->entry_id = $model->id;
-            $log = [];
-
-            foreach (Input::get('group_access') as $key => $item) {
-                $access->{$key} = $item;
-                $log[] = User::$groups[$key] . ': ' . ($item == 1 ? "Allow" : "Deny");
-            }
-
-            $access->save();
-
-            History::make('group_access', 'Changed group access. ' . implode(', ', $log).'.', $model->id);
-        }
-
         return $model;
     }
 
@@ -48,7 +33,7 @@ class EntryController extends \BaseController
 	 */
 	public function show($id)
 	{
-		return Entry::with('groupAccess')->findOrFail($id);
+		return Entry::findOrFail($id);
 	}
 
 	/**
@@ -76,58 +61,13 @@ class EntryController extends \BaseController
         if (isset($data->password)) {
             History::make('entry_p', 'Updated entry password.', $model->id);
 
-            $this->sendUpdateNotification($model);
-
             $model->password = $data->password;
-        }
-
-        if (isset($data->group_access)) {
-            $access = $model->groupAccess;
-            $log = [];
-
-            foreach (User::$groups as $group => $name) {
-                if ($access->{$group} != $data->group_access->{$group}) {
-                    $log[] = User::$groups[$group] . ': ' . ($data->group_access->{$group} == 1 ? "Allow" : "Deny");
-                }
-                $access->{$group} = $data->group_access->{$group};
-            }
-
-            if (sizeof($log) > 0) {
-                History::make('group_access', 'Changed group access. ' . implode(', ', $log).'.', $model->id);
-            }
-
-            $access->save();
         }
 
         $model->save();
 
         return $model;
 	}
-
-    private function sendUpdateNotification(Entry $entry)
-    {
-        $users = DB::table('history')
-            ->select('user.email')
-            ->distinct()
-            ->leftJoin('user', 'user.id', '=', 'history.user_id')
-            ->where('history.model', 'password')
-            ->where('history.model_id', $entry->id)
-            ->whereNull('user.deleted_at')
-            ->get();
-
-        foreach ($users as $user) {
-            $validator = Validator::make(['email' => $user->email], ['email' => 'email']);
-
-            if ($validator->fails()) {
-                continue;
-            }
-
-            Mail::send('emails.entry', ['model' => $entry], function($message) use ($entry, $user)
-            {
-                $message->to($user->email)->subject('Entry #' . $entry->id . ' had password changed!');
-            });
-        }
-    }
 
 	/**
 	 * Remove the specified resource from storage.
@@ -173,21 +113,6 @@ class EntryController extends \BaseController
         $users = [];
         $added = [];
 
-        if (isset($model->groupAccess->id)) {
-            foreach (User::$groups as $group => $name) {
-                if (!$model->groupAccess->{$group}) {
-                    continue;
-                }
-                foreach (User::where('group', $group)->get() as $user) {
-                    if (in_array($user->id, $added)) {
-                        continue;
-                    }
-                    $users[] = $user->toArray();
-                    $added[] = $user->id;
-                }
-            }
-        }
-
         foreach ($model->shares()->get() as $share) {
             if (!in_array($share->user_id, $added)) {
                 $users[] = $share->user->toArray();
@@ -197,6 +122,21 @@ class EntryController extends \BaseController
 
         if (!in_array($model->owner->id, $added)) {
             $users[] = $model->owner->toArray();
+            $added[] = $model->owner->id;
+        }
+
+        foreach ($model->project->teams()->with('users')->get() as $team) {
+            if (!in_array($team->user_id, $added)) {
+                $users[] = $team->owner->toArray();
+                $added[] = $team->user_id;
+            }
+
+            foreach ($team->users as $user) {
+                if (!in_array($user->id, $added)) {
+                    $users[] = $user->toArray();
+                    $added[] = $user->id;
+                }
+            }
         }
 
         return $users;

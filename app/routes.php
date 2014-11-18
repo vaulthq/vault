@@ -20,7 +20,6 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::resource('user', 'UserController');
         Route::resource('recent', 'RecentController');
         Route::resource('share', 'ShareController');
-        Route::resource('unsafe', 'UnsafeController');
         Route::resource('group', 'GroupController');
         Route::resource('team', 'TeamController');
         Route::resource('teamMembers', 'TeamMembersController');
