@@ -49,4 +49,9 @@ class Team extends Eloquent
     {
         return $this->belongsToMany('User', 'user_team', 'team_id', 'user_id');
     }
+
+    public function projects()
+    {
+        return $this->belongsToMany('Project', 'project_team', 'team_id', 'project_id');
+    }
 }

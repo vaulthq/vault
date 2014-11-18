@@ -10,6 +10,7 @@
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
+            projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null)
         }
     }

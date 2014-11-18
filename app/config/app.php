@@ -111,7 +111,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 
-        'Vault\Storage\StorageServiceProvider'
+        'Vault\AccessServiceProvider'
 
 	),
 
@@ -178,6 +178,8 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
+
+		'Access'            => 'Vault\Facades\Access'
 
 	),
 

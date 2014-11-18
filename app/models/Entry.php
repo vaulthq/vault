@@ -7,25 +7,15 @@ class Entry extends Eloquent
     use SoftDeletingTrait;
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
 	protected $table = 'entry';
-
     protected $hidden = [
         'deleted_at', 'password'
     ];
-
     protected $appends = ['can_edit'];
 
     public function getCanEditAttribute()
     {
-        $userId = Auth::user()->id;
-        return $this->user_id == $userId
-            || (isset($this->groupAccess->id) && $this->groupAccess->{Auth::user()->group} == true)
-            || Share::where('user_id', $userId)->where('entry_id', $this->id)->count() > 0;
+        return Access::userCanAccessEntry($this);
     }
 
     public function setPasswordAttribute($value)
@@ -61,5 +51,24 @@ class Entry extends Eloquent
     private function fixNewLines($str)
     {
         return preg_replace('~\r\n?~', "\r\n", $str);
+    }
+
+    private function belongsToUserTeam($userId)
+    {
+        $teams = $this->project->teams()->with('users')->get();
+
+        foreach ($teams as $team) {
+            if ($team->user_id == $userId) {
+                return true;
+            }
+
+            foreach ($team->users as $user) {
+                if ($user->id == $userId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

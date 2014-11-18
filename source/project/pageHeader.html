@@ -1,7 +1,10 @@
 <div class="page-header">
     <h3>
         {{ getProject().name }} <small>{{ getProject().description }}</small>
-        <p class="pull-right">
+        <p class="pull-right" ng-if="projects.$resolved">
+            <a class="btn btn-success btn-xs" title="Share to Team" ng-click="projectTeams()" ng-if="getProject().can_edit">
+                <i class="glyphicon glyphicon-share"></i>
+            </a>
             <a class="btn btn-warning btn-xs" title="Edit project" ng-click="updateProject()" ng-if="getProject().can_edit">
                 <i class="glyphicon glyphicon-edit"></i>
             </a>

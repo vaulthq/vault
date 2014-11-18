@@ -6,9 +6,11 @@ xApp
 
         $rootScope.projectId = projectId;
 
+        $scope.projectTeams = teams;
+
         $scope.getProject = function() {
             return $scope.projects[getProjectIndexById($scope.projectId)];
-        }
+        };
 
         var getProjectIndexById = function(projectId) {
             for (var p in $scope.projects) {
@@ -16,11 +18,11 @@ xApp
                     return p;
                 }
             }
-        }
+        };
 
         $scope.setProject = function(model) {
             return $scope.projects[getProjectIndexById(model.id)] = model;
-        }
+        };
 
         $scope.updateProject = function() {
             var modalInstance = $modal.open({
@@ -38,6 +40,24 @@ xApp
                 shareFlash([]);
             }, function() {
                 shareFlash([]);
+            });
+        };
+
+        function teams() {
+            $modal.open({
+                templateUrl: '/t/project-team/teams.html',
+                controller: 'ProjectTeamController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.team.query();
+                    },
+                    access: function(Api) {
+                        return Api.projectTeams.query({id: $scope.getProject().id});
+                    },
+                    project: function() {
+                        return $scope.getProject();
+                    }
+                }
             });
         }
 

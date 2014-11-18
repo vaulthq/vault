@@ -21,7 +21,7 @@
             }).result.then(function (model) {
                 $scope.teams.push(model);
             });
-        }
+        };
 
         function update(teamId, index) {
             $modal.open({
@@ -35,7 +35,7 @@
             }).result.then(function (model) {
                 $scope.teams[index] = model;
             });
-        }
+        };
 
         function remove(team) {
             if (!confirm('Are you sure?')) {
@@ -45,7 +45,7 @@
                 toaster.pop('info', "Team Deleted", 'Team "' + team.name + '" has been deleted.');
                 $scope.teams.splice($scope.teams.indexOf(team), 1);
             });
-        }
+        };
 
         function members(teamId, index) {
             $modal.open({
@@ -63,7 +63,7 @@
                     }
                 }
             });
-        }
+        };
 
         function onTeamMemberAdded(event, data) {
             $scope.teams[$scope.teams.indexOf(data.team)].users.push(data.member);

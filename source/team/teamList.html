@@ -9,9 +9,9 @@
     </h3>
 </div>
 
-<loader when="!teams.$resolved"></loader>
-
 <div class="content">
+    <loader when="!teams.$resolved"></loader>
+
     <table ng-if="teams.length > 0" class="table table-hover">
         <thead>
         <tr>
@@ -53,4 +53,8 @@
         </tr>
         </tbody>
     </table>
+
+    <div ng-if="teams.$resolved && teams.length == 0">
+        Currently there are no teams. Be first to create one!
+    </div>
 </div>

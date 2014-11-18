@@ -16,8 +16,6 @@ class Project extends Eloquent
 
     protected $appends = ['can_edit'];
 
-
-
     protected $hidden = [
         'deleted_at'
     ];
@@ -34,5 +32,10 @@ class Project extends Eloquent
     public function getCanEditAttribute()
     {
         return $this->user_id == Auth::user()->id;
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany('Team', 'project_team', 'project_id', 'team_id');
     }
 }

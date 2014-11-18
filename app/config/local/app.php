@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'domain' => 'vault.dev',
+    'domain' => 'x-share.dev',
     'https' => false,
     'csrf' => false
 );
