@@ -177,6 +177,33 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 (function() {
     angular
         .module('xApp')
+        .factory('Api', apiFactory);
+
+    function apiFactory($resource) {
+        return {
+            auth: $resource("/internal/auth"),
+            project: $resource("/api/project/:id", null, enableCustom),
+            user: $resource("/api/user/:id", null, enableCustom),
+            team: $resource("/api/team/:id", null, enableCustom),
+            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
+            projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
+            authStatus: $resource("/internal/auth/status", null)
+        }
+    }
+
+    var enableCustom = {
+        update: {
+            method: 'PUT', params: {id: '@id'}
+        },
+        delete: {
+            method: 'DELETE', params: {id: '@id'}
+        }
+    };
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .controller('AuthController', authController);
 
     function authController($scope, AuthFactory) {
@@ -283,33 +310,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     }
 
 })();
-(function() {
-    angular
-        .module('xApp')
-        .factory('Api', apiFactory);
-
-    function apiFactory($resource) {
-        return {
-            auth: $resource("/internal/auth"),
-            project: $resource("/api/project/:id", null, enableCustom),
-            user: $resource("/api/user/:id", null, enableCustom),
-            team: $resource("/api/team/:id", null, enableCustom),
-            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
-            projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
-            authStatus: $resource("/internal/auth/status", null)
-        }
-    }
-
-    var enableCustom = {
-        update: {
-            method: 'PUT', params: {id: '@id'}
-        },
-        delete: {
-            method: 'DELETE', params: {id: '@id'}
-        }
-    };
-})();
-
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
@@ -451,7 +451,7 @@ xApp
         return $resource("/api/unsafe", {}, {
             query: { method: 'GET', isArray: true  }
         })
-    })
+    });
 
 xApp
     .controller('ModalAccessController', function($scope, $modalInstance, access) {
@@ -462,12 +462,10 @@ xApp
         };
     });
 xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id, GROUPS) {
+    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id) {
         $scope.entry = {
-            project_id: project_id,
-            group_access: {}
+            project_id: project_id
         };
-        $scope.groups = GROUPS;
 
         $scope.ok = function () {
             EntriesFactory.create($scope.entry,
@@ -705,6 +703,15 @@ angular.module('shareFlash', [])
         return directive;
     }]);
 xApp
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    })
+xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
     })
@@ -863,6 +870,49 @@ xApp
             keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectTeamController', teamController);
+
+    function teamController($scope, $modalInstance, Api, teams, project, access) {
+        $scope.teams = teams;
+        $scope.access = access;
+        $scope.project = project;
+
+        $scope.canAccess = function(team) {
+            return getAccessIndexForUserId(team.id) != -1;
+        };
+
+        $scope.grant = function(team) {
+            Api.projectTeams.save({
+                team_id: team.id,
+                project_id: $scope.project.id
+            }, function (response) {
+                $scope.access.push(response);
+            });
+        };
+
+        $scope.revoke = function(team) {
+            var accessIndex = getAccessIndexForUserId(team.id);
+
+            Api.projectTeams.delete({
+                id: $scope.access[accessIndex].id
+            }, function() {
+                $scope.access.splice(accessIndex, 1);
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+
+        function getAccessIndexForUserId(teamId) {
+            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
+        };
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
@@ -1034,15 +1084,6 @@ xApp
 })();
 
 xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    })
-xApp
     .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
@@ -1140,45 +1181,3 @@ xApp
             update: { method: 'POST' }
         })
     });
-(function() {
-    angular
-        .module('xApp')
-        .controller('ProjectTeamController', teamController);
-
-    function teamController($scope, $modalInstance, Api, teams, project, access) {
-        $scope.teams = teams;
-        $scope.access = access;
-        $scope.project = project;
-
-        $scope.canAccess = function(team) {
-            return getAccessIndexForUserId(team.id) != -1;
-        }
-
-        $scope.grant = function(team) {
-            Api.projectTeams.save({
-                team_id: team.id,
-                project_id: $scope.project.id
-            }, function(response) {
-                $scope.access.push(response);
-            });
-        }
-
-        $scope.revoke = function(team) {
-            var accessIndex = getAccessIndexForUserId(team.id);
-
-            Api.projectTeams.delete({
-                id: $scope.access[accessIndex].id
-            }, function() {
-                $scope.access.splice(accessIndex, 1);
-            });
-        }
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-
-        function getAccessIndexForUserId(teamId) {
-            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
-        }
-    }
-})();

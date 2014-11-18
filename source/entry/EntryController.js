@@ -139,4 +139,4 @@ xApp
         return $resource("/api/unsafe", {}, {
             query: { method: 'GET', isArray: true  }
         })
-    })
+    });

@@ -1,10 +1,8 @@
 xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id, GROUPS) {
+    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id) {
         $scope.entry = {
-            project_id: project_id,
-            group_access: {}
+            project_id: project_id
         };
-        $scope.groups = GROUPS;
 
         $scope.ok = function () {
             EntriesFactory.create($scope.entry,
