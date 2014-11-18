@@ -83,6 +83,12 @@ class UserController extends \BaseController
             History::make('reassign', 'Assigning entry #'.$item->id.'.', $item->id);
         }
 
+        foreach (Team::where('user_id', $model->id)->get() as $item) {
+            $item->user_id = Auth::user()->id;
+            $item->save();
+            History::make('reassign', 'Assigning team #'.$item->id.'.', $item->id);
+        }
+
         $model->delete();
     }
 
