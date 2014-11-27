@@ -6,4 +6,4 @@ xApp
         return $resource("/api/recent", {}, {
             query: { method: 'GET', isArray: true }
         });
-    })
+    });

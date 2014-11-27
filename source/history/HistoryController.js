@@ -6,4 +6,4 @@ xApp
         return $resource("/api/history", {}, {
             query: { method: 'GET', isArray: true }
         })
-    })
+    });

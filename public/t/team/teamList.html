@@ -16,7 +16,6 @@
         <thead>
         <tr>
             <th>Team Name</th>
-            <th>Owner</th>
             <th>Members</th>
             <th>Created</th>
             <th></th>
@@ -28,13 +27,12 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
         </tr>
         <tr ng-repeat="team in teams | filter:search">
             <td>{{ team.name }}</td>
-            <td>{{ team.owner.email }}</td>
             <td>
                 <ul class="list-inline">
+                    <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
                     <li ng-repeat="user in team.users">{{ user.email }}</li>
                 </ul>
             </td>
