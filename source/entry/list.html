@@ -12,7 +12,15 @@
             <th></th>
         </tr>
         </thead>
-        <tr ng-repeat="entry in entries" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
+        <tr class="filter-row">
+            <td></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr ng-repeat="entry in entries | filter:seach" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
             <td>{{ entry.id }}</td>
             <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
             <td><span title="{{entry.note}}">{{ entry.url }}</span></td>

@@ -202,3 +202,14 @@ body {
   padding-bottom: 10px;
   border: 1px solid #E0E0E0;
 }
+.table > thead > tr.filter-row > th,
+.table > tbody > tr.filter-row > th,
+.table > tfoot > tr.filter-row > th,
+.table > thead > tr.filter-row > td,
+.table > tbody > tr.filter-row > td,
+.table > tfoot > tr.filter-row > td {
+  padding: 5px;
+}
+.list-inline {
+  margin-bottom: 0px;
+}
