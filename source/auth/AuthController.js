@@ -7,7 +7,7 @@
         $scope.login = login;
 
         function login() {
-            AuthFactory.initLogin($scope.email, $scope.password);
+            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
         }
     }
 })();

@@ -194,3 +194,11 @@ body {
   font-weight: normal;
   font-style: normal;
 }
+.form-signin {
+  background: #F1F1F1;
+  max-width: 340px;
+  margin-top: 170px;
+  padding: 30px;
+  padding-bottom: 10px;
+  border: 1px solid #E0E0E0;
+}

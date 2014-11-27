@@ -1,9 +1,9 @@
 (function() {
     angular
         .module('xApp')
-        .factory('AuthFactory', authFactory);
+        .factory('AuthFactory', auth);
 
-    function authFactory($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
+    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
         var cookieName = 'user';
 
         return {
@@ -33,10 +33,11 @@
             return getUser().id > 0;
         }
 
-        function initLogin(username, password) {
+        function initLogin(username, password, remember) {
             Api.auth.save({
                 email: $sanitize(username),
-                password: $sanitize(password)
+                password: $sanitize(password),
+                remember: $sanitize(remember)
             }, function (response) {
                 login(response);
                 $location.path('/recent');

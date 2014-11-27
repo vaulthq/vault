@@ -8,7 +8,7 @@ class AuthController extends \BaseController
             'password' => Input::get('password')
         ];
 
-        if (Auth::attempt($credentials, true)) {
+        if (Auth::attempt($credentials, Input::get('remember'))) {
             History::make('auth', Auth::user()->email . ' logged in.', null);
             return Response::json([
                 'user' => Auth::user()->toArray(),
