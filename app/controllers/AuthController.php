@@ -26,7 +26,7 @@ class AuthController extends \BaseController
             ], 202);
         }
 
-        return Response::json([], 419);
+        return Response::json([], 405);
     }
 
     public function getIndex()
