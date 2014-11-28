@@ -20,7 +20,7 @@
             <td></td>
             <td></td>
         </tr>
-        <tr ng-repeat="entry in entries | filter:seach" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
+        <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
             <td>{{ entry.id }}</td>
             <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
             <td><span title="{{entry.note}}">{{ entry.url }}</span></td>

@@ -21,6 +21,7 @@
                 <td>{{team.name}}</td>
                 <td>
                     <ul class="list-inline">
+                        <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
                         <li ng-repeat="user in team.users">{{ user.email }}</li>
                     </ul>
                 </td>
