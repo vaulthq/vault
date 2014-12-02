@@ -23,7 +23,7 @@
             });
         };
 
-        function update(teamId, index) {
+        function update(teamId) {
             $modal.open({
                 templateUrl: '/t/team/form.html',
                 controller: 'updateTeamController',
@@ -33,21 +33,22 @@
                     }
                 }
             }).result.then(function (model) {
-                $scope.teams[index] = model;
+                $scope.teams[$scope.teams.map(function(e) {return e.id}).indexOf(teamId)] = model;
             });
         };
 
-        function remove(team) {
+        function remove(teamId) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            Api.team.delete({id: team.id}, function() {
-                toaster.pop('info', "Team Deleted", 'Team "' + team.name + '" has been deleted.');
-                $scope.teams.splice($scope.teams.indexOf(team), 1);
+            Api.team.delete({id: teamId}, function() {
+                var teamIndex = $scope.teams.map(function(e) {return e.id}).indexOf(teamId);
+                toaster.pop('info', "Team Deleted", 'Team "' + $scope.teams[teamIndex].name + '" has been deleted.');
+                $scope.teams.splice(teamIndex, 1);
             });
         };
 
-        function members(teamId, index) {
+        function members(teamId) {
             $modal.open({
                 templateUrl: '/t/team/members.html',
                 controller: 'teamMembersController',
@@ -59,7 +60,7 @@
                         return Api.teamMembers.query({id: teamId});
                     },
                     team: function() {
-                        return $scope.teams[index];
+                        return $scope.teams[$scope.teams.map(function(c) {return c.id}).indexOf(teamId)];
                     }
                 }
             });
