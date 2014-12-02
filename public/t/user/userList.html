@@ -35,10 +35,10 @@
             <td>{{ user.surname }} </td>
             <td>{{ user.group | userGroup }} </td>
             <td class="text-right" ng-show="login.group == 'admin'">
-                <a ng-click="updateUser($index)" class="btn btn-warning btn-xs" title="Update">
+                <a ng-click="updateUser(user.id)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
-                <a ng-click="deleteUser($index)" class="btn btn-danger btn-xs" title="Remove">
+                <a ng-click="deleteUser(user.id)" class="btn btn-danger btn-xs" title="Remove">
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </td>

@@ -16,31 +16,31 @@ xApp
             });
         }
 
-        $scope.updateUser = function(index) {
+        $scope.updateUser = function(userId) {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
                 controller: 'ModalUpdateUserController',
                 resolve: {
                     user: function(UserFactory) {
-                        return UserFactory.show({id: $scope.users[index].id});
+                        return UserFactory.show({id: userId});
                     }
                 }
             });
 
             modalInstance.result.then(function (model) {
-                $scope.users[index] = model;
+                $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
                 shareFlash([]);
             }, function() {
                 shareFlash([]);
             });
         }
 
-        $scope.deleteUser = function(index) {
+        $scope.deleteUser = function(userId) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            UserFactory.delete({id: $scope.users[index].id}, function() {
-                $scope.users.splice(index, 1);
+            UserFactory.delete({id: userId}, function() {
+                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
             });
         }
     })
