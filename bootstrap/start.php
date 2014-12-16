@@ -24,11 +24,11 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
+	$env = $app->detectEnvironment(array(
 
-	'local' => array('Valdass-MacBook-Pro.local', 'PC1129', 'homestead'),
+		'local' => array('Valdass-MacBook-Pro.local', 'PC1129', 'homestead', 'PC1124'),
 
-));
+	));
 
 /*
 |--------------------------------------------------------------------------
