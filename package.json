@@ -1,0 +1,22 @@
+{
+  "name": "vault",
+  "version": "0.0.0",
+  "description": "Password save and share system.",
+  "main": "gulpfile.js",
+  "scripts": {
+    "setup": "bower install ; gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@pm.datajob.lt:datadog/vault.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "~3.8.10",
+    "gulp-concat": "~2.4.2",
+    "gulp-uglify": "~1.0.2",
+    "gulp-less": "~2.0.1",
+    "del": "~1.1.0"
+  }
+}

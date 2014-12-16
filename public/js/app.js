@@ -177,6 +177,33 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 (function() {
     angular
         .module('xApp')
+        .factory('Api', apiFactory);
+
+    function apiFactory($resource) {
+        return {
+            auth: $resource("/internal/auth"),
+            project: $resource("/api/project/:id", null, enableCustom),
+            user: $resource("/api/user/:id", null, enableCustom),
+            team: $resource("/api/team/:id", null, enableCustom),
+            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
+            projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
+            authStatus: $resource("/internal/auth/status", null)
+        }
+    }
+
+    var enableCustom = {
+        update: {
+            method: 'PUT', params: {id: '@id'}
+        },
+        delete: {
+            method: 'DELETE', params: {id: '@id'}
+        }
+    };
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .controller('AuthController', authController);
 
     function authController($scope, AuthFactory) {
@@ -284,142 +311,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
     }
 
 })();
-xApp.
-    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
-        $scope.profile = {
-            old: '',
-            new: '',
-            repeat: ''
-        };
-
-        $scope.ok = function () {
-            ProfileFactory.update($scope.profile,
-                function() {
-                    $modalInstance.close();
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp.constant('GROUPS', {
-    admin: 'Administrator',
-    dev: 'Developer',
-    tester: 'Tester',
-    pm: 'Project Manager'
-});
-xApp.
-    directive('loader', function() {
-        return {
-            restrict: 'E',
-            scope: {
-                when: '='
-            },
-            template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
-        };
-    })
-    .directive('clipCopy', function () {
-        return {
-            scope: {
-                clipCopy: '&',
-                clipClick: '&'
-            },
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                // Create the clip object
-                var clip = new ZeroClipboard(element);
-                clip.on( 'load', function(client) {
-                    var onDataRequested = function (client) {
-                        client.setText(scope.$eval(scope.clipCopy));
-                        if (angular.isDefined(attrs.clipClick)) {
-                            scope.$apply(scope.clipClick);
-                        }
-                    };
-                    client.on('dataRequested', onDataRequested);
-
-                    scope.$on('$destroy', function() {
-                        client.off('dataRequested', onDataRequested);
-                        client.unclip(element);
-                    });
-                });
-            }
-        };
-    });
-xApp.
-    filter('userGroup', function(GROUPS) {
-        return function(input) {
-            return GROUPS[input];
-        }
-    });
-angular.module('shareFlash', [])
-    .factory('shareFlash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
-        var messages = [];
-
-        var reset;
-        var cleanup = function() {
-            $timeout.cancel(reset);
-            reset = $timeout(function() { messages = []; });
-        };
-
-        var emit = function() {
-            $rootScope.$emit('flash:message', messages, cleanup);
-        };
-
-        $rootScope.$on('$locationChangeSuccess', emit);
-        $rootScope.$on('closeFlash', emit);
-
-        var asMessage = function(level, text) {
-            if (!text) {
-                text = level;
-                level = 'success';
-            }
-            return { level: level, text: text };
-        };
-
-        var asArrayOfMessages = function(level, text) {
-            if (level instanceof Array) return level.map(function(message) {
-                return message.text ? message : asMessage(message);
-            });
-            return text ? [{ level: level, text: text }] : [asMessage(level)];
-        };
-
-        var flash = function(level, text) {
-            if (level == []) {
-                emit([]);
-                return;
-            }
-            emit(messages = asArrayOfMessages(level, text));
-        };
-
-        ['error', 'warning', 'info', 'success'].forEach(function (level) {
-            flash[level] = function (text) { flash(level, text); };
-        });
-
-        return flash;
-    }])
-
-    .directive('flashMessages', [function() {
-        var directive = { restrict: 'EA', replace: true };
-        directive.template = '<div class="flash-message" ng-if="messages.length > 0"><div ng-repeat="m in messages" class="alert alert-{{m.level}} text-center" ng-click="closeFlash()">{{m.text}}</div></div>';
-
-        directive.controller = ['$scope', '$rootScope', function($scope, $rootScope) {
-            $rootScope.$on('flash:message', function(_, messages, done) {
-                $scope.messages = messages;
-                done();
-            });
-
-            $scope.closeFlash = function() {
-                $rootScope.$emit('closeFlash');
-            }
-        }];
-
-        return directive;
-    }]);
 xApp
     .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
 
@@ -676,33 +567,151 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-(function() {
-    angular
-        .module('xApp')
-        .factory('Api', apiFactory);
+xApp.
+    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
+        $scope.profile = {
+            old: '',
+            new: '',
+            repeat: ''
+        };
 
-    function apiFactory($resource) {
+        $scope.ok = function () {
+            ProfileFactory.update($scope.profile,
+                function() {
+                    $modalInstance.close();
+                },
+                function(err) {
+                    shareFlash('danger', err.data);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp.constant('GROUPS', {
+    admin: 'Administrator',
+    dev: 'Developer',
+    tester: 'Tester',
+    pm: 'Project Manager'
+});
+xApp.
+    directive('loader', function() {
         return {
-            auth: $resource("/internal/auth"),
-            project: $resource("/api/project/:id", null, enableCustom),
-            user: $resource("/api/user/:id", null, enableCustom),
-            team: $resource("/api/team/:id", null, enableCustom),
-            teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
-            projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
-            authStatus: $resource("/internal/auth/status", null)
-        }
-    }
+            restrict: 'E',
+            scope: {
+                when: '='
+            },
+            template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
+        };
+    })
+    .directive('clipCopy', function () {
+        return {
+            scope: {
+                clipCopy: '&',
+                clipClick: '&'
+            },
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                // Create the clip object
+                var clip = new ZeroClipboard(element);
+                clip.on( 'load', function(client) {
+                    var onDataRequested = function (client) {
+                        client.setText(scope.$eval(scope.clipCopy));
+                        if (angular.isDefined(attrs.clipClick)) {
+                            scope.$apply(scope.clipClick);
+                        }
+                    };
+                    client.on('dataRequested', onDataRequested);
 
-    var enableCustom = {
-        update: {
-            method: 'PUT', params: {id: '@id'}
-        },
-        delete: {
-            method: 'DELETE', params: {id: '@id'}
+                    scope.$on('$destroy', function() {
+                        client.off('dataRequested', onDataRequested);
+                        client.unclip(element);
+                    });
+                });
+            }
+        };
+    });
+xApp.
+    filter('userGroup', function(GROUPS) {
+        return function(input) {
+            return GROUPS[input];
         }
-    };
-})();
+    });
+angular.module('shareFlash', [])
+    .factory('shareFlash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+        var messages = [];
 
+        var reset;
+        var cleanup = function() {
+            $timeout.cancel(reset);
+            reset = $timeout(function() { messages = []; });
+        };
+
+        var emit = function() {
+            $rootScope.$emit('flash:message', messages, cleanup);
+        };
+
+        $rootScope.$on('$locationChangeSuccess', emit);
+        $rootScope.$on('closeFlash', emit);
+
+        var asMessage = function(level, text) {
+            if (!text) {
+                text = level;
+                level = 'success';
+            }
+            return { level: level, text: text };
+        };
+
+        var asArrayOfMessages = function(level, text) {
+            if (level instanceof Array) return level.map(function(message) {
+                return message.text ? message : asMessage(message);
+            });
+            return text ? [{ level: level, text: text }] : [asMessage(level)];
+        };
+
+        var flash = function(level, text) {
+            if (level == []) {
+                emit([]);
+                return;
+            }
+            emit(messages = asArrayOfMessages(level, text));
+        };
+
+        ['error', 'warning', 'info', 'success'].forEach(function (level) {
+            flash[level] = function (text) { flash(level, text); };
+        });
+
+        return flash;
+    }])
+
+    .directive('flashMessages', [function() {
+        var directive = { restrict: 'EA', replace: true };
+        directive.template = '<div class="flash-message" ng-if="messages.length > 0"><div ng-repeat="m in messages" class="alert alert-{{m.level}} text-center" ng-click="closeFlash()">{{m.text}}</div></div>';
+
+        directive.controller = ['$scope', '$rootScope', function($scope, $rootScope) {
+            $rootScope.$on('flash:message', function(_, messages, done) {
+                $scope.messages = messages;
+                done();
+            });
+
+            $scope.closeFlash = function() {
+                $rootScope.$emit('closeFlash');
+            }
+        }];
+
+        return directive;
+    }]);
+xApp
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    });
 xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
@@ -862,15 +871,6 @@ xApp
             keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });
-xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    });
 (function() {
     angular
         .module('xApp')
@@ -914,104 +914,6 @@ xApp
     }
 })();
 
-xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
-        $scope.user = {};
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            UsersFactory.create($scope.user,
-                function(response) {
-                    $modalInstance.close(response);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            UserFactory.update($scope.user,
-                function() {
-                    $modalInstance.close($scope.user);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
-        $scope.users = users;
-
-        $scope.createUser = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalCreateUserController'
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.users.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        }
-
-        $scope.updateUser = function(userId) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalUpdateUserController',
-                resolve: {
-                    user: function(UserFactory) {
-                        return UserFactory.show({id: userId});
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        }
-
-        $scope.deleteUser = function(userId) {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-            UserFactory.delete({id: userId}, function() {
-                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
-            });
-        }
-    })
-    .factory('UsersFactory', function ($resource) {
-        return $resource("/api/user", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('UserFactory', function ($resource) {
-        return $resource("/api/user/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('ProfileFactory', function ($resource) {
-        return $resource("/api/profile", {}, {
-            update: { method: 'POST' }
-        })
-    });
 (function() {
     angular
         .module('xApp')
@@ -1191,3 +1093,102 @@ xApp
         }
     }
 })();
+
+xApp
+    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
+        $scope.user = {};
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            UsersFactory.create($scope.user,
+                function(response) {
+                    $modalInstance.close(response);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, user, GROUPS) {
+        $scope.user = user;
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            UserFactory.update($scope.user,
+                function() {
+                    $modalInstance.close($scope.user);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp
+    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
+        $scope.users = users;
+
+        $scope.createUser = function() {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalCreateUserController'
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.users.push(model);
+                shareFlash([]);
+            }, function() {
+                shareFlash([]);
+            });
+        }
+
+        $scope.updateUser = function(userId) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalUpdateUserController',
+                resolve: {
+                    user: function(UserFactory) {
+                        return UserFactory.show({id: userId});
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
+                shareFlash([]);
+            }, function() {
+                shareFlash([]);
+            });
+        }
+
+        $scope.deleteUser = function(userId) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            UserFactory.delete({id: userId}, function() {
+                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
+            });
+        }
+    })
+    .factory('UsersFactory', function ($resource) {
+        return $resource("/api/user", {}, {
+            query: { method: 'GET', isArray: true },
+            create: { method: 'POST' }
+        })
+    })
+    .factory('UserFactory', function ($resource) {
+        return $resource("/api/user/:id", {}, {
+            show: { method: 'GET' },
+            update: { method: 'PUT', params: {id: '@id'} },
+            delete: { method: 'DELETE', params: {id: '@id'} }
+        })
+    })
+    .factory('ProfileFactory', function ($resource) {
+        return $resource("/api/profile", {}, {
+            update: { method: 'POST' }
+        })
+    });
