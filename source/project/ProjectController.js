@@ -7,6 +7,7 @@ xApp
         $rootScope.projectId = projectId;
 
         $scope.projectTeams = teams;
+        $scope.assignedTeams = teamsAssigned;
 
         $scope.getProject = function() {
             return $scope.projects[getProjectIndexById($scope.projectId)];
@@ -56,6 +57,18 @@ xApp
                     },
                     project: function() {
                         return $scope.getProject();
+                    }
+                }
+            });
+        }
+
+        function teamsAssigned() {
+            $modal.open({
+                templateUrl: '/t/project-team/assigned.html',
+                controller: 'AssignedTeamController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.assignedTeams.query({id: $scope.getProject().id});
                     }
                 }
             });
