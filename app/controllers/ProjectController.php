@@ -47,6 +47,13 @@ class ProjectController extends \BaseController
         return Entry::where('project_id', $id)->get();
     }
 
+    public function getTeams($id)
+    {
+        $project = Project::findOrFail($id);
+
+        return $project->teams()->with('owner', 'users')->get();
+    }
+
 	/**
 	 * Display the specified resource.
 	 *
