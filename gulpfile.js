@@ -91,4 +91,4 @@ gulp.task('watch', function() {
   gulp.watch(paths.styles, ['styles']);
 });
 
-gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles', 'watch']);
+gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles']);

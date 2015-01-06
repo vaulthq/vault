@@ -1,12 +1,17 @@
 <div class="page-header">
     <h3>
         {{ getProject().name }} <small>{{ getProject().description }}</small>
-        <p class="pull-right" ng-if="projects.$resolved">
-            <a class="btn btn-success btn-xs" title="Share to Team" ng-click="projectTeams()" ng-if="getProject().can_edit">
-                <i class="glyphicon glyphicon-share-alt"></i>
+
+        <div class="pull-right">
+            <a class="btn btn-success btn-xs" title="Assign Team" ng-click="projectTeams()" ng-if="getProject().can_edit">
+                <i class="glyphicon glyphicon-share-alt"></i> Assign Team
             </a>
+            <a class="btn btn-success btn-xs" title="Show Assigned Teams" ng-click="assignedTeams()" ng-if="!getProject().can_edit">
+                <i class="glyphicon glyphicon-question-sign"></i>
+            </a>
+
             <a class="btn btn-warning btn-xs" title="Edit project" ng-click="updateProject()" ng-if="getProject().can_edit">
-                <i class="glyphicon glyphicon-edit"></i>
+                <i class="glyphicon glyphicon-edit"></i> Edit
             </a>
             <a class="btn btn-danger btn-xs" title="Delete project" ng-click="deleteProject()" ng-if="getProject().can_edit" style="margin-right: 30px">
                 <i class="glyphicon glyphicon-trash"></i>
@@ -17,6 +22,6 @@
             <a class="btn btn-default btn-xs" title="Add new key" ng-click="createEntry()">
                 Add new key
             </a>
-        </p>
+        </div>
     </h3>
 </div>

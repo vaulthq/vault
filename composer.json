@@ -4,6 +4,8 @@
 	"keywords": ["password", "laravel", "share", "vault"],
 	"license": "MIT",
 	"require": {
+	    "php": ">=5.5.0",
+
 		"laravel/framework": "4.2.*",
         "phpspec/phpspec": "2.0.*@dev",
         "phpunit/phpunit": "4.1.*@dev"
