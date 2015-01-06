@@ -183,6 +183,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
+            assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
@@ -771,6 +772,7 @@ xApp
         $rootScope.projectId = projectId;
 
         $scope.projectTeams = teams;
+        $scope.assignedTeams = teamsAssigned;
 
         $scope.getProject = function() {
             return $scope.projects[getProjectIndexById($scope.projectId)];
@@ -825,6 +827,18 @@ xApp
             });
         }
 
+        function teamsAssigned() {
+            $modal.open({
+                templateUrl: '/t/project-team/assigned.html',
+                controller: 'AssignedTeamController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.assignedTeams.query({id: $scope.getProject().id});
+                    }
+                }
+            });
+        }
+
         $scope.projectOwnerInfo = function() {
             $modal.open({
                 templateUrl: '/t/project/owner.html',
@@ -871,6 +885,21 @@ xApp
             keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
         })
     });
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('AssignedTeamController', teamController);
+
+    function teamController($scope, $modalInstance, teams) {
+        $scope.teams = teams;
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
