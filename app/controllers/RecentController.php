@@ -13,7 +13,7 @@ class RecentController extends \BaseController
             ->leftJoin('project', 'entry.project_id', '=', 'project.id')
             ->where('history.model', 'password')
             ->where('history.user_id', Auth::user()->id)
-            ->select('entry.id', 'entry.name', 'entry.url', 'entry.project_id', 'history.created_at', 'project.name as project_name')
+            ->select('entry.id', 'entry.name', 'entry.url', 'entry.project_id', 'history.created_at', 'project.name as project_name', 'entry.note')
             ->orderBy('history.id', 'desc')
             ->take(15)
             ->get();

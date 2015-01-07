@@ -1,8 +1,9 @@
 xApp
-    .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
+    .controller('EntryController', function($scope, $rootScope, $state, $modal, $location, shareFlash, entries, projectId, EntryFactory) {
 
         $scope.entries = entries;
         $rootScope.projectId = projectId;
+        $scope.activeEntry = $location.search().active || 0;
 
         $scope.$on('entry:create', function() {
             $scope.createEntry();
@@ -46,7 +47,6 @@ xApp
             });
         }
 
-
         $scope.deleteEntry = function(index) {
             if (!confirm('Are you sure?')) {
                 return;
@@ -55,17 +55,6 @@ xApp
             $scope.entries.splice(index, 1);
         }
 
-        $scope.getPassword = function(index) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/password.html',
-                controller: 'ModalGetPasswordController',
-                resolve: {
-                    password: function(EntryPasswordFactory) {
-                        return EntryPasswordFactory.password({id: $scope.entries[index].id});
-                    }
-                }
-            });
-        }
         $scope.entryAccessInfo = function(index) {
             var modalInstance = $modal.open({
                 templateUrl: '/t/entry/access.html',
@@ -115,11 +104,6 @@ xApp
             update: { method: 'PUT', params: {id: '@id'} },
             password: { method: 'GET', params: {id: '@id'} },
             delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('EntryPasswordFactory', function ($resource) {
-        return $resource("/api/entry/password/:id", {}, {
-            password: { method: 'GET', params: {id: '@id'} }
         })
     })
     .factory('EntryAccessFactory', function ($resource) {

@@ -13,7 +13,7 @@
         </tr>
         </thead>
 
-        <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': isUnsafe(entry.id)}">
+        <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeEntry}">
             <td>{{ entry.id }}</td>
             <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
             <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
@@ -24,9 +24,7 @@
                     <i class="glyphicon glyphicon-info-sign"></i>
                 </a>
                 <div ng-show="entry.can_edit">
-                    <a ng-click="getPassword($index)" class="btn btn-info btn-xs" title="Display Password">
-                        <i class="glyphicon glyphicon-lock"></i>
-                    </a>
+                    <show-password entry-id="entry.id"></show-password>
                     <a ng-click="shareEntry($index)" class="btn btn-success btn-xs" title="Share to User">
                         <i class="glyphicon glyphicon-share-alt"></i>
                     </a>

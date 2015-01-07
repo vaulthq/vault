@@ -174,6 +174,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
+
 (function() {
     angular
         .module('xApp')
@@ -188,7 +189,10 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
-            authStatus: $resource("/internal/auth/status", null)
+            authStatus: $resource("/internal/auth/status", null),
+            entryPassword: $resource("/api/entry/password/:id", {}, {
+                password: { method: 'GET', params: {id: '@id'} }
+            })
         }
     }
 
@@ -313,10 +317,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
 
 })();
 xApp
-    .controller('EntryController', function($scope, $rootScope, $state, $modal, shareFlash, entries, projectId, EntryFactory) {
+    .controller('EntryController', function($scope, $rootScope, $state, $modal, $location, shareFlash, entries, projectId, EntryFactory) {
 
         $scope.entries = entries;
         $rootScope.projectId = projectId;
+        $scope.activeEntry = $location.search().active || 0;
 
         $scope.$on('entry:create', function() {
             $scope.createEntry();
@@ -360,7 +365,6 @@ xApp
             });
         }
 
-
         $scope.deleteEntry = function(index) {
             if (!confirm('Are you sure?')) {
                 return;
@@ -369,17 +373,6 @@ xApp
             $scope.entries.splice(index, 1);
         }
 
-        $scope.getPassword = function(index) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/password.html',
-                controller: 'ModalGetPasswordController',
-                resolve: {
-                    password: function(EntryPasswordFactory) {
-                        return EntryPasswordFactory.password({id: $scope.entries[index].id});
-                    }
-                }
-            });
-        }
         $scope.entryAccessInfo = function(index) {
             var modalInstance = $modal.open({
                 templateUrl: '/t/entry/access.html',
@@ -429,11 +422,6 @@ xApp
             update: { method: 'PUT', params: {id: '@id'} },
             password: { method: 'GET', params: {id: '@id'} },
             delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('EntryPasswordFactory', function ($resource) {
-        return $resource("/api/entry/password/:id", {}, {
-            password: { method: 'GET', params: {id: '@id'} }
         })
     })
     .factory('EntryAccessFactory', function ($resource) {
@@ -597,8 +585,14 @@ xApp.constant('GROUPS', {
     tester: 'Tester',
     pm: 'Project Manager'
 });
-xApp.
-    directive('loader', function() {
+(function() {
+    angular
+        .module('xApp')
+        .directive('loader', loaderDirective)
+        .directive('showPassword', showPasswordDirective)
+        .directive('clipCopy', clipCopyDirective);
+
+    function loaderDirective() {
         return {
             restrict: 'E',
             scope: {
@@ -606,8 +600,9 @@ xApp.
             },
             template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
         };
-    })
-    .directive('clipCopy', function () {
+    }
+
+    function clipCopyDirective() {
         return {
             scope: {
                 clipCopy: '&',
@@ -633,7 +628,40 @@ xApp.
                 });
             }
         };
-    });
+    }
+
+    function showPasswordDirective() {
+        return {
+            scope: {
+                entryId: '=',
+                'elementClass': '=?'
+            },
+            restrict: 'EA',
+            template:
+                '<a ng-click="showPassword()" ng-class="elementClass" title="Display Password">' +
+                '    <i class="glyphicon glyphicon-lock"></i>' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.elementClass = $scope.elementClass || 'btn btn-info btn-xs';
+                $scope.showPassword = showPasswordModal;
+
+                function showPasswordModal() {
+                    $modal.open({
+                        templateUrl: '/t/entry/password.html',
+                        controller: 'ModalGetPasswordController',
+                        resolve: {
+                            password: function(Api) {
+                                return Api.entryPassword.password({id: $scope.entryId});
+                            }
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+})();
+
 xApp.
     filter('userGroup', function(GROUPS) {
         return function(input) {
