@@ -472,6 +472,7 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+
 xApp
     .controller('ModalGetPasswordController', function($scope, $modalInstance, password) {
         $scope.password = password;
@@ -590,7 +591,8 @@ xApp.constant('GROUPS', {
         .module('xApp')
         .directive('loader', loaderDirective)
         .directive('showPassword', showPasswordDirective)
-        .directive('clipCopy', clipCopyDirective);
+        .directive('clipCopy', clipCopyDirective)
+        .directive('fileRead', fileReadDirective);
 
     function loaderDirective() {
         return {
@@ -656,6 +658,28 @@ xApp.constant('GROUPS', {
                         }
                     });
                 }
+            }
+        };
+    }
+
+    function fileReadDirective() {
+        return {
+            restrict: 'A',
+            scope: {
+                content: '='
+            },
+            link: function(scope, element, attrs) {
+                element.on('change', function(onChangeEvent) {
+                    var reader = new FileReader();
+
+                    reader.onload = function(onLoadEvent) {
+                        scope.$apply(function() {
+                            scope.content = onLoadEvent.target.result;
+                        });
+                    };
+
+                    reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                });
             }
         };
     }

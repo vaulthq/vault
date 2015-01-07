@@ -3,6 +3,7 @@ node_modules
 .git
 .idea
 bower_components
-node_modules
+Vagrantfile
 bin
 /app/config/local
+.vagrant
