@@ -52,23 +52,4 @@ class Entry extends Eloquent
     {
         return preg_replace('~\r\n?~', "\r\n", $str);
     }
-
-    private function belongsToUserTeam($userId)
-    {
-        $teams = $this->project->teams()->with('users')->get();
-
-        foreach ($teams as $team) {
-            if ($team->user_id == $userId) {
-                return true;
-            }
-
-            foreach ($team->users as $user) {
-                if ($user->id == $userId) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 }
