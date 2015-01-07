@@ -9,20 +9,20 @@
         <thead>
         <tr>
             <th>#</th>
-            <th>Name</th>
             <th>Project</th>
+            <th>Name</th>
+            <th>Username</th>
             <th>URL</th>
-            <th>Note</th>
             <th>Accessed</th>
             <th></th>
         </tr>
         </thead>
         <tr ng-repeat="entry in recent">
             <td>{{ entry.id }}</td>
-            <td>{{ entry.name }}</td>
             <td>{{ entry.project_name }}</td>
-            <td>{{ entry.url }}</td>
-            <td>{{ entry.note }}</td>
+            <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
+            <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
+            <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
                 <show-password entry-id="entry.id"></show-password>

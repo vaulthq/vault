@@ -6,6 +6,7 @@
         <tr>
             <th>#</th>
             <th>Name</th>
+            <th>Username</th>
             <th>URL</th>
             <th>Created</th>
             <th>Updated</th>
@@ -16,6 +17,7 @@
         <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeEntry}">
             <td>{{ entry.id }}</td>
             <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
+            <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
             <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}"></span></td>

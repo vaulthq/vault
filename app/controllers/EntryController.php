@@ -15,6 +15,7 @@ class EntryController extends \BaseController
         $model->url = Input::get('url');
         $model->password = Input::get('password');
         $model->note = Input::get('note');
+        $model->username = Input::get('username');
         $model->project_id = Input::get('project_id');
         $model->user_id = Auth::user()->id;
 
@@ -53,6 +54,7 @@ class EntryController extends \BaseController
         }
 
         $model->name = $data->name;
+        $model->username = $data->username;
         $model->url = $data->url;
         $model->note = $data->note;
 
