@@ -5,7 +5,7 @@
 
     <loader when="!teams.$resolved || !access.$resolved"></loader>
 
-    <table class="table" ng-show="teams.$resolved && access.$resolved">
+    <table class="table" ng-show="teams.$resolved && access.$resolved" ng-if="teams.length > 0">
         <thead>
             <th>Name</th>
             <th>Members</th>
@@ -36,6 +36,10 @@
             </tr>
         </tbody>
     </table>
+
+    <div ng-if="teams.$resolved && teams.length == 0">
+        There are no teams created.
+    </div>
 </div>
 <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Close</button>
