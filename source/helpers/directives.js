@@ -1,5 +1,11 @@
-xApp.
-    directive('loader', function() {
+(function() {
+    angular
+        .module('xApp')
+        .directive('loader', loaderDirective)
+        .directive('showPassword', showPasswordDirective)
+        .directive('clipCopy', clipCopyDirective);
+
+    function loaderDirective() {
         return {
             restrict: 'E',
             scope: {
@@ -7,8 +13,9 @@ xApp.
             },
             template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
         };
-    })
-    .directive('clipCopy', function () {
+    }
+
+    function clipCopyDirective() {
         return {
             scope: {
                 clipCopy: '&',
@@ -34,4 +41,36 @@ xApp.
                 });
             }
         };
-    });
+    }
+
+    function showPasswordDirective() {
+        return {
+            scope: {
+                entryId: '=',
+                'elementClass': '=?'
+            },
+            restrict: 'EA',
+            template:
+                '<a ng-click="showPassword()" ng-class="elementClass" title="Display Password">' +
+                '    <i class="glyphicon glyphicon-lock"></i>' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.elementClass = $scope.elementClass || 'btn btn-info btn-xs';
+                $scope.showPassword = showPasswordModal;
+
+                function showPasswordModal() {
+                    $modal.open({
+                        templateUrl: '/t/entry/password.html',
+                        controller: 'ModalGetPasswordController',
+                        resolve: {
+                            password: function(Api) {
+                                return Api.entryPassword.password({id: $scope.entryId});
+                            }
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+})();
