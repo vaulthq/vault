@@ -12,6 +12,7 @@
             <th>Name</th>
             <th>Project</th>
             <th>URL</th>
+            <th>Note</th>
             <th>Accessed</th>
             <th></th>
         </tr>
@@ -21,9 +22,11 @@
             <td>{{ entry.name }}</td>
             <td>{{ entry.project_name }}</td>
             <td>{{ entry.url }}</td>
+            <td>{{ entry.note }}</td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
-                <a ng-href="/#/project/{{ entry.project_id }}" class="btn btn-info btn-xs" title="Go to entry">
+                <show-password entry-id="entry.id"></show-password>
+                <a ng-href="/#/project/{{ entry.project_id }}?active={{ entry.id }}" class="btn btn-info btn-xs" title="Go to entry">
                     <i class="glyphicon glyphicon-chevron-right"></i>
                 </a>
             </td>
