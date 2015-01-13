@@ -114,4 +114,35 @@ class ProjectController extends \BaseController
         $model->delete();
 	}
 
+    public function changeOwner($id)
+    {
+        $project = Project::findOrFail($id);
+        $newOwner = User::findOrFail(Input::get('owner'));
+        $recursive = Input::get('assign', false);
+
+        if (!$project->can_edit) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
+
+        History::make(
+            'project-owner',
+            'Changed owner from "'. $project->user_id .'" to "'. $newOwner->id .'"' . ($recursive ? ' (recursive)' : ''),
+            $id
+        );
+
+        if ($recursive) {
+            foreach ($project->keys as $key) {
+                if ($key->user_id == $project->user_id) {
+                    History::make('entry-owner', 'Changed entry owner from "'. $key->user_id .'" to "'. $newOwner->id .'"', $key->id);
+
+                    $key->user_id = $newOwner->id;
+
+                    $key->save();
+                }
+            }
+        }
+
+        $project->user_id = $newOwner->id;
+        $project->save();
+    }
 }

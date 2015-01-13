@@ -13,6 +13,8 @@
         </div>
     </div>
     <div class="modal-footer">
+        <div ng-if="project.id" change-project-owner project-id="project.id" class="pull-left"></div>
+
         <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>

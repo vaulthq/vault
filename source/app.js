@@ -6,6 +6,7 @@ var xApp = angular.module('xApp', [
     'shareFlash',
     'ui.bootstrap',
     'ui.router',
+    'ui.select',
     'ngScrollbar',
     'angularMoment',
     'toaster'
@@ -15,7 +16,10 @@ xApp.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$httpProvider',
-function($stateProvider, $urlRouterProvider, $httpProvider) {
+    'uiSelectConfig',
+function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
+
+    uiSelectConfig.theme = 'bootstrap';
 
     $stateProvider
         .state('anon', {

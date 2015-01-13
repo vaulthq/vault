@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h3>Change Project Owner</h3>
+</div>
+<form>
+    <div class="modal-body">
+        <div class="alert alert-info">
+            <strong>Attention!</strong> After changing the project owner you might loose rights to access and edit this project.
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Project Owner *</label>
+            <ui-select ng-model="form.owner">
+                <ui-select-match>{{ $select.selected.name }} {{ $select.selected.surname }} ({{ $select.selected.email }})</ui-select-match>
+                <ui-select-choices repeat="user.id as user in users | filter: {$: $select.search}">
+                    {{ user.name }} {{ user.surname }} ({{ user.email }})
+                </ui-select-choices>
+            </ui-select>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="form.assign"> Re-assign Entries
+                </label>
+            </div>
+            <p class="help-block">If checked, all user entries in this project will be assigned to new owner.</p>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    </div>
+</form>

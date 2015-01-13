@@ -4,7 +4,8 @@
         .directive('loader', loaderDirective)
         .directive('showPassword', showPasswordDirective)
         .directive('clipCopy', clipCopyDirective)
-        .directive('fileRead', fileReadDirective);
+        .directive('fileRead', fileReadDirective)
+        .directive('changeProjectOwner', projectOwnerDirective);
 
     function loaderDirective() {
         return {
@@ -92,6 +93,38 @@
 
                     reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
                 });
+            }
+        };
+    }
+
+    function projectOwnerDirective() {
+        return {
+            scope: {
+                projectId: '=',
+                elementClass: '=?'
+            },
+            template:
+                '<a ng-click="showModal()" ng-class="elementClass" title="Change Project Owner">' +
+                '    <i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.elementClass = $scope.elementClass || 'btn btn-default';
+                $scope.showModal = showModal;
+
+                function showModal() {
+                    $modal.open({
+                        templateUrl: '/t/project/changeOwner.html',
+                        controller: 'ModalChangeProjectOwnerController',
+                        resolve: {
+                            users: function(Api) {
+                                return Api.user.query();
+                            },
+                            project: function(Api) {
+                                return Api.project.get({id: $scope.projectId});
+                            }
+                        }
+                    });
+                }
             }
         };
     }

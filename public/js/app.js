@@ -6,6 +6,7 @@ var xApp = angular.module('xApp', [
     'shareFlash',
     'ui.bootstrap',
     'ui.router',
+    'ui.select',
     'ngScrollbar',
     'angularMoment',
     'toaster'
@@ -15,7 +16,10 @@ xApp.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$httpProvider',
-function($stateProvider, $urlRouterProvider, $httpProvider) {
+    'uiSelectConfig',
+function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
+
+    uiSelectConfig.theme = 'bootstrap';
 
     $stateProvider
         .state('anon', {
@@ -184,6 +188,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
+            projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
@@ -602,7 +607,8 @@ xApp.constant('GROUPS', {
         .directive('loader', loaderDirective)
         .directive('showPassword', showPasswordDirective)
         .directive('clipCopy', clipCopyDirective)
-        .directive('fileRead', fileReadDirective);
+        .directive('fileRead', fileReadDirective)
+        .directive('changeProjectOwner', projectOwnerDirective);
 
     function loaderDirective() {
         return {
@@ -694,6 +700,38 @@ xApp.constant('GROUPS', {
         };
     }
 
+    function projectOwnerDirective() {
+        return {
+            scope: {
+                projectId: '=',
+                elementClass: '=?'
+            },
+            template:
+                '<a ng-click="showModal()" ng-class="elementClass" title="Change Project Owner">' +
+                '    <i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.elementClass = $scope.elementClass || 'btn btn-default';
+                $scope.showModal = showModal;
+
+                function showModal() {
+                    $modal.open({
+                        templateUrl: '/t/project/changeOwner.html',
+                        controller: 'ModalChangeProjectOwnerController',
+                        resolve: {
+                            users: function(Api) {
+                                return Api.user.query();
+                            },
+                            project: function(Api) {
+                                return Api.project.get({id: $scope.projectId});
+                            }
+                        }
+                    });
+                }
+            }
+        };
+    }
+
 })();
 
 xApp.
@@ -702,6 +740,7 @@ xApp.
             return GROUPS[input];
         }
     });
+
 angular.module('shareFlash', [])
     .factory('shareFlash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
         var messages = [];
@@ -784,6 +823,32 @@ xApp
             query: { method: 'GET', isArray: true }
         });
     });
+xApp
+    .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
+        $scope.users = users;
+        $scope.project = project;
+        $scope.form = {owner: 0, assign: 0};
+
+        $scope.project.$promise.then(function() {
+            $scope.form.owner = $scope.project.user_id;
+        });
+
+        $scope.ok = function () {
+            Api.projectOwner.get({
+                id: $scope.project.id,
+                owner: $scope.form.owner,
+                assign: $scope.form.assign
+            }, function() {
+                $modalInstance.close();
+                toaster.pop('success', 'Project owner has been changed.');
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    });
+
 xApp
     .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory) {
         $scope.project = {};

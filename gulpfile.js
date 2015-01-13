@@ -9,7 +9,8 @@ var paths = {
     vendor_styles: [
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
         'js_vendor/ng-scrollbar/ng-scrollbar.css',
-        'bower_components/AngularJS-Toaster/toaster.css'
+        'bower_components/AngularJS-Toaster/toaster.css',
+        'bower_components/angular-ui-select/dist/select.min.css'
     ],
     html_templates: [
         'source/**/*.html'
@@ -21,12 +22,13 @@ var paths = {
         'bower_components/angular-cookies/angular-cookies.min.js',
         'bower_components/angular-animate/angular-animate.min.js',
         'bower_components/angular-bootstrap/ui-bootstrap.min.js',
+        'bower_components/angular-ui-select/dist/select.min.js',
+        'bower_components/AngularJS-Toaster/toaster.js',
+        'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js',
-        'bower_components/angular-ui-router/release/angular-ui-router.min.js',
-        'js_vendor/ng-scrollbar/ng-scrollbar.js',
-        'bower_components/AngularJS-Toaster/toaster.js'
+        'js_vendor/ng-scrollbar/ng-scrollbar.js'
     ],
     scripts: [
         'source/**/*.js'
