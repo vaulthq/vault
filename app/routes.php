@@ -15,6 +15,7 @@ Route::group(['before' => 'ngcsrf'], function() {
     Route::group(array('prefix' => 'api', 'before' => 'ngauth'), function() {
         Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
         Route::get('project/teams/{id}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
+        Route::get('project/changeOwner/{id}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
         Route::resource('project', 'ProjectController');
 
         Route::resource('profile', 'ProfileController');
