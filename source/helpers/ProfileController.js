@@ -1,5 +1,5 @@
 xApp.
-    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
+    controller('ProfileController', function($scope, $modalInstance, toaster, Api) {
         $scope.profile = {
             old: '',
             new: '',
@@ -7,12 +7,10 @@ xApp.
         };
 
         $scope.ok = function () {
-            ProfileFactory.update($scope.profile,
+            Api.profile.save($scope.profile,
                 function() {
+                    toaster.pop('success', 'Password successfully changed!');
                     $modalInstance.close();
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };

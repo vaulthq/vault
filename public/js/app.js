@@ -140,8 +140,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             templateUrl: '/t/user/userList.html',
             controller: 'UserListController',
             resolve: {
-                users: function(UsersFactory) {
-                    return UsersFactory.query();
+                users: function(Api) {
+                    return Api.user.query();
                 }
             }
         })
@@ -186,10 +186,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             project: $resource("/api/project/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
+            showUser: $resource("/api/user/show", null),
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
+            loginAs: $resource("/internal/auth/login/:id", null),
+            profile: $resource("/api/profile", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })
@@ -233,7 +236,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             logout: logout,
             getUser: getUser,
             isLoggedIn: isLoggedIn,
-            initLogin: initLogin
+            initLogin: initLogin,
+            loginAs: loginAs
         };
 
         function login(response) {
@@ -266,6 +270,14 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
             })
+        }
+
+        function loginAs(userId) {
+            Api.loginAs.get({id: userId}, function(response) {
+                logout();
+                login(response);
+                $location.path('/recent');
+            });
         }
     }
 })();
@@ -390,8 +402,8 @@ xApp
                 templateUrl: '/t/entry/share.html',
                 controller: 'ModalShareController',
                 resolve: {
-                    users: function(UsersFactory) {
-                        return UsersFactory.query();
+                    users: function(Api) {
+                        return Api.user.query();
                     },
                     access: function(ShareFactory) {
                         return ShareFactory.show({id: $scope.entries[index].id});
@@ -558,7 +570,7 @@ xApp
         };
     });
 xApp.
-    controller('ProfileController', function($scope, $modalInstance, ProfileFactory, shareFlash) {
+    controller('ProfileController', function($scope, $modalInstance, toaster, Api) {
         $scope.profile = {
             old: '',
             new: '',
@@ -566,12 +578,10 @@ xApp.
         };
 
         $scope.ok = function () {
-            ProfileFactory.update($scope.profile,
+            Api.profile.save($scope.profile,
                 function() {
+                    toaster.pop('success', 'Password successfully changed!');
                     $modalInstance.close();
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };
@@ -580,6 +590,7 @@ xApp.
             $modalInstance.dismiss('cancel');
         };
     });
+
 xApp.constant('GROUPS', {
     admin: 'Administrator',
     dev: 'Developer',
@@ -896,8 +907,8 @@ xApp
                 templateUrl: '/t/project/owner.html',
                 controller: 'ModalProjectOwnerController',
                 resolve: {
-                    owner: function(UserFactory) {
-                        return UserFactory.show({id: $scope.getProject().user_id});
+                    owner: function(Api) {
+                        return Api.user.get({id: $scope.getProject().user_id});
                     }
                 }
             });
@@ -1073,8 +1084,8 @@ xApp
                 templateUrl: '/t/team/members.html',
                 controller: 'teamMembersController',
                 resolve: {
-                    users: function(UsersFactory) {
-                        return UsersFactory.query();
+                    users: function(Api) {
+                        return Api.user.query();
                     },
                     access: function(Api) {
                         return Api.teamMembers.query({id: teamId});
@@ -1176,12 +1187,12 @@ xApp
 })();
 
 xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
+    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            UsersFactory.create($scope.user,
+            Api.user.save($scope.user,
                 function(response) {
                     $modalInstance.close(response);
                 }
@@ -1192,13 +1203,14 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+
 xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, user, GROUPS) {
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
         $scope.user = user;
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            UserFactory.update($scope.user,
+            Api.user.update($scope.user,
                 function() {
                     $modalInstance.close($scope.user);
                 }
@@ -1209,9 +1221,16 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-xApp
-    .controller('UserListController', function($scope, $resource, UsersFactory, UserFactory, $modal, users, shareFlash) {
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('UserListController', controller);
+
+    function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
         $scope.users = users;
+
+        $scope.loginAs = loginAsAction;
 
         $scope.createUser = function() {
             var modalInstance = $modal.open({
@@ -1221,55 +1240,42 @@ xApp
 
             modalInstance.result.then(function (model) {
                 $scope.users.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
             });
-        }
+        };
 
         $scope.updateUser = function(userId) {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
                 controller: 'ModalUpdateUserController',
                 resolve: {
-                    user: function(UserFactory) {
-                        return UserFactory.show({id: userId});
+                    user: function(Api) {
+                        return Api.user.get({id: userId});
                     }
                 }
             });
 
             modalInstance.result.then(function (model) {
                 $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
             });
-        }
+        };
 
         $scope.deleteUser = function(userId) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            UserFactory.delete({id: userId}, function() {
+            Api.user.delete({id: userId}, function() {
                 $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
             });
+        };
+
+        function loginAsAction(userId) {
+            AuthFactory.loginAs(userId);
+
+            toaster.pop('info', 'Logging in as other user...');
+
+            $timeout(function() {
+                location.reload()
+            }, 2000);
         }
-    })
-    .factory('UsersFactory', function ($resource) {
-        return $resource("/api/user", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('UserFactory', function ($resource) {
-        return $resource("/api/user/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('ProfileFactory', function ($resource) {
-        return $resource("/api/profile", {}, {
-            update: { method: 'POST' }
-        })
-    });
+    }
+})();

@@ -1,10 +1,10 @@
 xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, UsersFactory, GROUPS) {
+    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            UsersFactory.create($scope.user,
+            Api.user.save($scope.user,
                 function(response) {
                     $modalInstance.close(response);
                 }

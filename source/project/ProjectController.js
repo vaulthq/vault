@@ -79,8 +79,8 @@ xApp
                 templateUrl: '/t/project/owner.html',
                 controller: 'ModalProjectOwnerController',
                 resolve: {
-                    owner: function(UserFactory) {
-                        return UserFactory.show({id: $scope.getProject().user_id});
+                    owner: function(Api) {
+                        return Api.user.get({id: $scope.getProject().user_id});
                     }
                 }
             });
