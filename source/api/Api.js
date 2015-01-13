@@ -13,6 +13,8 @@
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
+            loginAs: $resource("/internal/auth/login/:id", null),
+            profile: $resource("/api/profile", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })

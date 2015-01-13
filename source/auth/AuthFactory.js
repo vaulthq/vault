@@ -11,7 +11,8 @@
             logout: logout,
             getUser: getUser,
             isLoggedIn: isLoggedIn,
-            initLogin: initLogin
+            initLogin: initLogin,
+            loginAs: loginAs
         };
 
         function login(response) {
@@ -44,6 +45,14 @@
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
             })
+        }
+
+        function loginAs(userId) {
+            Api.loginAs.get({id: userId}, function(response) {
+                logout();
+                login(response);
+                $location.path('/recent');
+            });
         }
     }
 })();

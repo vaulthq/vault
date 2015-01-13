@@ -1,10 +1,10 @@
 xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, UserFactory, user, GROUPS) {
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
         $scope.user = user;
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            UserFactory.update($scope.user,
+            Api.user.update($scope.user,
                 function() {
                     $modalInstance.close($scope.user);
                 }

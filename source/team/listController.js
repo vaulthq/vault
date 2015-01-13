@@ -53,8 +53,8 @@
                 templateUrl: '/t/team/members.html',
                 controller: 'teamMembersController',
                 resolve: {
-                    users: function(UsersFactory) {
-                        return UsersFactory.query();
+                    users: function(Api) {
+                        return Api.user.query();
                     },
                     access: function(Api) {
                         return Api.teamMembers.query({id: teamId});

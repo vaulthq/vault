@@ -72,8 +72,8 @@ xApp
                 templateUrl: '/t/entry/share.html',
                 controller: 'ModalShareController',
                 resolve: {
-                    users: function(UsersFactory) {
-                        return UsersFactory.query();
+                    users: function(Api) {
+                        return Api.user.query();
                     },
                     access: function(ShareFactory) {
                         return ShareFactory.show({id: $scope.entries[index].id});

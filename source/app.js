@@ -140,8 +140,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider) {
             templateUrl: '/t/user/userList.html',
             controller: 'UserListController',
             resolve: {
-                users: function(UsersFactory) {
-                    return UsersFactory.query();
+                users: function(Api) {
+                    return Api.user.query();
                 }
             }
         })
