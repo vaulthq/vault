@@ -105,7 +105,7 @@
             },
             template:
                 '<a ng-click="showModal()" ng-class="elementClass" title="Change Project Owner">' +
-                '    <i class="glyphicon glyphicon-link"></i>' +
+                '    <i class="glyphicon glyphicon-share-alt"></i>' +
                 '</a>',
             controller: function($scope, $modal) {
                 $scope.elementClass = $scope.elementClass || 'btn btn-default';
