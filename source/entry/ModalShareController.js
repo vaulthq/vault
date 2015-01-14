@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalShareController', function($scope, $modalInstance, users, access, ShareFactory, entry) {
+    .controller('ModalShareController', function($scope, $modalInstance, users, access, Api, entry) {
         $scope.users = users;
         $scope.access = access;
         $scope.entry = entry;
@@ -19,7 +19,7 @@ xApp
         }
 
         $scope.grant = function(userId) {
-            ShareFactory.create({
+            Api.share.save({
                 user_id: userId,
                 id: $scope.entry.id
             }, function(response) {
@@ -29,7 +29,7 @@ xApp
 
         $scope.revoke = function(userId) {
             var scopeIndex = $scope.getAccessIndex(userId);
-            ShareFactory.delete({
+            Api.share.delete({
                 id: $scope.access[scopeIndex].id
             }, function(response) {
                 $scope.access.splice(scopeIndex, 1);

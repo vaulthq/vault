@@ -197,6 +197,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
             authStatus: $resource("/internal/auth/status", null),
             loginAs: $resource("/internal/auth/login/:id", null),
             profile: $resource("/api/profile", null, enableCustom),
+            share: $resource("/api/share/:id", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })
@@ -332,100 +333,224 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
     }
 
 })();
-xApp
-    .controller('EntryController', function($scope, $rootScope, $state, $modal, $location, shareFlash, entries, projectId, EntryFactory) {
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryAccessInfo', entryAccessInfoDirective);
+
+    function entryAccessInfoDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-primary btn-xs" title="Access Information" ng-click="info()" ng-if="!entry.can_edit">' +
+                    '<i class="glyphicon glyphicon-info-sign"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.info = entryInfo;
+
+                function entryInfo() {
+                    $modal.open({
+                        templateUrl: '/t/entry/access.html',
+                        controller: 'ModalAccessController',
+                        resolve: {
+                            access: function(EntryAccessFactory) {
+                                return EntryAccessFactory.query({id: $scope.entry.id});
+                            }
+                        }
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryCreate', entryCreateDirective);
+
+    function entryCreateDirective() {
+        return {
+            restrict: 'E',
+            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            scope: {
+                projectId: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.create = createEntry;
+
+                function createEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/form.html',
+                        controller: 'ModalCreateEntryController',
+                        resolve: {
+                            project_id: function() {
+                                return $scope.projectId;
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:create', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryDelete', entryDeleteDirective);
+
+    function entryDeleteDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="delete()" class="btn btn-danger btn-xs" title="Remove">' +
+                    '<i class="glyphicon glyphicon-trash"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, EntryFactory) {
+                $scope.delete = entryDelete;
+
+                function entryDelete() {
+                    if (!confirm('Are you sure?')) {
+                        return;
+                    }
+
+                    EntryFactory.delete({id: $scope.entry.id});
+                    $rootScope.$broadcast('entry:delete', $scope.entry);
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryShare', entryShareDirective);
+
+    function entryShareDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
+                    '<i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.share = shareEntry;
+
+                function shareEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/share.html',
+                        controller: 'ModalShareController',
+                        resolve: {
+                            users: function(Api) {
+                                return Api.user.query();
+                            },
+                            access: function(Api) {
+                                return Api.share.query({id: $scope.entry.id});
+                            },
+                            entry: function() {
+                                return $scope.entry;
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:share', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryUpdate', entryUpdateDirective);
+
+    function entryUpdateDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
+                    '<i class="glyphicon glyphicon-edit"></i>' +
+                '</a>',
+            scope: {
+                entryId: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.update = updateEntry;
+
+                function updateEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/form.html',
+                        controller: 'ModalUpdateEntryController',
+                        resolve: {
+                            entry: function(EntryFactory) {
+                                return EntryFactory.show({id: $scope.entryId});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:update', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('EntryController', controller);
+
+    function controller($rootScope, $scope, $location, entries, projectId) {
 
         $scope.entries = entries;
         $rootScope.projectId = projectId;
         $scope.activeEntry = $location.search().active || 0;
 
-        $scope.$on('entry:create', function() {
-            $scope.createEntry();
-        });
+        $scope.$on('entry:create', onEntryCreate);
+        $scope.$on('entry:update', onEntryUpdate);
+        $scope.$on('entry:delete', onEntryDelete);
 
-        $scope.createEntry = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/form.html',
-                controller: 'ModalCreateEntryController',
-                resolve: {
-                    project_id: function() {
-                        return $scope.projectId;
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.entries.push(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
+        function onEntryCreate(event, model) {
+            $scope.entries.push(model);
         }
 
-        $scope.updateEntry = function(index) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/form.html',
-                controller: 'ModalUpdateEntryController',
-                resolve: {
-                    entry: function(EntryFactory) {
-                        return EntryFactory.show({id: $scope.entries[index].id});
-                    }
-                }
-            });
+        function onEntryUpdate(event, model) {
+            var index = getEntryIndex(model);
 
-            modalInstance.result.then(function (model) {
+            if (index >= 0) {
                 $scope.entries[index] = model;
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        }
-
-        $scope.deleteEntry = function(index) {
-            if (!confirm('Are you sure?')) {
-                return;
             }
-            EntryFactory.delete({id: $scope.entries[index].id});
-            $scope.entries.splice(index, 1);
         }
 
-        $scope.entryAccessInfo = function(index) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/access.html',
-                controller: 'ModalAccessController',
-                resolve: {
-                    access: function(EntryAccessFactory) {
-                        return EntryAccessFactory.query({id: $scope.entries[index].id});
-                    }
-                }
-            });
+        function onEntryDelete(event, model) {
+            var index = getEntryIndex(model);
+
+            if (index >= 0) {
+                $scope.entries.splice(index, 1);
+            }
         }
 
-        $scope.shareEntry = function(index) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/entry/share.html',
-                controller: 'ModalShareController',
-                resolve: {
-                    users: function(Api) {
-                        return Api.user.query();
-                    },
-                    access: function(ShareFactory) {
-                        return ShareFactory.show({id: $scope.entries[index].id});
-                    },
-                    entry: function() {
-                        return $scope.entries[index];
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                shareFlash([]);
-            }, function() {
-                $state.reload();
-                shareFlash([]);
-            });
+        function getEntryIndex(entry) {
+            return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
         }
-    })
+    }
+})();
+
+xApp
     .factory('EntriesFactory', function ($resource) {
         return $resource("/api/entry", {}, {
             query: { method: 'GET', isArray: true },
@@ -443,19 +568,6 @@ xApp
     .factory('EntryAccessFactory', function ($resource) {
         return $resource("/api/entry/access/:id", {}, {
             query: { method: 'GET', params: {id: '@id'}, isArray: true }
-        })
-    })
-    .factory('ShareFactory', function ($resource) {
-        return $resource("/api/share/:id", {}, {
-            show: { method: 'GET', isArray: true  },
-            create: { method: 'POST' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('UnsafeFactory', function ($resource) {
-        return $resource("/api/unsafe", {}, {
-            query: { method: 'GET', isArray: true  }
         })
     });
 
@@ -512,7 +624,7 @@ xApp
         };
     });
 xApp
-    .controller('ModalShareController', function($scope, $modalInstance, users, access, ShareFactory, entry) {
+    .controller('ModalShareController', function($scope, $modalInstance, users, access, Api, entry) {
         $scope.users = users;
         $scope.access = access;
         $scope.entry = entry;
@@ -532,7 +644,7 @@ xApp
         }
 
         $scope.grant = function(userId) {
-            ShareFactory.create({
+            Api.share.save({
                 user_id: userId,
                 id: $scope.entry.id
             }, function(response) {
@@ -542,7 +654,7 @@ xApp
 
         $scope.revoke = function(userId) {
             var scopeIndex = $scope.getAccessIndex(userId);
-            ShareFactory.delete({
+            Api.share.delete({
                 id: $scope.access[scopeIndex].id
             }, function(response) {
                 $scope.access.splice(scopeIndex, 1);
@@ -553,6 +665,7 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+
 xApp
     .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, shareFlash, entry, GROUPS) {
         $scope.entry = entry;
@@ -708,7 +821,7 @@ xApp.constant('GROUPS', {
             },
             template:
                 '<a ng-click="showModal()" ng-class="elementClass" title="Change Project Owner">' +
-                '    <i class="glyphicon glyphicon-link"></i>' +
+                '    <i class="glyphicon glyphicon-share-alt"></i>' +
                 '</a>',
             controller: function($scope, $modal) {
                 $scope.elementClass = $scope.elementClass || 'btn btn-default';
@@ -976,7 +1089,7 @@ xApp
                     }
                 }
             });
-        }
+        };
 
         $scope.deleteProject = function() {
             if (!confirm('Are you sure?')) {
@@ -987,11 +1100,7 @@ xApp
             $rootScope.$broadcast('rebuild:scrollbar');
 
             $location.path('/recent');
-        }
-
-        $scope.createEntry = function() {
-            $rootScope.$broadcast('entry:create');
-        }
+        };
     })
     .factory('ProjectsFactory', function ($resource) {
         return $resource("/api/project", {}, {

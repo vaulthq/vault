@@ -84,7 +84,7 @@ xApp
                     }
                 }
             });
-        }
+        };
 
         $scope.deleteProject = function() {
             if (!confirm('Are you sure?')) {
@@ -95,11 +95,7 @@ xApp
             $rootScope.$broadcast('rebuild:scrollbar');
 
             $location.path('/recent');
-        }
-
-        $scope.createEntry = function() {
-            $rootScope.$broadcast('entry:create');
-        }
+        };
     })
     .factory('ProjectsFactory', function ($resource) {
         return $resource("/api/project", {}, {

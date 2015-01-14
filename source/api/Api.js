@@ -16,6 +16,7 @@
             authStatus: $resource("/internal/auth/status", null),
             loginAs: $resource("/internal/auth/login/:id", null),
             profile: $resource("/api/profile", null, enableCustom),
+            share: $resource("/api/share/:id", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })
