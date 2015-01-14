@@ -37,7 +37,7 @@
         <input type="hidden" ng-model="entry.project_id">
     </div>
     <div class="modal-footer">
-        <show-password entry-id="entry.id" element-class="'btn btn-info pull-left'"></show-password>
+        <show-password entry-id="entry.id" element-class="'btn btn-info pull-left'" ng-if="entry.id > 0"></show-password>
         <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
