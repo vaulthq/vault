@@ -109,6 +109,24 @@ class EntryController extends \BaseController
         return Response::json(['password' => strlen($model->password) > 0 ? $model->password : ''], 200);
     }
 
+    public function getDownload($id)
+    {
+        $model = Entry::findOrFail($id);
+
+        if (!$model->can_edit) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
+
+        History::make('password', 'Downloaded password #' . $id . ' ('.$model->project->name.').', $id);
+
+        $headers = array(
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="'. $model->username .'"',
+        );
+
+        return Response::make(rtrim($model->password, "\n"), 200, $headers);
+    }
+
     public function getAccess($id)
     {
         $model = Entry::findOrFail($id);

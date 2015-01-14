@@ -1,6 +1,7 @@
 xApp
-    .controller('ModalGetPasswordController', function($scope, $modalInstance, password) {
+    .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
         $scope.password = password;
+        $scope.entry = entry;
 
         $scope.shown = false;
 

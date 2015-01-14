@@ -27,6 +27,7 @@ Route::group(['before' => 'ngcsrf'], function() {
         Route::resource('projectTeams', 'ProjectTeamsController');
 
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
+        Route::get('entry/download/{id}', ['as' => 'download', 'uses' => 'EntryController@getDownload']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
         Route::resource('entry', 'EntryController');
 
