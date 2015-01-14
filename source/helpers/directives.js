@@ -67,6 +67,9 @@
                         resolve: {
                             password: function(Api) {
                                 return Api.entryPassword.password({id: $scope.entryId});
+                            },
+                            entry: function(EntryFactory) {
+                                return EntryFactory.show({id: $scope.entryId});
                             }
                         }
                     });
@@ -79,19 +82,21 @@
         return {
             restrict: 'A',
             scope: {
-                content: '='
+                content: '=',
+                name: '='
             },
             link: function(scope, element, attrs) {
                 element.on('change', function(onChangeEvent) {
                     var reader = new FileReader();
+                    var file = (onChangeEvent.srcElement || onChangeEvent.target).files[0];
 
                     reader.onload = function(onLoadEvent) {
                         scope.$apply(function() {
                             scope.content = onLoadEvent.target.result;
+                            scope.name = file.name;
                         });
                     };
-
-                    reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                    reader.readAsText(file);
                 });
             }
         };

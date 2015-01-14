@@ -5,15 +5,15 @@
 <form>
     <div class="modal-body">
         <div class="form-group">
-            <label class="control-label" for="iName">Name</label>
+            <label class="control-label" for="iName">Title</label>
             <input type="text" name="name" class="form-control" id="iName" ng-model="entry.name">
         </div>
         <div class="form-group">
-            <label class="control-label" for="iUsername">Username</label>
+            <label class="control-label" for="iUsername">Name</label>
             <input type="text" name="name" class="form-control" id="iUsername" ng-model="entry.username">
         </div>
         <div class="form-group">
-            <label class="control-label" for="iUrl">URL/IP</label>
+            <label class="control-label" for="iUrl">Address</label>
             <input type="text" name="url" class="form-control" id="iUrl" ng-model="entry.url">
         </div>
 
@@ -24,7 +24,7 @@
                     <textarea name="password" class="form-control password" id="iPassword" ng-model="entry.password" rows="1"></textarea>
                 </div>
                 <div class="col-xs-2" style="overflow: hidden; color: white; font-size: 13px">
-                    <input type="file" file-read content="entry.password" style="margin-left: -15px"/>
+                    <input type="file" file-read content="entry.password" name="entry.username" style="margin-left: -15px"/>
                 </div>
             </div>
         </div>
