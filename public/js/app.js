@@ -620,9 +620,18 @@ xApp
             $scope.shown = false;
         }
 
-        $scope.cancel = function () {
+        $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
         };
+
+        $scope.download = function() {
+            var a = document.createElement('a');
+            a.href = 'data:application/octet-stream;charset=utf-8,' + encodeURI($scope.password.password);
+            a.target = '_blank';
+            a.download = $scope.entry.username ? $scope.entry.username : $scope.entry.id;
+            document.body.appendChild(a);
+            a.click();
+        }
     });
 
 xApp
