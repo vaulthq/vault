@@ -28,5 +28,6 @@ xApp
             a.download = $scope.entry.username ? $scope.entry.username : $scope.entry.id;
             document.body.appendChild(a);
             a.click();
+            a.parentNode.removeChild(a);
         }
     });
