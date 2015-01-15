@@ -37,7 +37,7 @@
                 <td>{{share.user.surname}}</td>
                 <td>{{share.user.email}}</td>
                 <td class="text-right">
-                    <a ng-click="revoke(share.id)" class="btn btn-danger btn-xs" title="Revoke Access">
+                    <a ng-click="revokeUser(share.id)" class="btn btn-danger btn-xs" title="Revoke Access">
                         <i class="glyphicon glyphicon-minus"></i>
                     </a>
                 </td>
@@ -46,9 +46,66 @@
         </table>
 
         <div ng-if="access.length == 0">
-            At the moment key is not shared for any user.
+            At the moment key is not shared to any user.
         </div>
-   </div>
+    </div>
+
+    <hr>
+
+    <loader when="!teams.$resolved || !entryTeams.$resolved"></loader>
+
+    <div ng-if="teams.$resolved && entryTeams.$resolved">
+        <div class="form-group">
+            <label class="control-label">Share to Team</label>
+            <div class="row">
+                <div class="col-xs-9">
+                    <ui-select ng-model="share.team">
+                        <ui-select-match>{{ $select.selected.name }}</ui-select-match>
+                        <ui-select-choices repeat="team.id as team in teams | filter: {$: $select.search}">
+                            <strong>{{ team.name }}</strong>
+                            <ul class="list-inline">
+                                <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
+                                <li ng-repeat="user in team.users">{{ user.email }}</li>
+                            </ul>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+                <div class="col-xs-3">
+                    <button class="btn btn-default btn-block btn-success" ng-click="shareTeam()">
+                        <i class="glyphicon glyphicon-text-width"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <table class="table" ng-if="entryTeams.length > 0">
+            <thead>
+                <th>Name</th>
+                <th>Members</th>
+                <th></th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="share in entryTeams">
+                <td>{{ share.team.name }}</td>
+                <td>
+                    <ul class="list-inline">
+                        <li title="Team Owner"><u>{{ share.team.owner.email }}</u></li>
+                        <li ng-repeat="user in share.team.users">{{ user.email }}</li>
+                    </ul>
+                </td>
+                 <td class="text-right">
+                    <a ng-click="revokeTeam(share.id)" class="btn btn-danger btn-xs" title="Revoke Access">
+                        <i class="glyphicon glyphicon-minus"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div ng-if="entryTeams.length == 0">
+            At the moment key is not shared to any team.
+        </div>
+    </div>
 
 </div>
 <div class="modal-footer">

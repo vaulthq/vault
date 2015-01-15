@@ -13,6 +13,7 @@
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
+            entryTeams: $resource("/api/entryTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
             loginAs: $resource("/internal/auth/login/:id", null),
             profile: $resource("/api/profile", null, enableCustom),

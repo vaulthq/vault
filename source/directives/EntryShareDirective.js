@@ -29,6 +29,12 @@
                             },
                             entry: function() {
                                 return $scope.entry;
+                            },
+                            teams: function(Api) {
+                                return Api.team.query();
+                            },
+                            entryTeams: function(Api) {
+                                return Api.entryTeams.query({id: $scope.entry.id});
                             }
                         }
                     }).result.then(function (model) {

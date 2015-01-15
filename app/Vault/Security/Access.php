@@ -23,7 +23,7 @@ class Access
             return true;
         }
 
-        if ($this->belongsToAssignedTeams($entry)) {
+        if ($this->belongsToAssignedTeams($entry) || $this->belongsToSharedTeams($entry)) {
             return true;
         }
 
@@ -59,6 +59,23 @@ class Access
             }
 
             if ($this->isTeamMember($team)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function belongsToSharedTeams(Entry $entry)
+    {
+        $shares = $entry->teamShares()->with('team', 'team.users')->get();
+
+        foreach ($shares as $share) {
+            if ($this->isTeamOwner($share->team)) {
+                return true;
+            }
+
+            if ($this->isTeamMember($share->team)) {
                 return true;
             }
         }
