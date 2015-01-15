@@ -31,29 +31,36 @@ class EntryTeamsController extends \BaseController {
 	 */
 	public function store()
 	{
+		$teamId = Input::get('team_id');
+		$entryId = Input::get('id');
+
         $validator = Validator::make([
-            'team_id' => Input::get('team_id'),
-            'project_id' => Input::get('entry_id')
+            'team_id' => $teamId,
+            'entry_id' => $entryId
         ], EntryTeam::$rules);
 
         if ($validator->fails()) {
             return Response::make($validator->messages()->first(), 419);
         }
 
-        $entry = Entry::findOrFail(Input::get('entry_id'));
+		if (EntryTeam::where('team_id', $teamId)->where('entry_id', $entryId)->count() > 0) {
+			return Response::make('This entry is already shared for this team.', 419);
+		}
+
+		$entry = Entry::findOrFail($entryId);
         if (!$entry->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
         $model = new EntryTeam();
         $model->user_by_id = Auth::user()->id;
-        $model->entry_id = Input::get('entry_id');
-        $model->team_id = Input::get('team_id');
+        $model->entry_id = $entryId;
+        $model->team_id = $teamId;
         $model->save();
 
         History::make('share', 'Added team to entry ('.$entry->name.').', $model->id);
 
-        return $model;
+        return EntryTeam::with('team', 'team.users', 'team.owner')->where('id', $model->id)->first();
 	}
 
 
@@ -65,7 +72,7 @@ class EntryTeamsController extends \BaseController {
 	 */
 	public function show($id)
 	{
-        return EntryTeam::where('entry_id', $id)->get();
+        return EntryTeam::with('team', 'team.users', 'team.owner')->where('entry_id', $id)->get();
     }
 
 

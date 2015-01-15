@@ -701,7 +701,7 @@ xApp
                 team_id: $scope.share.team,
                 id: $scope.entry.id
             }, function(response) {
-                $scope.teamAccess.push(response);
+                $scope.entryTeams.push(response);
             });
         };
 

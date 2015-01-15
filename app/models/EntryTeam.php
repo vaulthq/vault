@@ -9,4 +9,9 @@ class EntryTeam extends Eloquent
         'team_id' => 'required',
         'entry_id' => 'required',
     ];
+
+    public function team()
+    {
+        return $this->belongsTo('Team', 'team_id');
+    }
 }
