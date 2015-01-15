@@ -63,7 +63,7 @@
                         <ui-select-match>{{ $select.selected.name }}</ui-select-match>
                         <ui-select-choices repeat="team.id as team in teams | filter: {$: $select.search}">
                             <strong>{{ team.name }}</strong>
-                            <ul class="list-inline">
+                            <ul>
                                 <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
                                 <li ng-repeat="user in team.users">{{ user.email }}</li>
                             </ul>
