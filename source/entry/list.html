@@ -8,7 +8,6 @@
             <th>Title</th>
             <th>Name</th>
             <th>Address</th>
-            <th>Created</th>
             <th>Updated</th>
             <th style="min-width: 130px"></th>
         </tr>
@@ -23,7 +22,7 @@
                 <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-                <td colspan="3"></td>
+                <td colspan="2"></td>
             </tr>
 
             <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeEntry}">
@@ -31,8 +30,7 @@
                 <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
                 <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
                 <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
-                <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
-                <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}"></span></td>
+                <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span></td>
                 <td class="text-right">
                     <entry-access-info entry="entry"></entry-access-info>
 
