@@ -122,6 +122,21 @@ class EntryController extends \BaseController
             }
         }
 
+        foreach ($model->teamShares()->with('team', 'team.users')->get() as $share) {
+            $team = $share->team;
+            if (!in_array($team->user_id, $added)) {
+                $users[] = $team->owner->toArray();
+                $added[] = $team->user_id;
+            }
+
+            foreach ($team->users as $user) {
+                if (!in_array($user->id, $added)) {
+                    $users[] = $user->toArray();
+                    $added[] = $user->id;
+                }
+            }
+        }
+
         if (!in_array($model->owner->id, $added)) {
             $users[] = $model->owner->toArray();
             $added[] = $model->owner->id;

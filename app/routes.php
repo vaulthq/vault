@@ -28,7 +28,9 @@ Route::group(['before' => 'ngcsrf'], function() {
 
         Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
         Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
+
         Route::resource('entry', 'EntryController');
+        Route::resource('entryTeams', 'EntryTeamsController');
 
         Route::group(['before' => 'admin'], function() {
             Route::resource('history', 'HistoryController');

@@ -48,6 +48,12 @@ class Entry extends Eloquent
         return $this->hasMany('Share', 'entry_id');
     }
 
+    public function teamShares()
+    {
+        return $this->hasMany('EntryTeam', 'entry_id');
+    }
+
+
     private function fixNewLines($str)
     {
         return preg_replace('~\r\n?~', "\r\n", $str);
