@@ -1,9 +1,8 @@
-vendor
-node_modules
-.git
-.idea
-bower_components
-Vagrantfile
-bin
+/vendor
+/node_modules
+/.idea
+/bower_components
+/Vagrantfile
+/bin
 /app/config/local
-.vagrant
+/.vagrant
