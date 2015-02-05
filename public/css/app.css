@@ -10,11 +10,9 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background: #4F565E;
+  background: #F1F1F1;
 }
 ::-webkit-scrollbar-thumb {
-  border-radius: 10px;
   background: #64737e;
 }
 ::-webkit-scrollbar-thumb:window-inactive {
@@ -54,6 +52,15 @@ body {
   background: #3B424C;
   border-right: 1px solid #4F565E;
   z-index: 1;
+}
+.project-list ::-webkit-scrollbar-track {
+  background: #3B424C;
+}
+.project-list ::-webkit-scrollbar-thumb {
+  background: #64737e;
+}
+.project-list ::-webkit-scrollbar-thumb:window-inactive {
+  background: #4F565E;
 }
 .project-list .nav li {
   line-height: 1em;
