@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'domain' => 'x-share.dev',
+    'domain' => 'localhost',
     'https' => false,
     'csrf' => false
 );
