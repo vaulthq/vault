@@ -10,6 +10,10 @@
 </head>
 <body>
 
+<div class="vault">
+    Vault
+</div>
+
 <div ui-view></div>
 
 <flash:messages></flash:messages>

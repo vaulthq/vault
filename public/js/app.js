@@ -7,7 +7,6 @@ var xApp = angular.module('xApp', [
     'ui.bootstrap',
     'ui.router',
     'ui.select',
-    'ngScrollbar',
     'angularMoment',
     'toaster'
 ]);
@@ -53,19 +52,20 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api, $filter) {
                 $scope.projects = projects;
                 $rootScope.projectId = projectId;
 
                 $scope.login = AuthFactory.getUser();
 
-                $scope.projects.$promise.then(function() {
-                    $scope.broadcastProjectList();
-                });
-
-                $scope.broadcastProjectList = function() {
-                    $scope.$broadcast('rebuild:scrollbar');
-                }
+                $scope.openFirst = function ($event) {
+                    if ($event.which === 13) {
+                        var project = $filter('filter')(projects, $scope.projectFilter).shift();
+                        if (project) {
+                            $location.path('/project/' + project.id);
+                        }
+                    }
+                };
 
                 $scope.createProject = function() {
                     $modal.open({
@@ -73,16 +73,15 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
                         controller: 'ModalCreateProjectController'
                     }).result.then(function (model) {
                         $scope.projects.push(model);
-                        $scope.broadcastProjectList();
                     });
-                }
+                };
 
                 $scope.logout = function () {
                     Api.auth.get({}, function() {
                         AuthFactory.logout();
                         $location.path('/login');
                     })
-                }
+                };
 
                 $scope.profile = function() {
                     $modal.open({
@@ -1163,8 +1162,6 @@ xApp
             }
             ProjectFactory.delete({id: $scope.projectId});
             $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $rootScope.$broadcast('rebuild:scrollbar');
-
             $location.path('/recent');
         };
     })
