@@ -1,13 +1,13 @@
+# Setup via vagrant
+Install docker (> 1.4 recommended)
+
+    vagrant up
+    
+SSH to container
+
+    vagrant ssh
+
 # Setup vault
-
-Install globally with nodejs
-
-    npm install -g gulp bower
-
-Run these commands
-
-    npm install
-    npm run setup
     
 Install framework deps:
 
@@ -72,7 +72,21 @@ Add hostname to [see issue](http://pm.datajob.lt/datadog/vault/issues/19):
 
     vim bootstrap/start.php # at line 29
     
+# Compile assets
+
+Install globally with nodejs
+
+    npm install -g gulp bower
+
+Run these commands
+
+    npm install
+    npm run setup
+
+# Login details
+
 How to login:
 
     Username: admin
     Password: admin
+

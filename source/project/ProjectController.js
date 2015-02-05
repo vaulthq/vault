@@ -92,8 +92,6 @@ xApp
             }
             ProjectFactory.delete({id: $scope.projectId});
             $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $rootScope.$broadcast('rebuild:scrollbar');
-
             $location.path('/recent');
         };
     })

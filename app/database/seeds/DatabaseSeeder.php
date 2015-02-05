@@ -11,21 +11,25 @@ class DatabaseSeeder extends Seeder {
 	{
 		Eloquent::unguard();
 
-		// $this->call('UserTableSeeder');
-        User::create([
-            'email' => 'admin',
-            'password' => Hash::make('admin'),
-            'name' => 'Main',
-            'surname' => 'Admin',
-            'group' => \User::GROUP_ADMIN
-        ]);
-
-        for ($i=0; $i<5; $i++) {
-            Project::create([
-                'name' => 'Project' . ($i + 1),
-                'description' => 'some description about what dis is',
-                'user_id' => 1
+        if (!User::find(1)) {
+            User::create([
+                'email' => 'admin',
+                'password' => Hash::make('admin'),
+                'name' => 'Main',
+                'surname' => 'Admin',
+                'group' => \User::GROUP_ADMIN
             ]);
+
+            for ($i=0; $i<5; $i++) {
+                Project::create([
+                    'name' => 'Project' . ($i + 1),
+                    'description' => 'some description about what dis is',
+                    'user_id' => 1
+                ]);
+            }
+            echo "DB Seeded...\n";
+        } else {
+            echo "DB Already Seeded...\n";
         }
 	}
 

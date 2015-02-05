@@ -7,6 +7,37 @@ html, body {
 body {
   min-width: 970px;
 }
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: #4F565E;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #64737e;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+  background: #4F565E;
+}
+.ng-scope {
+  .vault {
+    display: none;
+  }
+}
+.vault {
+  font-size: 400px;
+  color: #4F565E;
+  text-align: center;
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+}
 .right-content {
   position: absolute;
   left: @sidebar-width;
@@ -63,6 +94,7 @@ body {
     width: @sidebar-width - 20px;
     background: #3B424C;
     border: 1px solid #4F565E;
+    color: #E7EDEA;
   }
   .ending {
     position: absolute;
@@ -130,9 +162,9 @@ body {
     }
   }
 }
-
 .project-scrollbar {
   height: calc(~"100% - 170px");
+  overflow: auto;
 }
 
 .page-header {

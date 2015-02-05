@@ -8,7 +8,6 @@ var del = require('del');
 var paths = {
     vendor_styles: [
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
-        'js_vendor/ng-scrollbar/ng-scrollbar.css',
         'bower_components/AngularJS-Toaster/toaster.css',
         'bower_components/angular-ui-select/dist/select.min.css'
     ],
@@ -27,8 +26,7 @@ var paths = {
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
-        'js_vendor/ZeroClipboard.min.js',
-        'js_vendor/ng-scrollbar/ng-scrollbar.js'
+        'js_vendor/ZeroClipboard.min.js'
     ],
     scripts: [
         'source/**/*.js'
