@@ -34,4 +34,4 @@ echo "Running migrations";
 php /var/www/artisan migrate --no-interaction
 
 echo "Running seeding";
-php /var/www/artisan db:seed --no-interaction 2&> /dev/null
+php /var/www/artisan db:seed --no-interaction
