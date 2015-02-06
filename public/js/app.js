@@ -889,23 +889,12 @@ xApp.constant('GROUPS', {
                 '<a ng-click="showPassword()" ng-class="elementClass" title="Display Password">' +
                 '    <i class="glyphicon glyphicon-lock"></i>' +
                 '</a>',
-            controller: function($scope, $modal) {
+            controller: function($scope, $modal, modal) {
                 $scope.elementClass = $scope.elementClass || 'btn btn-info btn-xs';
                 $scope.showPassword = showPasswordModal;
 
                 function showPasswordModal() {
-                    $modal.open({
-                        templateUrl: '/t/entry/password.html',
-                        controller: 'ModalGetPasswordController',
-                        resolve: {
-                            password: function(Api) {
-                                return Api.entryPassword.password({id: $scope.entryId});
-                            },
-                            entry: function(EntryFactory) {
-                                return EntryFactory.show({id: $scope.entryId});
-                            }
-                        }
-                    });
+                    modal.showPassword($scope.entryId);
                 }
             }
         };
