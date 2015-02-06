@@ -60,7 +60,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
 
                 $scope.openFirst = function ($event) {
                     if ($event.which === 13) {
-                        var project = $filter('filter')(projects, $scope.projectFilter).shift();
+                        var project = $filter('filter')(projects, $scope.projectFilter)[0];
                         if (project) {
                             $location.path('/project/' + project.id);
                         }
@@ -515,6 +515,53 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
     }
 })();
 
+/*global angular */
+/**
+ * Directive that places focus on the element it is applied to when the expression it binds to evaluates to true
+ */
+(function () {
+    angular
+        .module('xApp')
+        .directive('appFocus', appFocusDirective);
+
+    function appFocusDirective($parse) {
+        return function (scope, elem, attrs) {
+            var select = attrs.hasOwnProperty('appFocusSelect');
+            var optionsFn = angular.noop;
+            if (select) {
+                optionsFn = $parse(attrs.appFocusSelect) || optionsFn;
+            }
+            if (!attrs.appFocus) {
+                focus();
+            } else {
+                scope.$watch(attrs.appFocus, function (newVal) {
+                    if (newVal) {
+                        focus();
+                    }
+                });
+            }
+            function focus() {
+                setTimeout(function () {
+                    elem[0].focus();
+                    select && selectInput();
+                }, 200);
+            }
+
+            function selectInput() {
+                var options = optionsFn(scope);
+                if (options) {
+                    elem[0].setSelectionRange(
+                        options.start || 0,
+                        options.end || 0
+                    );
+                } else {
+                    elem[0].select();
+                }
+            }
+        };
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
@@ -540,15 +587,25 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($rootScope, $scope, $location, entries, projectId) {
+    function controller($rootScope, $scope, $location, $filter, modal, entries, projectId) {
 
         $scope.entries = entries;
         $rootScope.projectId = projectId;
         $scope.activeEntry = $location.search().active || 0;
+        $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+
+        function copyFirst($event) {
+            if ($event.which === 13) {
+                var entry = $filter('filter')($scope.entries, $scope.search)[0];
+                if (entry) {
+                    modal.showPassword(entry.id);
+                }
+            }
+        }
 
         function onEntryCreate(event, model) {
             $scope.entries.push(model);
@@ -983,6 +1040,33 @@ angular.module('shareFlash', [])
 
         return directive;
     }]);
+(function () {
+    angular
+        .module('xApp')
+        .factory('modal', modal);
+
+    function modal($modal) {
+        return {
+            showPassword: showPassword
+        };
+
+        function showPassword(entryId) {
+            return $modal.open({
+                templateUrl: '/t/entry/password.html',
+                controller: 'ModalGetPasswordController',
+                resolve: {
+                    password: function (Api) {
+                        return Api.entryPassword.password({id: entryId});
+                    },
+                    entry: function (EntryFactory) {
+                        return EntryFactory.show({id: entryId});
+                    }
+                }
+            });
+        }
+    }
+})();
+
 xApp
     .controller('HistoryController', function($scope, history) {
         $scope.history = history;

@@ -19,7 +19,7 @@
                         <i class="glyphicon glyphicon-remove"></i>
                     </button>
                 </td>
-                <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus ng-keypress="copyFirst($event)"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
                 <td colspan="2"></td>
