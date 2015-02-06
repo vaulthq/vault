@@ -22,9 +22,6 @@ mysql -u root -e "GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;"
 echo "Creating vault database";
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS vault;"
 
-echo "Potatoe git";
-sudo yum install -y git
-
 echo "Running Composer";
 php /usr/bin/composer install --working-dir=/var/www
 
