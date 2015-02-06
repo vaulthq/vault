@@ -60,7 +60,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
 
                 $scope.openFirst = function ($event) {
                     if ($event.which === 13) {
-                        var project = $filter('filter')(projects, $scope.projectFilter).shift();
+                        var project = $filter('filter')(projects, $scope.projectFilter)[0];
                         if (project) {
                             $location.path('/project/' + project.id);
                         }

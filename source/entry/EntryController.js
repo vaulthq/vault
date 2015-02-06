@@ -3,15 +3,25 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($rootScope, $scope, $location, entries, projectId) {
+    function controller($rootScope, $scope, $location, $filter, modal, entries, projectId) {
 
         $scope.entries = entries;
         $rootScope.projectId = projectId;
         $scope.activeEntry = $location.search().active || 0;
+        $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+
+        function copyFirst($event) {
+            if ($event.which === 13) {
+                var entry = $filter('filter')($scope.entries, $scope.search)[0];
+                if (entry) {
+                    modal.showPassword(entry.id);
+                }
+            }
+        }
 
         function onEntryCreate(event, model) {
             $scope.entries.push(model);
