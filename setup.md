@@ -1,13 +1,19 @@
-# Setup via vagrant
-Install docker (> 1.4 recommended)
+# Setup via Vagrant
+Install docker (> 1.4 recommended):
 
     vagrant up
     
-SSH to container
+SSH to container:
 
     vagrant ssh
 
-# Setup vault
+Run installation script (might ask for GitHub credentials):
+
+    chmod +x ./docker/setup.sh; ./docker/setup.sh
+    
+Follow [asset installation guide](#compile-assets)
+    
+# Setup vault without Vagrant
     
 Install framework deps:
 
@@ -71,8 +77,8 @@ Reload with new config:
 Add hostname to [see issue](http://pm.datajob.lt/datadog/vault/issues/19):
 
     vim bootstrap/start.php # at line 29
-    
-# Compile assets
+
+# Compile assets <a name="compile-assets"></a>
 
 Install globally with nodejs
 

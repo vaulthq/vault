@@ -22,16 +22,7 @@ mysql -u root -e "GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION;"
 echo "Creating vault database";
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS vault;"
 
-echo "Running Composer";
-php /usr/bin/composer install --working-dir=/var/www
-
 echo "Copying default configs"
 if [ ! -d /var/www/app/config/local ]; then
     cp -R -u /var/www/app/config/example /var/www/app/config/local
 fi
-
-echo "Running migrations";
-php /var/www/artisan migrate --no-interaction
-
-echo "Running seeding";
-php /var/www/artisan db:seed --no-interaction
