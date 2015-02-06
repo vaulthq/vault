@@ -1,7 +1,7 @@
-# Setup via Vagrant
-Install docker (> 1.4 recommended):
+## Setup via Vagrant
+Run Vagrant with Docker:
 
-    vagrant up
+    vagrant up --provider=docker
     
 SSH to container:
 
@@ -13,9 +13,9 @@ Run installation script (might ask for GitHub credentials):
     
 Follow [asset installation guide](#compile-assets)
     
-# Setup vault without Vagrant
+## Setup without Vagrant
     
-Install framework deps:
+Install framework dependencies:
 
     composer install
     
@@ -74,25 +74,27 @@ Reload with new config:
 
     sudo service nginx reload
     
-Add hostname to [see issue](http://pm.datajob.lt/datadog/vault/issues/19):
+Add hostname to bootstrap file ([see issue](http://pm.datajob.lt/datadog/vault/issues/19)):
 
     vim bootstrap/start.php # at line 29
 
-# Compile assets <a name="compile-assets"></a>
+## Compile assets <a name="compile-assets"></a>
 
-Install globally with nodejs
+Install NodeJS within container:
 
-    npm install -g gulp bower
+    sudo npm install -g gulp bower
 
 Run these commands
 
-    npm install
-    npm run setup
+    npm install; npm run setup
 
-# Login details
+## Login details
 
 How to login:
 
     Username: admin
     Password: admin
 
+### Before script editing use Gulp watch task:
+
+    gulp watch
