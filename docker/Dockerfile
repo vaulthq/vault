@@ -5,4 +5,4 @@ MAINTAINER "DataDog" <info@datadog.lt>
 COPY nginx.conf /etc/nginx/sites-available/default.conf
 RUN echo "date.timezone = UTC" >> /etc/php.ini
 RUN echo "cd /var/www" >> /home/www/.bashrc
-RUN yum install -y git
+RUN yum install -y git npm
