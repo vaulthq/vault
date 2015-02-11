@@ -1,10 +1,10 @@
 #!/bin/sh
 
 echo "Running Composer";
-php /usr/bin/composer install --working-dir=/var/www
+php /usr/bin/composer install --working-dir=/var/www/api
 
 echo "Running migrations";
-php /var/www/artisan migrate --no-interaction
+php /var/www/api/artisan migrate --no-interaction
 
 echo "Running seeding";
-php /var/www/artisan db:seed --no-interaction
+php /var/www/api/artisan db:seed --no-interaction
