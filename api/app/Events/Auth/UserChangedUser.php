@@ -1,14 +1,9 @@
 <?php namespace App\Events\Auth;
 
-use App\Events\Event;
 use App\Vault\Models\User;
 
-class UserChangedUser extends Event
+class UserChangedUser extends AuthEvent
 {
-	/**
-	 * @var User
-	 */
-	private $user;
 	/**
 	 * @var User
 	 */
@@ -20,16 +15,9 @@ class UserChangedUser extends Event
 	 */
 	public function __construct(User $user, User $userTo)
 	{
-		$this->user = $user;
 		$this->userTo = $userTo;
-	}
 
-	/**
-	 * @return User
-	 */
-	public function getUser()
-	{
-		return $this->user;
+		parent::__construct($user);
 	}
 
 	/**
