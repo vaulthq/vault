@@ -2,12 +2,9 @@
 
 use App\Events\Event;
 use App\Vault\Models\User;
-use Illuminate\Queue\SerializesModels;
 
 class UserChangedUser extends Event
 {
-	use SerializesModels;
-
 	/**
 	 * @var User
 	 */

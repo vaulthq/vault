@@ -98,4 +98,14 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     {
         $this->belongsToMany('Team', 'user_team', 'team_id', 'user_id');
     }
+
+    public function isAdmin()
+    {
+        return $this->group == self::GROUP_ADMIN;
+    }
+
+    public function getGroup()
+    {
+        return self::$groups[$this->group];
+    }
 }

@@ -1,9 +1,9 @@
-<?php namespace App\Events\Auth;
+<?php namespace App\Events\User;
 
 use App\Events\Event;
 use App\Vault\Models\User;
 
-class UserLoggedOut extends Event
+class UserCreated extends Event
 {
 	/**
 	 * @var User

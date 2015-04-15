@@ -1,31 +1,35 @@
 <?php namespace App\Http\Controllers;
 
+use App\Events\User\UserCreated;
+use App\Events\User\UserDeleted;
+use App\Http\Requests\AdminOnlyRequest;
+use App\Http\Requests\UserCreateRequest;
+use App\Vault\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Input;
+
 class UserController extends Controller
 {
     public function __construct()
     {
         $this->beforeFilter('admin', [
-            'only' => ['store', 'update', 'destroy']
+            'only' => ['update', 'destroy']
         ]);
     }
+
     public function index()
     {
         return User::all();
     }
 
-    public function store()
+    public function store(UserCreateRequest $request)
     {
-        $validator = Validator::make(Input::all(), User::$rules);
-
-        if ($validator->fails()) {
-            return Response::make($validator->messages()->first(), 419);
-        }
-
         $model = User::create(Input::all());
-        $model->password = Hash::make(Input::get('password'));
+        $model->password = Hash::make($request->get('password'));
         $model->save();
 
-        History::make('user', 'Created new user. (' . $model->email . ', ' . User::$groups[$model->group] . ').', $model->id);
+        event(new UserCreated($model));
 
         return $model;
     }
@@ -62,21 +66,16 @@ class UserController extends Controller
         $model->save();
     }
 
-    public function destroy($id)
+    public function destroy(User $user, AdminOnlyRequest $request)
     {
-        $model = User::findOrFail($id);
-
-        if ($this->isLastAdmin($model)) {
-            return Response::make('Unauthorized', 403);
+        if ($this->isLastAdmin($user)) {
+            abort(403);
         }
 
-        History::make('user', 'Deleted user #' . $id . ' ('.$model->email.').', $id);
+        event(new UserDeleted($user));
+/*
 
-        foreach (Project::where('user_id', $model->id)->get() as $item) {
-            $item->user_id = Auth::user()->id;
-            $item->save();
-            History::make('reassign', 'Assigning project #'.$item->id.'.', $item->id);
-        }
+//@todo move to events
 
         foreach (Entry::where('user_id', $model->id)->get() as $item) {
             $item->user_id = Auth::user()->id;
@@ -90,14 +89,14 @@ class UserController extends Controller
             History::make('reassign', 'Assigning team #'.$item->id.'.', $item->id);
         }
 
-        $model->delete();
+        $model->delete();*/
     }
 
-    private function isLastAdmin(\User $user)
+    private function isLastAdmin(User $user)
     {
         $adminCount = DB::table('user')
             ->where('id', '<>', $user->id)
-            ->where('group', \User::GROUP_ADMIN)
+            ->where('group', User::GROUP_ADMIN)
             ->whereNull('deleted_at')
             ->count();
 
