@@ -1,5 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\Entry;
+use App\Vault\Models\Project;
+
 class ProjectController extends Controller
 {
 	/**

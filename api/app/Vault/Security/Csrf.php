@@ -1,6 +1,8 @@
-<?php namespace Vault\Security;
+<?php namespace App\Vault\Security;
 
+use Config;
 use Illuminate\Http\Request;
+use Session;
 
 class Csrf
 {
@@ -27,7 +29,7 @@ class Csrf
 
     public function usingProtection()
     {
-        return \Config::get('app.csrf', true);
+        return Config::get('app.csrf', true);
     }
 
     protected function tokenMatches($token)
@@ -45,15 +47,15 @@ class Csrf
             self::COOKIE_NAME,
             $value, 0,
             '/',
-            \Config::get('app.domain'),
-            \Config::get('app.https'),
+            Config::get('app.domain'),
+            Config::get('app.https'),
             false
         );
     }
 
     protected function generateToken()
     {
-        return md5(\Session::token());
+        return md5(Session::token());
     }
 
     protected function getCsrfCookie()

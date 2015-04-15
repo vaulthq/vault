@@ -1,13 +1,9 @@
 <?php namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+
 class HistoryController extends Controller
 {
-
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
 	public function index()
 	{
 		return DB::table('history')
@@ -17,5 +13,4 @@ class HistoryController extends Controller
             ->take(500)
             ->get();
 	}
-
 }

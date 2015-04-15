@@ -1,16 +1,15 @@
-<?php
-namespace Vault;
+<?php namespace App\Vault;
 
-use Auth;
+use App\Vault\Security\Access;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Vault\Security\Access;
 
 class AccessServiceProvider extends ServiceProvider
 {
 
     public function register()
     {
-        $this->app->bind('Vault\Security\Access', function() {
+        $this->app->bind('App\Vault\Security\Access', function() {
             return new Access(Auth::user());
         });
     }

@@ -2,7 +2,7 @@
 
 Route::get('/', function()
 {
-    App::make('Vault\Security\Csrf')->createCsfrCookie();
+    App::make('App\Vault\Security\Csrf')->createCsfrCookie();
 
 	return View::make('angular');
 });

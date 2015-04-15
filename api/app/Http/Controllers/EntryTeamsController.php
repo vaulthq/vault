@@ -1,5 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\EntryTeam;
+use Illuminate\Support\Facades\Input;
+
 class EntryTeamsController extends Controller
 {
 

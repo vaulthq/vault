@@ -13,12 +13,10 @@
 	},
 	"autoload": {
 		"classmap": [
-			"database",
-			"app/Models"
+			"database"
 		],
 		"psr-4": {
-			"App\\": "app/",
-			"Vault\\": "app/Vault"
+			"App\\": "app/"
 		}
 	},
 	"scripts": {

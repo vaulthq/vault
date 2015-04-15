@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Vault\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;

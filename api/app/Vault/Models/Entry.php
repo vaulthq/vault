@@ -1,7 +1,9 @@
-<?php
+<?php namespace App\Vault\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
+use Vault\Facades\Access;
 
 class Entry extends Model
 {

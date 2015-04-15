@@ -13,7 +13,7 @@ class VerifyCsrfToken extends BaseVerifier {
 	*/
 	protected function tokensMatch($request)
 	{
-			$csrf = App::make('Vault\Security\Csrf');
+			$csrf = App::make('App\Vault\Security\Csrf');
 
 			return $csrf->isRequestValid($request);
 	}

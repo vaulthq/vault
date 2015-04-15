@@ -1,9 +1,9 @@
-<?php namespace Vault\Security;
+<?php namespace App\Vault\Security;
 
-use Entry;
-use Share;
-use Team;
-use User;
+use App\Vault\Models\Entry;
+use App\Vault\Models\Share;
+use App\Vault\Models\Team;
+use App\Vault\Models\User;
 
 class Access
 {
