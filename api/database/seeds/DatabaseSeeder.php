@@ -1,5 +1,7 @@
 <?php
 
+use App\Vault\Models\Project;
+use App\Vault\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +23,7 @@ class DatabaseSeeder extends Seeder
               'password' => Hash::make('admin'),
               'name' => 'Main',
               'surname' => 'Admin',
-              'group' => \User::GROUP_ADMIN
+              'group' => User::GROUP_ADMIN
           ]);
 
           for ($i=0; $i<5; $i++) {
