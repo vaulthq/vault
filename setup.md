@@ -17,14 +17,9 @@ Init Composer, DB and Seeding:
     
 # Compile assets
 
-Install globally with nodejs
+To compile assets, run:
 
-    npm install -g gulp bower
-
-Run these commands
-
-    npm install
-    npm run setup
+    docker-compose run --rm webtools gulp watch
 
 # Login details
 
