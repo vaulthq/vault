@@ -12,7 +12,7 @@ if [ ! -d app/config/local ]; then
 fi
 
 echo "Running Composer";
-composer install
+cdocker-compose run --rm php bash -c 'composer install -o'
 
 echo "Running migrations";
 docker-compose run --rm php bash -c 'php artisan migrate --no-interaction --env=local'
