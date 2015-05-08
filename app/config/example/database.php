@@ -5,10 +5,10 @@ return array(
 
         'mysql' => array(
             'driver'    => 'mysql',
-            'host'      => 'localhost',
+            'host'      => 'mysql',
             'database'  => 'vault',
             'username'  => 'root',
-            'password'  => '',
+            'password'  => 'secret',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
