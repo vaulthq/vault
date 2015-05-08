@@ -9,7 +9,7 @@ Make sure that you have `docker-compose >1.2` installed:
     
 Start containers:
     
-    docker-compose up
+    docker-compose up -d
     
 Init Composer, DB and Seeding:
 
