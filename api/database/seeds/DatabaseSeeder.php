@@ -3,11 +3,9 @@
 use App\Vault\Models\Project;
 use App\Vault\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 
 class DatabaseSeeder extends Seeder
 {
-
 	/**
 	 * Run the database seeds.
 	 *
@@ -15,28 +13,28 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run()
 	{
-			Eloquent::unguard();
+        Eloquent::unguard();
 
-      if (!User::find(1)) {
-          User::create([
-              'email' => 'admin',
-              'password' => Hash::make('admin'),
-              'name' => 'Main',
-              'surname' => 'Admin',
-              'group' => User::GROUP_ADMIN
-          ]);
+        if (!User::find(1)) {
+            User::create([
+                'email' => 'admin',
+                'password' => Hash::make('admin'),
+                'name' => 'Main',
+                'surname' => 'Admin',
+                'group' => \User::GROUP_ADMIN
+            ]);
 
-          for ($i=0; $i<5; $i++) {
-              Project::create([
-                  'name' => 'Project' . ($i + 1),
-                  'description' => 'some description about what dis is',
-                  'user_id' => 1
-              ]);
-          }
-          echo "DB Seeded...\n";
-      } else {
-          echo "DB Already Seeded...\n";
-      }
+            for ($i=0; $i<5; $i++) {
+                Project::create([
+                    'name' => 'Project' . ($i + 1),
+                    'description' => 'some description about what dis is',
+                    'user_id' => 1
+                ]);
+            }
+            echo "DB Seeded...\n";
+        } else {
+            echo "DB Already Seeded...\n";
+        }
 	}
 
 }

@@ -1,9 +1,9 @@
 <?php namespace App\Http\Controllers;
 
-use App\Events\User\UserCreated;
 use App\Events\User\UserDeleted;
 use App\Http\Requests\AdminOnlyRequest;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Vault\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,9 +13,9 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->beforeFilter('admin', [
+     /*   $this->beforeFilter('admin', [
             'only' => ['update', 'destroy']
-        ]);
+        ]);*/
     }
 
     public function index()
@@ -25,13 +25,7 @@ class UserController extends Controller
 
     public function store(UserCreateRequest $request)
     {
-        $model = User::create(Input::all());
-        $model->password = Hash::make($request->get('password'));
-        $model->save();
-
-        event(new UserCreated($model));
-
-        return $model;
+        return $this->dispatchFrom('App\Commands\UserCreateCommand', $request);
     }
 
     public function show($id)
@@ -39,31 +33,9 @@ class UserController extends Controller
         return User::findOrFail($id);
     }
 
-    public function update()
+    public function update(UserUpdateRequest $request)
     {
-        $data = json_decode(file_get_contents("php://input", "r"));
-
-        $model = User::findOrFail($data->id);
-
-        $model->email = $data->email;
-        $model->name = $data->name;
-        $model->surname = $data->surname;
-
-        if (isset($data->group) && $model->group != $data->group && $model->group == User::GROUP_ADMIN) {
-            if ($this->isLastAdmin($model)) {
-                return Response::make('You cannot change this user group.', 419);
-            }
-            $model->group = $data->group;
-        }
-
-        History::make('user', 'Updated user details.', $model->id);
-
-        if (isset($data->password)) {
-            History::make('user', 'Changed user password.', $model->id);
-            $model->password = Hash::make($data->password);
-        }
-
-        $model->save();
+        $this->dispatchFrom('App\Commands\UserUpdateCommand', $request);
     }
 
     public function destroy(User $user, AdminOnlyRequest $request)
@@ -92,14 +64,5 @@ class UserController extends Controller
         $model->delete();*/
     }
 
-    private function isLastAdmin(User $user)
-    {
-        $adminCount = DB::table('user')
-            ->where('id', '<>', $user->id)
-            ->where('group', User::GROUP_ADMIN)
-            ->whereNull('deleted_at')
-            ->count();
 
-        return $adminCount <= 0;
-    }
 }

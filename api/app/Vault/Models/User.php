@@ -7,6 +7,11 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class User
+ * @property string $email
+ * @package App\Vault\Models
+ */
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
     use SoftDeletes, Authenticatable, CanResetPassword;
