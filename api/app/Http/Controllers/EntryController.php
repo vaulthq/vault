@@ -75,21 +75,20 @@ class EntryController extends Controller
         return $model;
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param Entry $model
+     * @return Response
+     * @throws \Exception
+     */
+	public function destroy(Entry $model)
 	{
-        $model = Entry::findOrFail($id);
-
         if (!$model->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        History::make('entry', 'Deleted entry #' . $id . ' ('.$model->project->name.').', $id);
+        History::make('entry', 'Deleted entry #' . $model->id . ' ('.$model->project->name.').', $model->id);
 
         $model->delete();
 	}

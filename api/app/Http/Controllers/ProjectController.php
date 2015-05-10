@@ -4,9 +4,10 @@ use App\Vault\Models\Entry;
 use App\Vault\Models\History;
 use App\Vault\Models\Project;
 use App\Vault\Models\User;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
 {

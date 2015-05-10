@@ -1,6 +1,11 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\History;
 use App\Vault\Models\Team;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class TeamController extends Controller
 {
