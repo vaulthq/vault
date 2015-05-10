@@ -4,13 +4,19 @@ use App\Events\Auth\UserChangedUser;
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\UserLoggedOut;
 use App\Vault\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Response;
+use App\Vault\Response\JsonResponse;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function __construct()
+    use JsonResponse;
+    /**
+     * @var Guard
+     */
+    private $guard;
+
+    public function __construct(Guard $guard)
     {
         $this->beforeFilter('ngauth', [
             'only' => ['getLogin']
@@ -21,46 +27,51 @@ class AuthController extends Controller
         $this->beforeFilter('admin', [
             'only' => ['getLogin']
         ]);
+
+        $this->guard = $guard;
     }
 
-    public function postIndex()
+    public function postIndex(Request $request)
     {
-        if (Auth::attempt(Input::only('email', 'password'), Input::get('remember'))) {
-            event(new UserLoggedIn(Auth::user()));
+        $guard = $this->guard;
 
-            return Response::json(['user' => Auth::user()->toArray()], 202);
+        if ($guard->attempt($request->only('email', 'password'), $request->get('remember'))) {
+            /** @var User $user */
+            $user = $guard->user();
+
+            event(new UserLoggedIn($user));
+
+            return $this->jsonResponse(['user' => $user]);
         }
 
-        return Response::json(['Invalid username or password'], 401);
+        return $this->jsonResponse(['Invalid username or password'], 401);
     }
 
     public function getStatus()
     {
-        if (Auth::check()) {
-            return Response::json(['user' => Auth::user()->toArray()], 202);
+        if ($this->guard->check()) {
+            return $this->jsonResponse(['user' => $this->guard->user()]);
         }
 
-        return Response::json([], 405);
+        return $this->jsonResponse(null, 405);
     }
 
     public function getIndex()
     {
-        if (Auth::check()) {
-            event(new UserLoggedOut(Auth::user()));
-            Auth::logout();
+        if ($this->guard->check()) {
+            event(new UserLoggedOut($this->guard->user()));
+            $this->guard->logout();
         }
 
-        return Response::json(['flash' => trans('auth.flash.logout_success')], 200);
+        return $this->jsonResponse(['flash' => trans('auth.flash.logout_success')]);
     }
 
-    public function getLogin($id)
+    public function getLogin(User $user)
     {
-        $user = User::findOrFail($id);
+        event(new UserChangedUser($this->guard->user(), $user));
 
-        event(new UserChangedUser(Auth::user(), $user));
+        $this->guard->login($user);
 
-        Auth::login($user);
-
-        return Response::json(['user' => Auth::user()->toArray()], 202);
+        return $this->jsonResponse(['user' => $this->guard->user()]);
     }
 }
