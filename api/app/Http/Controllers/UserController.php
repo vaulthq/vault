@@ -4,10 +4,11 @@ use App\Events\User\UserDeleted;
 use App\Http\Requests\AdminOnlyRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Vault\Models\Entry;
+use App\Vault\Models\History;
+use App\Vault\Models\Team;
 use App\Vault\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -28,9 +29,9 @@ class UserController extends Controller
         return $this->dispatchFrom('App\Commands\UserCreateCommand', $request);
     }
 
-    public function show($id)
+    public function show(User $model)
     {
-        return User::findOrFail($id);
+        return $model;
     }
 
     public function update(UserUpdateRequest $request)
@@ -40,28 +41,9 @@ class UserController extends Controller
 
     public function destroy(User $user, AdminOnlyRequest $request)
     {
-        if ($this->isLastAdmin($user)) {
-            abort(403);
-        }
-
-        event(new UserDeleted($user));
-/*
-
-//@todo move to events
-
-        foreach (Entry::where('user_id', $model->id)->get() as $item) {
-            $item->user_id = Auth::user()->id;
-            $item->save();
-            History::make('reassign', 'Assigning entry #'.$item->id.'.', $item->id);
-        }
-
-        foreach (Team::where('user_id', $model->id)->get() as $item) {
-            $item->user_id = Auth::user()->id;
-            $item->save();
-            History::make('reassign', 'Assigning team #'.$item->id.'.', $item->id);
-        }
-
-        $model->delete();*/
+        $this->dispatchFrom('App\Commands\UserDeleteCommand', $request, [
+            'id' => $user->id
+        ]);
     }
 
 

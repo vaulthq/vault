@@ -1,6 +1,7 @@
 <?php namespace App\Commands;
 
 use App\Events\User\UserCreated;
+use App\Vault\Models\History;
 use App\Vault\Models\User;
 use App\Vault\Repository\UserRepository;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -69,16 +70,16 @@ class UserUpdateCommand extends Command implements SelfHandling
             $model->group = $this->group;
         }
 
- /*       History::make('user', 'Updated user details.', $model->id);
+        History::make('user', 'Updated user details.', $model->id);
 
-        if (isset($data->password)) {
+        if ( ! is_null($this->password)) {
             History::make('user', 'Changed user password.', $model->id);
-            $model->password = Hash::make($data->password);
-        }*/
+            $model->password = Hash::make($this->password);
+        }
 
         $model->save();
 
-//        event(new UserCreated($model));
+        event(new UserCreated($model));
 
         return $model;
     }

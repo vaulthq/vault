@@ -25,6 +25,7 @@ class RouteServiceProvider extends ServiceProvider {
 		parent::boot($router);
 
 		$router->model('entry', 'App\Vault\Models\Entry');
+		$router->model('user', 'App\Vault\Models\User');
 	}
 
 	/**
