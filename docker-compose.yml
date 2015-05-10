@@ -15,20 +15,18 @@ web:
 php:
   image: datadoglt/php:56
   volumes_from: [app]
+  working_dir: /var/www
   links:
    - mysql
 
 mysql:
   image: mysql:5.6
-  env_file:
-    - .env
+  environment:
+    MYSQL_ROOT_PASSWORD: secret
 
-artisan:
-  image: datadoglt/php:56
-  user: www
-  working_dir: /var/www
-  entrypoint: /var/www/api/artisan
-  command: queue:listen --tries=2 --timeout=360
+webtools:
+  image: datadoglt/webtools
   volumes_from: [app]
-  links:
-   - mysql
+  working_dir: /var/www
+#  environment:
+#    GULP_TASK: watch
