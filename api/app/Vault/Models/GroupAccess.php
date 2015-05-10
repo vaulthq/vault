@@ -15,7 +15,7 @@ class GroupAccess extends Model
 
     public function entry()
     {
-        return $this->belongsTo('Entry', 'entry_id');
+        return $this->belongsTo('App\Vault\Models\Entry', 'entry_id');
     }
 
     public function getAdminAttribute($value)

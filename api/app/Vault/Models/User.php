@@ -96,12 +96,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function share()
     {
-        return $this->hasMany('Share', 'user_id');
+        return $this->hasMany('App\Vault\Models\Share', 'user_id');
     }
 
     public function teams()
     {
-        $this->belongsToMany('Team', 'user_team', 'team_id', 'user_id');
+        $this->belongsToMany('App\Vault\Models\Team', 'user_team', 'team_id', 'user_id');
     }
 
     public function isAdmin()

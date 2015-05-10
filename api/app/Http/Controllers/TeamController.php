@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\Team;
+
 class TeamController extends Controller
 {
 

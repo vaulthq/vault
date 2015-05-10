@@ -1,9 +1,9 @@
 <?php namespace App\Vault\Models;
 
+use App\Vault\Facades\Access;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
-use Vault\Facades\Access;
 
 class Entry extends Model
 {
@@ -33,27 +33,27 @@ class Entry extends Model
 
     public function groupAccess()
     {
-        return $this->hasOne('GroupAccess', 'entry_id');
+        return $this->hasOne('App\Vault\Models\GroupAccess', 'entry_id');
     }
 
     public function project()
     {
-        return $this->belongsTo('Project', 'project_id');
+        return $this->belongsTo('App\Vault\Models\Project', 'project_id');
     }
 
     public function owner()
     {
-        return $this->belongsTo('User', 'user_id');
+        return $this->belongsTo('App\Vault\Models\User', 'user_id');
     }
 
     public function shares()
     {
-        return $this->hasMany('Share', 'entry_id');
+        return $this->hasMany('App\Vault\Models\Share', 'entry_id');
     }
 
     public function teamShares()
     {
-        return $this->hasMany('EntryTeam', 'entry_id');
+        return $this->hasMany('App\Vault\Models\EntryTeam', 'entry_id');
     }
 
 

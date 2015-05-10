@@ -28,7 +28,7 @@ class Project extends Model
 
     public function keys()
     {
-        return $this->hasMany('Entry', 'project_id');
+        return $this->hasMany('App\Vault\Models\Entry', 'project_id');
     }
 
     public function getCanEditAttribute()
@@ -38,6 +38,6 @@ class Project extends Model
 
     public function teams()
     {
-        return $this->belongsToMany('Team', 'project_team', 'project_id', 'team_id');
+        return $this->belongsToMany('App\Vault\Models\Team', 'project_team', 'project_id', 'team_id');
     }
 }

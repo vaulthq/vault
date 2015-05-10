@@ -22,16 +22,16 @@ class Share extends Model
 
     public function owner()
     {
-        return $this->belongsTo('User', 'user_by_id');
+        return $this->belongsTo('App\Vault\Models\User', 'user_by_id');
     }
 
     public function user()
     {
-        return $this->belongsTo('User', 'user_id');
+        return $this->belongsTo('App\Vault\Models\User', 'user_id');
     }
 
     public function entry()
     {
-        return $this->belongsTo('Entry', 'entry_id');
+        return $this->belongsTo('App\Vault\Models\Entry', 'entry_id');
     }
 }

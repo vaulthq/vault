@@ -145,6 +145,7 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 
+		'App\Vault\AccessServiceProvider',
 	],
 
 	/*
@@ -193,6 +194,7 @@ return [
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
 
+		'Access'    => 'App\Vault\Facades\Access',
 	],
 
 ];

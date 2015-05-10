@@ -1,5 +1,13 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\History;
+use App\Vault\Models\Team;
+use App\Vault\Models\UserTeam;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Response;
+
 class TeamMembersController extends Controller
 {
 

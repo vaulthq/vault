@@ -1,5 +1,11 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Models\History;
+use App\Vault\Models\Project;
+use App\Vault\Models\ProjectTeam;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+
 class ProjectTeamsController extends Controller
 {
 

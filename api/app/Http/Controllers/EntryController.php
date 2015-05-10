@@ -2,6 +2,7 @@
 
 use App\Vault\Models\Entry;
 use App\Vault\Models\History;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
@@ -32,44 +33,41 @@ class EntryController extends Controller
         return $model;
     }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
+    /**
+     * Display the specified resource.
+     *
+     * @param Entry $model
+     * @return Response
+     */
+	public function show(Entry $model)
 	{
-		return Entry::findOrFail($id);
+		return $model;
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Entry $model
+     * @param Request $request
+     * @return Response
+     */
+	public function update(Entry $model, Request $request)
 	{
-        $data = json_decode(file_get_contents("php://input", "r"));
-
-        $model = Entry::findOrFail($data->id);
-
         if (!$model->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        $model->name = $data->name;
-        $model->username = $data->username;
-        $model->url = $data->url;
-        $model->note = $data->note;
+        $model->name = $request->get('name');
+        $model->username = $request->get('username');
+        $model->url = $request->get('url');
+        $model->note = $request->get('note');
 
         History::make('entry', 'Updated entry details.', $model->id);
 
-        if (isset($data->password)) {
+        if ( ! is_null($request->get('password', null))) {
             History::make('entry_p', 'Updated entry password.', $model->id);
 
-            $model->password = $data->password;
+            $model->password = $request->get('password');
         }
 
         $model->save();

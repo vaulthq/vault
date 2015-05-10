@@ -44,16 +44,16 @@ class Team extends Model
 
     public function owner()
     {
-        return $this->belongsTo('User', 'user_id');
+        return $this->belongsTo('App\Vault\Models\User', 'user_id');
     }
 
     public function users()
     {
-        return $this->belongsToMany('User', 'user_team', 'team_id', 'user_id');
+        return $this->belongsToMany('App\Vault\Models\User', 'user_team', 'team_id', 'user_id');
     }
 
     public function projects()
     {
-        return $this->belongsToMany('Project', 'project_team', 'team_id', 'project_id');
+        return $this->belongsToMany('App\Vault\Models\Project', 'project_team', 'team_id', 'project_id');
     }
 }

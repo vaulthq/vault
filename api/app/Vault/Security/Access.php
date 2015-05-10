@@ -19,6 +19,8 @@ class Access
 
     public function userCanAccessEntry(Entry $entry)
     {
+//        var_dump($entry->id);
+//        var_dump($entry->project()->get());die;
         if ($this->isEntryOwner($entry)) {
             return true;
         }
