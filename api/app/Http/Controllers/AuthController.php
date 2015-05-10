@@ -7,6 +7,9 @@ use App\Vault\Models\User;
 use App\Vault\Response\JsonResponse;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\JWTAuth;
+use Tymon\JWTAuth\Providers\Auth\AuthInterface;
 
 class AuthController extends Controller
 {
@@ -31,37 +34,40 @@ class AuthController extends Controller
         $this->guard = $guard;
     }
 
-    public function postIndex(Request $request)
+    public function postIndex(Request $request, JWTAuth $jwt, AuthInterface $auth)
     {
-        $guard = $this->guard;
+        $credentials = $request->only('email', 'password');
 
-        if ($guard->attempt($request->only('email', 'password'), $request->get('remember'))) {
-            /** @var User $user */
-            $user = $guard->user();
-
-            event(new UserLoggedIn($user));
-
-            return $this->jsonResponse(['user' => $user]);
+        try {
+            if ($auth->byCredentials($credentials)) {
+                if ($token = $jwt->fromUser($auth->user(), ['user' => $auth->user()])) {
+                    return $this->jsonResponse(['token' => $token]);
+                }
+            }
+        } catch (JWTException $e) {
+            return $this->jsonResponse(['Error creating JWT token'], 401);
         }
+
+        //event(new UserLoggedIn($user));
 
         return $this->jsonResponse(['Invalid username or password'], 401);
     }
 
-    public function getStatus()
+    public function getStatus(JWTAuth $jwt)
     {
-        if ($this->guard->check()) {
-            return $this->jsonResponse(['user' => $this->guard->user()]);
+        if ($token = $jwt->getToken()) {
+            return $this->jsonResponse(['user' => $jwt->toUser($token)]);
         }
 
         return $this->jsonResponse(null, 405);
     }
 
-    public function getIndex()
+    public function getIndex(JWTAuth $jwt)
     {
-        if ($this->guard->check()) {
-            event(new UserLoggedOut($this->guard->user()));
-            $this->guard->logout();
-        }
+        //if ($this->guard->check()) {
+         //   event(new UserLoggedOut($jwt->toUser()));
+            $jwt->invalidate($jwt->getToken());
+       // }
 
         return $this->jsonResponse(['flash' => trans('auth.flash.logout_success')]);
     }

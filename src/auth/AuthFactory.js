@@ -3,8 +3,8 @@
         .module('xApp')
         .factory('AuthFactory', auth);
 
-    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
-        var cookieName = 'user';
+    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
+        var localToken = 'auth_token';
 
         return {
             login: login,
@@ -12,22 +12,37 @@
             getUser: getUser,
             isLoggedIn: isLoggedIn,
             initLogin: initLogin,
-            loginAs: loginAs
+            loginAs: loginAs,
+            getToken: getToken,
+            tokenExpired: tokenExpired
         };
 
-        function login(response) {
-            $cookieStore.put(cookieName, response);
+        function getToken() {
+            return localStorage.getItem(localToken);
+        }
+
+        function login(token) {
+            localStorage.setItem(localToken, token);
             $rootScope.$broadcast('auth:login', getUser());
         }
 
         function logout() {
-            $cookieStore.remove(cookieName);
+            localStorage.removeItem(localToken);
             $rootScope.$broadcast('auth:login', null);
         }
 
         function getUser() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function tokenExpired() {
+            return jwtHelper.isTokenExpired(getToken());
         }
 
         function isLoggedIn() {
@@ -40,7 +55,7 @@
                 password: $sanitize(password),
                 remember: $sanitize(remember)
             }, function (response) {
-                login(response);
+                login(response.token);
                 $location.path('/recent');
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);

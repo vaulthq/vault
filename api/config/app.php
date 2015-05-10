@@ -136,9 +136,8 @@ return [
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 
-		/*
-		 * Application Service Providers...
-		 */
+		'Tymon\JWTAuth\Providers\JWTAuthServiceProvider',
+
 		'App\Providers\AppServiceProvider',
 		'App\Providers\BusServiceProvider',
 		'App\Providers\ConfigServiceProvider',
@@ -193,6 +192,9 @@ return [
 		'URL'       => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
+
+		'JWTAuth' => 'Tymon\JWTAuth\Facades\JWTAuth',
+		'JWTFactory' => 'Tymon\JWTAuth\Facades\JWTFactory',
 
 		'Access'    => 'App\Vault\Facades\Access',
 	],

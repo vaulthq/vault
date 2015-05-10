@@ -16,14 +16,7 @@
         function error(rejection) {
             var AuthFactory = $injector.get('AuthFactory');
 
-            if (rejection.status === 420) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
-                }
-                location.reload();
-            }
-
-            if (rejection.status === 401) {
+            if (rejection.status === 400 || rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
                     toaster.pop('warning', 'Session Expired', 'Please log in.');
                 }

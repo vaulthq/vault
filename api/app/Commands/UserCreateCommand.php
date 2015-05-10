@@ -35,7 +35,7 @@ class UserCreateCommand extends Command implements SelfHandling
      * @param string $name
      * @param string $surname
      */
-    public function __construct($email, $password, $group, $name, $surname)
+    public function __construct($email, $password, $group, $name = '', $surname = '')
     {
         $this->email = $email;
         $this->password = $password;

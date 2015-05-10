@@ -8,7 +8,8 @@ var xApp = angular.module('xApp', [
     'ui.router',
     'ui.select',
     'angularMoment',
-    'toaster'
+    'toaster',
+    'angular-jwt'
 ]);
 
 xApp.config([
@@ -16,7 +17,8 @@ xApp.config([
     '$urlRouterProvider',
     '$httpProvider',
     'uiSelectConfig',
-function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
+    'jwtInterceptorProvider',
+function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtInterceptorProvider) {
 
     uiSelectConfig.theme = 'bootstrap';
 
@@ -30,9 +32,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, Api, AuthFactory) {
-                Api.authStatus.get({}, function(response) {
-                    AuthFactory.login(response);
+            controller: function($location, Api) {
+                Api.authStatus.get({}, function() {
                     $location.path('/recent');
                 }, function() {
                     $location.path('/login');
@@ -174,6 +175,18 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         });
 
     $urlRouterProvider.otherwise('/404');
+
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
+        var idToken = AuthFactory.getToken();
+
+        if (config.url.substr(config.url.length - 5) == '.html') {
+            return null;
+        }
+
+        return idToken;
+    };
+
+    $httpProvider.interceptors.push('jwtInterceptor');
 
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);

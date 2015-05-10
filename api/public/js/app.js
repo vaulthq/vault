@@ -8,7 +8,8 @@ var xApp = angular.module('xApp', [
     'ui.router',
     'ui.select',
     'angularMoment',
-    'toaster'
+    'toaster',
+    'angular-jwt'
 ]);
 
 xApp.config([
@@ -16,7 +17,8 @@ xApp.config([
     '$urlRouterProvider',
     '$httpProvider',
     'uiSelectConfig',
-function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
+    'jwtInterceptorProvider',
+function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtInterceptorProvider) {
 
     uiSelectConfig.theme = 'bootstrap';
 
@@ -30,9 +32,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, Api, AuthFactory) {
-                Api.authStatus.get({}, function(response) {
-                    AuthFactory.login(response);
+            controller: function($location, Api) {
+                Api.authStatus.get({}, function() {
                     $location.path('/recent');
                 }, function() {
                     $location.path('/login');
@@ -175,6 +176,18 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
 
     $urlRouterProvider.otherwise('/404');
 
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
+        var idToken = AuthFactory.getToken();
+
+        if (config.url.substr(config.url.length - 5) == '.html') {
+            return null;
+        }
+
+        return idToken;
+    };
+
+    $httpProvider.interceptors.push('jwtInterceptor');
+
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
 
@@ -233,8 +246,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         .module('xApp')
         .factory('AuthFactory', auth);
 
-    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster) {
-        var cookieName = 'user';
+    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
+        var localToken = 'auth_token';
 
         return {
             login: login,
@@ -242,22 +255,37 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
             getUser: getUser,
             isLoggedIn: isLoggedIn,
             initLogin: initLogin,
-            loginAs: loginAs
+            loginAs: loginAs,
+            getToken: getToken,
+            tokenExpired: tokenExpired
         };
 
-        function login(response) {
-            $cookieStore.put(cookieName, response);
+        function getToken() {
+            return localStorage.getItem(localToken);
+        }
+
+        function login(token) {
+            localStorage.setItem(localToken, token);
             $rootScope.$broadcast('auth:login', getUser());
         }
 
         function logout() {
-            $cookieStore.remove(cookieName);
+            localStorage.removeItem(localToken);
             $rootScope.$broadcast('auth:login', null);
         }
 
         function getUser() {
-            var fromCookie = $cookieStore.get(cookieName) || [];
-            return fromCookie.user || [];
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function tokenExpired() {
+            return jwtHelper.isTokenExpired(getToken());
         }
 
         function isLoggedIn() {
@@ -270,7 +298,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
                 password: $sanitize(password),
                 remember: $sanitize(remember)
             }, function (response) {
-                login(response);
+                login(response.token);
                 $location.path('/recent');
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
@@ -305,14 +333,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig) {
         function error(rejection) {
             var AuthFactory = $injector.get('AuthFactory');
 
-            if (rejection.status === 420) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Trying to log in...');
-                }
-                location.reload();
-            }
-
-            if (rejection.status === 401) {
+            if (rejection.status === 400 || rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
                     toaster.pop('warning', 'Session Expired', 'Please log in.');
                 }

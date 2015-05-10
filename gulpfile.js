@@ -24,6 +24,7 @@ var paths = {
         'bower_components/angular-ui-select/dist/select.min.js',
         'bower_components/AngularJS-Toaster/toaster.js',
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
+        'bower_components/angular-jwt/dist/angular-jwt.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
