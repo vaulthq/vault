@@ -21,14 +21,12 @@ class AuthController extends Controller
 
     public function __construct(Guard $guard)
     {
-        $this->beforeFilter('ngauth', [
-            'only' => ['getLogin']
-        ]);
-        $this->beforeFilter('ngcsrf', [
-            'only' => ['getLogin']
-        ]);
         $this->beforeFilter('admin', [
             'only' => ['getLogin']
+        ]);
+
+        $this->beforeFilter('jwt.refresh', [
+            'only' => ['getRefresh']
         ]);
 
         $this->guard = $guard;
@@ -70,6 +68,13 @@ class AuthController extends Controller
        // }
 
         return $this->jsonResponse(['flash' => trans('auth.flash.logout_success')]);
+    }
+
+    public function getRefresh(JWTAuth $jwt)
+    {
+        $token = $jwt->refresh($jwt->getToken());
+
+        return $this->jsonResponse(['token' => $token]);
     }
 
     public function getLogin(User $user)

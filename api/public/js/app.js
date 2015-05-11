@@ -176,11 +176,29 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
     $urlRouterProvider.otherwise('/404');
 
-    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory, $http) {
         var idToken = AuthFactory.getToken();
 
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
+        }
+
+        var refreshingToken = null;
+
+        if (idToken && AuthFactory.tokenExpired()) {
+            if (refreshingToken === null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + AuthFactory.getToken()
+                    }
+                }).then(function(response) {
+                    AuthFactory.login(response.data.token);
+                });
+            }
+            return refreshingToken;
         }
 
         return idToken;
@@ -1078,15 +1096,6 @@ angular.module('shareFlash', [])
 })();
 
 xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    });
-xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
     })
@@ -1279,6 +1288,15 @@ xApp
         })
     });
 
+xApp
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    });
 (function() {
     angular
         .module('xApp')
@@ -1333,6 +1351,100 @@ xApp
         function getAccessIndexForUserId(teamId) {
             return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
         };
+    }
+})();
+
+xApp
+    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
+        $scope.user = {};
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            Api.user.save($scope.user,
+                function(response) {
+                    $modalInstance.close(response);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+
+xApp
+    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
+        $scope.user = user;
+        $scope.groups = GROUPS;
+
+        $scope.ok = function () {
+            Api.user.update($scope.user,
+                function() {
+                    $modalInstance.close($scope.user);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('UserListController', controller);
+
+    function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
+        $scope.users = users;
+
+        $scope.loginAs = loginAsAction;
+
+        $scope.createUser = function() {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalCreateUserController'
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.users.push(model);
+            });
+        };
+
+        $scope.updateUser = function(userId) {
+            var modalInstance = $modal.open({
+                templateUrl: '/t/user/create.html',
+                controller: 'ModalUpdateUserController',
+                resolve: {
+                    user: function(Api) {
+                        return Api.user.get({id: userId});
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (model) {
+                $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
+            });
+        };
+
+        $scope.deleteUser = function(userId) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+            Api.user.delete({id: userId}, function() {
+                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
+            });
+        };
+
+        function loginAsAction(userId) {
+            AuthFactory.loginAs(userId);
+
+            toaster.pop('info', 'Logging in as other user...');
+
+            $timeout(function() {
+                location.reload()
+            }, 2000);
+        }
     }
 })();
 
@@ -1512,100 +1624,6 @@ xApp
 
         function cancel() {
             $modalInstance.dismiss();
-        }
-    }
-})();
-
-xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
-        $scope.user = {};
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            Api.user.save($scope.user,
-                function(response) {
-                    $modalInstance.close(response);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
-        $scope.user = user;
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            Api.user.update($scope.user,
-                function() {
-                    $modalInstance.close($scope.user);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-
-(function() {
-    angular
-        .module('xApp')
-        .controller('UserListController', controller);
-
-    function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
-        $scope.users = users;
-
-        $scope.loginAs = loginAsAction;
-
-        $scope.createUser = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalCreateUserController'
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.users.push(model);
-            });
-        };
-
-        $scope.updateUser = function(userId) {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
-                controller: 'ModalUpdateUserController',
-                resolve: {
-                    user: function(Api) {
-                        return Api.user.get({id: userId});
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
-            });
-        };
-
-        $scope.deleteUser = function(userId) {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-            Api.user.delete({id: userId}, function() {
-                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
-            });
-        };
-
-        function loginAsAction(userId) {
-            AuthFactory.loginAs(userId);
-
-            toaster.pop('info', 'Logging in as other user...');
-
-            $timeout(function() {
-                location.reload()
-            }, 2000);
         }
     }
 })();

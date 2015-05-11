@@ -176,11 +176,29 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
     $urlRouterProvider.otherwise('/404');
 
-    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory, $http) {
         var idToken = AuthFactory.getToken();
 
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
+        }
+
+        var refreshingToken = null;
+
+        if (idToken && AuthFactory.tokenExpired()) {
+            if (refreshingToken === null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + AuthFactory.getToken()
+                    }
+                }).then(function(response) {
+                    AuthFactory.login(response.data.token);
+                });
+            }
+            return refreshingToken;
         }
 
         return idToken;
