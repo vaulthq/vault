@@ -6,8 +6,6 @@
     function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
         $scope.users = users;
 
-        $scope.loginAs = loginAsAction;
-
         $scope.createUser = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
@@ -43,15 +41,5 @@
                 $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
             });
         };
-
-        function loginAsAction(userId) {
-            AuthFactory.loginAs(userId);
-
-            toaster.pop('info', 'Logging in as other user...');
-
-            $timeout(function() {
-                location.reload()
-            }, 2000);
-        }
     }
 })();

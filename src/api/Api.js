@@ -15,7 +15,6 @@
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             entryTeams: $resource("/api/entryTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
-            loginAs: $resource("/internal/auth/login/:id", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {

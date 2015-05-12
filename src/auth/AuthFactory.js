@@ -3,7 +3,7 @@
         .module('xApp')
         .factory('AuthFactory', auth);
 
-    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
+    function auth($rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
         var localToken = 'auth_token';
 
         return {
@@ -12,7 +12,6 @@
             getUser: getUser,
             isLoggedIn: isLoggedIn,
             initLogin: initLogin,
-            loginAs: loginAs,
             getToken: getToken,
             tokenExpired: tokenExpired,
             setToken: setToken
@@ -65,14 +64,6 @@
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
             })
-        }
-
-        function loginAs(userId) {
-            Api.loginAs.get({id: userId}, function(response) {
-                logout();
-                login(response);
-                $location.path('/recent');
-            });
         }
     }
 })();

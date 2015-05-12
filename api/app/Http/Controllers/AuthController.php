@@ -1,9 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-use App\Events\Auth\UserChangedUser;
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\UserLoggedOut;
-use App\Vault\Models\User;
 use App\Vault\Response\JsonResponse;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
@@ -46,7 +44,7 @@ class AuthController extends Controller
             return $this->jsonResponse(['Error creating JWT token'], 401);
         }
 
-        //event(new UserLoggedIn($user));
+        event(new UserLoggedIn($auth->user()));
 
         return $this->jsonResponse(['Invalid username or password'], 401);
     }
@@ -62,10 +60,10 @@ class AuthController extends Controller
 
     public function getIndex(JWTAuth $jwt)
     {
-        //if ($this->guard->check()) {
-         //   event(new UserLoggedOut($jwt->toUser()));
+        if ($token = $jwt->getToken()) {
             $jwt->invalidate($jwt->getToken());
-       // }
+            event(new UserLoggedOut($jwt->toUser($token)));
+        }
 
         return $this->jsonResponse(['flash' => trans('auth.flash.logout_success')]);
     }
@@ -75,14 +73,5 @@ class AuthController extends Controller
         $token = $jwt->refresh($jwt->getToken());
 
         return $this->jsonResponse(['token' => $token]);
-    }
-
-    public function getLogin(User $user)
-    {
-        event(new UserChangedUser($this->guard->user(), $user));
-
-        $this->guard->login($user);
-
-        return $this->jsonResponse(['user' => $this->guard->user()]);
     }
 }

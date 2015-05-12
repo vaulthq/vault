@@ -1,6 +1,5 @@
 <?php namespace App\Handlers\Events;
 
-use App\Events\Auth\UserChangedUser;
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\UserLoggedOut;
 
@@ -31,16 +30,10 @@ class AuthHistoryLogger
 		$this->logger->log('auth', $event->getUser()->email . ' logged out.');
 	}
 
-	public function onUserChange(UserChangedUser $event)
-	{
-		$this->logger->log('auth', $event->getUser()->email . ' logged in as ' . $event->getUserTo()->email . '.', null);
-	}
-
 	public function subscribe($events)
 	{
 		$events->listen('App\Events\Auth\UserLoggedIn', 'App\Handlers\Events\AuthHistoryLogger@onUserLogin');
 		$events->listen('App\Events\Auth\UserLoggedOut', 'App\Handlers\Events\AuthHistoryLogger@onUserLogout');
-		$events->listen('App\Events\Auth\UserChangedUser', 'App\Handlers\Events\AuthHistoryLogger@onUserChange');
 	}
 
 }
