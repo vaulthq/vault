@@ -6,6 +6,7 @@ use App\Vault\Response\JsonResponse;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Providers\Auth\AuthInterface;
 
@@ -65,12 +66,16 @@ class AuthController extends Controller
             event(new UserLoggedOut($jwt->toUser($token)));
         }
 
-        return $this->jsonResponse(['flash' => trans('auth.flash.logout_success')]);
+        return $this->jsonResponse();
     }
 
     public function getRefresh(JWTAuth $jwt)
     {
-        $token = $jwt->refresh($jwt->getToken());
+        try {
+            $token = $jwt->refresh($jwt->getToken());
+        } catch (TokenExpiredException $e) {
+            return $this->jsonResponse(null, 401);
+        }
 
         return $this->jsonResponse(['token' => $token]);
     }

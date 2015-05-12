@@ -32,12 +32,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, Api) {
-                Api.authStatus.get({}, function() {
+            controller: function($location, AuthFactory) {
+                if (AuthFactory.isLoggedIn()) {
                     $location.path('/recent');
-                }, function() {
+                } else {
                     $location.path('/login');
-                });
+                }
             }
         })
         .state('anon.login', {
@@ -176,38 +176,20 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
     $urlRouterProvider.otherwise('/404');
 
-    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory, $http) {
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
         var idToken = AuthFactory.getToken();
 
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
         }
 
-        var refreshingToken = null;
-
         if (idToken && AuthFactory.tokenExpired()) {
-            if (refreshingToken === null) {
-                refreshingToken = $http({
-                    url: '/internal/auth/refresh',
-                    skipAuthorization: true,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + idToken
-                    }
-                }).then(function(response) {
-                    var token = response.data.token;
-                    AuthFactory.setToken(token);
-
-                    return token;
-                });
-            }
-            return refreshingToken;
+            return AuthFactory.refreshToken();
         }
 
         return idToken;
     };
 
     $httpProvider.interceptors.push('jwtInterceptor');
-
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);

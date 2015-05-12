@@ -3,8 +3,9 @@
         .module('xApp')
         .factory('AuthFactory', auth);
 
-    function auth($rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
+    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
         var localToken = 'auth_token';
+        var refreshingToken = null;
 
         return {
             login: login,
@@ -14,7 +15,8 @@
             initLogin: initLogin,
             getToken: getToken,
             tokenExpired: tokenExpired,
-            setToken: setToken
+            setToken: setToken,
+            refreshToken: refreshToken
         };
 
         function getToken() {
@@ -64,6 +66,27 @@
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
             })
+        }
+
+        function refreshToken() {
+            if (refreshingToken == null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                }).then(function(response) {
+                    var token = response.data.token;
+                    setToken(token);
+                    refreshingToken = null;
+
+                    return token;
+                });
+            }
+
+            return refreshingToken;
         }
     }
 })();
