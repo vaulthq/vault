@@ -14,9 +14,9 @@ class UserController extends Controller
 {
     public function __construct()
     {
-     /*   $this->beforeFilter('admin', [
+        $this->beforeFilter('admin', [
             'only' => ['update', 'destroy']
-        ]);*/
+        ]);
     }
 
     public function index()

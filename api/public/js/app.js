@@ -32,12 +32,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         })
         .state('anon.check', {
             url: '',
-            controller: function($location, Api) {
-                Api.authStatus.get({}, function() {
+            controller: function($location, AuthFactory) {
+                if (AuthFactory.isLoggedIn()) {
                     $location.path('/recent');
-                }, function() {
+                } else {
                     $location.path('/login');
-                });
+                }
             }
         })
         .state('anon.login', {
@@ -176,39 +176,21 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
     $urlRouterProvider.otherwise('/404');
 
-    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory, $http) {
+    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
         var idToken = AuthFactory.getToken();
 
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
         }
 
-        var refreshingToken = null;
-
         if (idToken && AuthFactory.tokenExpired()) {
-            if (refreshingToken === null) {
-                refreshingToken = $http({
-                    url: '/internal/auth/refresh',
-                    skipAuthorization: true,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + idToken
-                    }
-                }).then(function(response) {
-                    var token = response.data.token;
-                    AuthFactory.setToken(token);
-
-                    return token;
-                });
-            }
-            return refreshingToken;
+            return AuthFactory.refreshToken();
         }
 
         return idToken;
     };
 
     $httpProvider.interceptors.push('jwtInterceptor');
-
     $httpProvider.interceptors.push('AuthInterceptor');
 }]);
 
@@ -229,7 +211,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             entryTeams: $resource("/api/entryTeams/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
-            loginAs: $resource("/internal/auth/login/:id", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
@@ -267,8 +248,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .module('xApp')
         .factory('AuthFactory', auth);
 
-    function auth($cookieStore, $rootScope, $sanitize, Api, $location, toaster, jwtHelper) {
+    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
         var localToken = 'auth_token';
+        var refreshingToken = null;
 
         return {
             login: login,
@@ -276,10 +258,10 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             getUser: getUser,
             isLoggedIn: isLoggedIn,
             initLogin: initLogin,
-            loginAs: loginAs,
             getToken: getToken,
             tokenExpired: tokenExpired,
-            setToken: setToken
+            setToken: setToken,
+            refreshToken: refreshToken
         };
 
         function getToken() {
@@ -297,6 +279,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
         function logout() {
             localStorage.removeItem(localToken);
+            toaster.pop('info', "", "Good bye!");
             $rootScope.$broadcast('auth:login', null);
         }
 
@@ -326,17 +309,31 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             }, function (response) {
                 login(response.token);
                 $location.path('/recent');
+                toaster.pop('info', "", "Welcome back, " + getUser().name);
             }, function (response) {
                 toaster.pop('error', "Login Failed", response.data[0]);
             })
         }
 
-        function loginAs(userId) {
-            Api.loginAs.get({id: userId}, function(response) {
-                logout();
-                login(response);
-                $location.path('/recent');
-            });
+        function refreshToken() {
+            if (refreshingToken == null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                }).then(function(response) {
+                    var token = response.data.token;
+                    setToken(token);
+                    refreshingToken = null;
+
+                    return token;
+                });
+            }
+
+            return refreshingToken;
         }
     }
 })();
@@ -362,8 +359,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             if (rejection.status === 400 || rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
                     toaster.pop('warning', 'Session Expired', 'Please log in.');
+                    AuthFactory.logout();
                 }
-                AuthFactory.logout();
                 $location.path('/login');
             }
 
@@ -380,6 +377,52 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     }
 
 })();
+(function() {
+    angular
+        .module('xApp')
+        .directive('copyPassword', copyPasswordDirective);
+
+    function copyPasswordDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="download()" class="btn btn-default btn-xs" title="Copy password" ng-if="isState(\'download\')">' +
+                    '<i class="glyphicon glyphicon-open"></i>' +
+                '</a>' +
+                '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
+                    '<i class="glyphicon glyphicon-save"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($scope, Api, toaster) {
+                $scope.state = 'download';
+                $scope.isState = isState;
+                $scope.download = downloadPassword;
+                $scope.copy = copy;
+                $scope.password = '';
+
+                function isState(state) {
+                    return $scope.state == state;
+                }
+
+                function copy() {
+                    toaster.pop('success', "", 'Password copied to clipboard.');
+                }
+
+                function downloadPassword() {
+                    Api.entryPassword.password({id: $scope.entry.id}, function(response) {
+                        $scope.password = response.password;
+                        response.$promise.then(function() {
+                            $scope.state = 'copy';
+                        });
+                    });
+                }
+            }
+        };
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
@@ -910,6 +953,7 @@ xApp.constant('GROUPS', {
                 clip.on( 'load', function(client) {
                     var onDataRequested = function (client) {
                         client.setText(scope.$eval(scope.clipCopy));
+
                         if (angular.isDefined(attrs.clipClick)) {
                             scope.$apply(scope.clipClick);
                         }
@@ -1586,8 +1630,6 @@ xApp
     function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
         $scope.users = users;
 
-        $scope.loginAs = loginAsAction;
-
         $scope.createUser = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
@@ -1623,15 +1665,5 @@ xApp
                 $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
             });
         };
-
-        function loginAsAction(userId) {
-            AuthFactory.loginAs(userId);
-
-            toaster.pop('info', 'Logging in as other user...');
-
-            $timeout(function() {
-                location.reload()
-            }, 2000);
-        }
     }
 })();

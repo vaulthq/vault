@@ -35,9 +35,6 @@
             <td>{{ user.surname }} </td>
             <td>{{ user.group | userGroup }} </td>
             <td class="text-right" ng-show="login.group == 'admin'">
-                <a ng-click="loginAs(user.id)" class="btn btn-primary btn-xs" title="Login As User">
-                    <i class="glyphicon glyphicon-transfer"></i> Login As User
-                </a>
                 <a ng-click="updateUser(user.id)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>

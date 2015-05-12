@@ -30,6 +30,7 @@
                 clip.on( 'load', function(client) {
                     var onDataRequested = function (client) {
                         client.setText(scope.$eval(scope.clipCopy));
+
                         if (angular.isDefined(attrs.clipClick)) {
                             scope.$apply(scope.clipClick);
                         }
