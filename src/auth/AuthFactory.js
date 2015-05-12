@@ -14,15 +14,20 @@
             initLogin: initLogin,
             loginAs: loginAs,
             getToken: getToken,
-            tokenExpired: tokenExpired
+            tokenExpired: tokenExpired,
+            setToken: setToken
         };
 
         function getToken() {
             return localStorage.getItem(localToken);
         }
 
-        function login(token) {
+        function setToken(token) {
             localStorage.setItem(localToken, token);
+        }
+
+        function login(token) {
+            setToken(token);
             $rootScope.$broadcast('auth:login', getUser());
         }
 

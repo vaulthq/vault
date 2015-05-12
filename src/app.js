@@ -192,10 +192,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     skipAuthorization: true,
                     method: 'GET',
                     headers: {
-                        'Authorization': 'Bearer ' + AuthFactory.getToken()
+                        'Authorization': 'Bearer ' + idToken
                     }
                 }).then(function(response) {
-                    AuthFactory.login(response.data.token);
+                    var token = response.data.token;
+                    AuthFactory.setToken(token);
+
+                    return token;
                 });
             }
             return refreshingToken;

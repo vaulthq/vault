@@ -28,5 +28,5 @@ webtools:
   image: datadoglt/webtools
   volumes_from: [app]
   working_dir: /var/www
-#  environment:
-#    GULP_TASK: watch
+  environment:
+    GULP_TASK: watch
