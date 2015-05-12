@@ -19,8 +19,8 @@
             if (rejection.status === 400 || rejection.status === 401) {
                 if (AuthFactory.isLoggedIn()) {
                     toaster.pop('warning', 'Session Expired', 'Please log in.');
+                    AuthFactory.logout();
                 }
-                AuthFactory.logout();
                 $location.path('/login');
             }
 
