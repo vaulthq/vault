@@ -1,0 +1,52 @@
+<div class="content">
+    <loader when="!entries.$resolved"></loader>
+
+    <table class="table table-hover" ng-if="entries.length > 0">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Updated</th>
+            <th style="min-width: 130px"></th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr class="filter-row">
+                <td>
+                    <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                </td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus ng-keypress="copyFirst($event)"></td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
+                <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
+                <td colspan="2"></td>
+            </tr>
+
+            <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeEntry}">
+                <td>{{ entry.id }}</td>
+                <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
+                <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
+                <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
+                <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span></td>
+                <td class="text-right">
+                    <entry-access-info entry="entry"></entry-access-info>
+
+                    <div ng-if="entry.can_edit">
+                        <copy-password entry="entry"></copy-password>
+                        <show-password entry-id="entry.id"></show-password>
+                        <entry-share entry="entry"></entry-share>
+                        <entry-update entry-id="entry.id"></entry-update>
+                        <entry-delete entry="entry"></entry-delete>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div ng-if="entries.$resolved && entries.length == 0">
+        This project has no added keys.
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="page-header">
+    <h3>
+        Manage Users
+        <p class="pull-right" ng-show="login.group == 'admin'">
+            <a class="btn btn-default btn-xs" title="Add User" ng-click="createUser()">
+                Add User
+            </a>
+        </p>
+    </h3>
+</div>
+
+<loader when="!users.$resolved"></loader>
+
+<div class="content">
+    <table ng-if="users.length > 0" class="table table-hover">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Group</th>
+            <th ng-show="login.group == 'admin'"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="filter-row">
+            <td><input type="text" class="form-control input-sm" ng-model="search.email"></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.surname"></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr ng-repeat="user in users | filter:search">
+            <td>{{ user.email }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.surname }} </td>
+            <td>{{ user.group | userGroup }} </td>
+            <td class="text-right" ng-show="login.group == 'admin'">
+                <a ng-click="updateUser(user.id)" class="btn btn-warning btn-xs" title="Update">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a ng-click="deleteUser(user.id)" class="btn btn-danger btn-xs" title="Remove">
+                    <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

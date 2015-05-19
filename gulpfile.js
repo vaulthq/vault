@@ -12,7 +12,7 @@ var paths = {
         'bower_components/angular-ui-select/dist/select.min.css'
     ],
     html_templates: [
-        'source/**/*.html'
+        'src/**/*.html'
     ],
     vendor_scripts: [
         'bower_components/angular/angular.min.js',
@@ -24,12 +24,13 @@ var paths = {
         'bower_components/angular-ui-select/dist/select.min.js',
         'bower_components/AngularJS-Toaster/toaster.js',
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
+        'bower_components/angular-jwt/dist/angular-jwt.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
     ],
     scripts: [
-        'source/**/*.js'
+        'src/**/*.js'
     ],
     styles: [
         'styles/**/*.less'
@@ -39,50 +40,50 @@ var paths = {
         'styles/fonts/*'
     ],
     cleanup: [
-        'public/t',
-        'public/js',
-        'public/fonts'
+        'api/public/t',
+        'api/public/js',
+        'api/public/fonts'
     ]
 };
 
 gulp.task('clean', function(cb) {
-    del(pats.cleanup, cb);
+    del(paths.cleanup, cb);
 });
 
 gulp.task('vendor_scripts', [], function() {
     return gulp.src(paths.vendor_scripts)
         .pipe(concat('vendor.js'))
-        .pipe(gulp.dest('public/js'));
+        .pipe(gulp.dest('api/public/js'));
 });
 
 gulp.task('vendor_styles', [], function() {
     return gulp.src(paths.vendor_styles)
         .pipe(concat('vendor_styles.css'))
-        .pipe(gulp.dest('public/css'));
+        .pipe(gulp.dest('api/public/css'));
 });
 
 gulp.task('vendor_fonts', [], function() {
     return gulp.src(paths.vendor_fonts)
-        .pipe(gulp.dest('public/fonts'));
+        .pipe(gulp.dest('api/public/fonts'));
 });
 
 gulp.task('scripts', [], function() {
     return gulp.src(paths.scripts)
         .pipe(concat('app.js'))
-        .pipe(gulp.dest('public/js'));
+        .pipe(gulp.dest('api/public/js'));
 });
 
 gulp.task('styles', [], function() {
     return gulp.src(paths.styles)
         .pipe(less())
         .pipe(concat('app.css'))
-        .pipe(gulp.dest('public/css'));
+        .pipe(gulp.dest('api/public/css'));
 });
 
 
 gulp.task('html_templates', [], function() {
     return gulp.src(paths.html_templates)
-        .pipe(gulp.dest('public/t'));
+        .pipe(gulp.dest('api/public/t'));
 });
 
 gulp.task('watch', function() {
