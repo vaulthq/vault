@@ -2,7 +2,5 @@
 /node_modules
 /.idea
 /bower_components
-/Vagrantfile
 /bin
-/.vagrant
 /api/.env
