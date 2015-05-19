@@ -9,7 +9,8 @@ var paths = {
     vendor_styles: [
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
         'bower_components/AngularJS-Toaster/toaster.css',
-        'bower_components/angular-ui-select/dist/select.min.css'
+        'bower_components/angular-ui-select/dist/select.min.css',
+        'bower_components/clippy/build/clippy.css'
     ],
     html_templates: [
         'src/**/*.html'
@@ -25,9 +26,13 @@ var paths = {
         'bower_components/AngularJS-Toaster/toaster.js',
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'bower_components/angular-jwt/dist/angular-jwt.min.js',
+        'bower_components/jquery/dist/jquery.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
+    ],
+    clippy: [
+        'bower_components/clippy/build/clippy.min.js'
     ],
     scripts: [
         'src/**/*.js'
@@ -53,6 +58,12 @@ gulp.task('clean', function(cb) {
 gulp.task('vendor_scripts', [], function() {
     return gulp.src(paths.vendor_scripts)
         .pipe(concat('vendor.js'))
+        .pipe(gulp.dest('api/public/js'));
+});
+
+gulp.task('clippy', [], function() {
+    return gulp.src(paths.clippy)
+        .pipe(concat('clippy.js'))
         .pipe(gulp.dest('api/public/js'));
 });
 
@@ -92,4 +103,4 @@ gulp.task('watch', function() {
   gulp.watch(paths.styles, ['styles']);
 });
 
-gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles']);
+gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'clippy', 'scripts', 'styles']);
