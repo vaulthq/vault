@@ -1,8 +1,5 @@
 #!/bin/sh
 
-echo "Creating vault database";
-docker-compose run --rm mysql bash -c 'mysql -u root -h mysql -psecret -e "CREATE DATABASE IF NOT EXISTS vault;"'
-
 echo "Granting write permissions to storage";
 chmod 777 -R api/storage
 
@@ -24,7 +21,7 @@ echo "Installing NPM";
 docker-compose run --rm webtools bash -c 'npm install'
 
 echo "Installing Bower";
-docker-compose run --rm webtools bash -c 'bower install'
+docker-compose run --rm webtools bash -c 'bower install --allow-root'
 
 echo "Running Gulp";
 docker-compose run --rm webtools bash -c 'gulp'
