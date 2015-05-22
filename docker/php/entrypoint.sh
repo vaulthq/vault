@@ -6,7 +6,7 @@ if [ -f /var/www/api/.env ]; then
    cp /var/www/api/.env.sample /var/www/api/.env
 fi
 
-if [ -f /var/www/composer.json ] && [ ! -d /var/www/vendor ]; then
+if [ -f /var/www/api/composer.json ]; then
    echo "Composer in background"
    composer install --optimize-autoloader --working-dir=/var/www/api
 fi
