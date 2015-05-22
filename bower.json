@@ -27,5 +27,8 @@
     "angular-modal-service": "~0.3.0",
     "angular-bootstrap": "~0.11.2",
     "angular-ui-select": "~0.9.6"
+  },
+  "resolutions": {
+    "angular": "1.3.15"
   }
 }
