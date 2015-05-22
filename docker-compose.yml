@@ -13,9 +13,10 @@ web:
    - "80:80"
 
 php:
-  build: docker/php
+  image: datadoglt/php:56
   volumes_from: [app]
   working_dir: /var/www
+  volumes: ["docker/entrypoint.sh:/entrypoint.sh"]
   links:
    - mysql
 
