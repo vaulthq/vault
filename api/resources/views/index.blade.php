@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/app.css">
     <script src="/js/vendor.js"></script>
     <script src="/js/app.js"></script>
+    <script src="/js/clippy.js"></script>
+    <script src="/js/fortunes.js"></script>
 </head>
 <body>
 
@@ -25,6 +27,17 @@
     <div tabindex="-1" role="dialog" class="modal fade" ng-class="{in: animate}" ng-style="{'z-index': 1050 + index*10, display: 'block'}" ng-click="close($event)">
         <div class="modal-dialog" ng-class="{'modal-sm': size == 'sm', 'modal-lg': size == 'lg'}"><div class="modal-content" modal-transclude></div></div>
     </div>
+</script>
+
+<script>
+    clippy.load('Clippy', function(agent){
+        agent.show();
+        agent._balloon.WORD_SPEAK_TIME = 200;
+        agent._balloon.CLOSE_BALLOON_DELAY = 15000;
+        setInterval(function () {
+            agent.speak(fortunes[Math.floor(Math.random()*fortunes.length)]);
+        }, 30000);
+    });
 </script>
 
 <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>

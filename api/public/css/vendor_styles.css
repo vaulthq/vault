@@ -249,3 +249,65 @@ button.toast-close-button {
  * Version: 0.9.9 - 2015-02-18T03:49:07.281Z
  * License: MIT
  */.ui-select-highlight{font-weight:700}.ui-select-offscreen{clip:rect(0 0 0 0)!important;width:1px!important;height:1px!important;border:0!important;margin:0!important;padding:0!important;overflow:hidden!important;position:absolute!important;outline:0!important;left:0!important;top:0!important}.ng-dirty.ng-invalid>a.select2-choice{border-color:#D44950}.select2-result-single{padding-left:0}.select-locked>.ui-select-match-close,.select2-locked>.select2-search-choice-close{display:none}.selectize-input.selectize-focus{border-color:#007FBB!important}.selectize-control>.selectize-dropdown,.selectize-control>.selectize-input>input{width:100%}.ng-dirty.ng-invalid>div.selectize-input{border-color:#D44950}.btn-default-focus{color:#333;background-color:#EBEBEB;border-color:#ADADAD;text-decoration:none;outline:-webkit-focus-ring-color auto 5px;outline-offset:-2px;box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)}.ui-select-bootstrap .ui-select-toggle{position:relative;text-align:left}.ui-select-bootstrap .ui-select-toggle>.caret{position:absolute;height:10px;top:50%;right:10px;margin-top:-2px}.input-group>.ui-select-bootstrap.dropdown{position:static}.input-group>.ui-select-bootstrap>input.ui-select-search.form-control{border-radius:4px 0 0 4px}.ui-select-bootstrap>.ui-select-match>.caret{position:absolute;top:45%;right:15px}.ui-select-bootstrap>.ui-select-choices{width:100%;height:auto;max-height:200px;overflow-x:hidden}.ui-select-multiple.ui-select-bootstrap{height:auto;padding:.3em}.ui-select-multiple.ui-select-bootstrap input.ui-select-search{background-color:transparent!important;border:none;outline:0;height:1.666666em}.ui-select-multiple.ui-select-bootstrap .ui-select-match .close{font-size:1.6em;line-height:.75}.ui-select-multiple.ui-select-bootstrap .ui-select-match-item{outline:0}.ui-select-bootstrap .ui-select-choices-row>a{display:block;padding:3px 20px;clear:both;font-weight:400;line-height:1.42857143;color:#333;white-space:nowrap}.ui-select-bootstrap .ui-select-choices-row>a:focus,.ui-select-bootstrap .ui-select-choices-row>a:hover{text-decoration:none;color:#262626;background-color:#f5f5f5}.ui-select-bootstrap .ui-select-choices-row.active>a{color:#fff;text-decoration:none;outline:0;background-color:#428bca}.ui-select-bootstrap .ui-select-choices-row.active.disabled>a,.ui-select-bootstrap .ui-select-choices-row.disabled>a{color:#777;cursor:not-allowed;background-color:#fff}.ui-select-match.ng-hide-add,.ui-select-search.ng-hide-add{display:none!important}.ui-select-bootstrap.ng-dirty.ng-invalid>button.btn.ui-select-match{border-color:#D44950}
+.clippy, .clippy-balloon {
+    position: fixed;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.clippy-balloon {
+
+    background: #FFC;
+    color: black;
+    padding: 8px;
+    border: 1px solid black;
+    border-radius: 5px;
+
+}
+
+.clippy-content {
+    max-width: 200px;
+    min-width: 120px;
+    font-family: "Microsoft Sans", sans-serif;
+    font-size: 10pt;
+}
+
+.clippy-tip {
+    width: 10px;
+    height: 16px;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAgCAMAAAAlvKiEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAlQTFRF///MAAAA////52QwgAAAAAN0Uk5T//8A18oNQQAAAGxJREFUeNqs0kEOwCAIRFHn3//QTUU6xMyyxii+jQosrTPkyPEM6IN3FtzIRk1U4dFeKWQiH6pRRowMVKEmvronEynkwj0uZJgR22+YLopPSo9P34wJSamLSU7lSIWLJU7NkNomNlhqxUeAAQC+TQLZyEuJBwAAAABJRU5ErkJggg==) no-repeat;
+    position: absolute;
+}
+
+.clippy-top-left .clippy-tip {
+    top: 100%;
+    margin-top: 0px;
+    left: 100%;
+    margin-left: -50px;
+}
+
+.clippy-top-right .clippy-tip {
+    top: 100%;
+    margin-top: 0px;
+    left: 0;
+    margin-left: 50px;
+    background-position: -10px 0;
+
+}
+
+.clippy-bottom-right .clippy-tip {
+    top: 0;
+    margin-top: -16px;
+    left: 0;
+    margin-left: 50px;
+    background-position: -10px -16px;
+}
+
+.clippy-bottom-left .clippy-tip {
+    top: 0;
+    margin-top: -16px;
+    left: 100%;
+    margin-left: -50px;
+    background-position: 0px -16px;
+}
+
