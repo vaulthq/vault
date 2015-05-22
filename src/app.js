@@ -53,9 +53,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
                 $scope.projects = projects;
-                $rootScope.projectId = projectId;
 
                 $scope.login = AuthFactory.getUser();
 
@@ -94,9 +93,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 projects: function(ProjectsFactory) {
                     return ProjectsFactory.query();
-                },
-                projectId: function() {
-                    return 0;
                 }
             }
         })
@@ -113,29 +109,28 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user.project', {
             url: '/project/:projectId',
             views: {
-                'head': {
+                head: {
                     templateUrl: '/t/project/pageHeader.html',
                     controller: 'ProjectController',
                     resolve: {
                         projects: function(projects) {
                             return projects;
-                        },
-                        projectId: function ($stateParams) {
-                            return $stateParams.projectId;
                         }
                     }
                 },
-                'content': {
+                content: {
                     templateUrl: '/t/entry/list.html',
                     controller: 'EntryController',
                     resolve: {
                         entries: function(ProjectKeysFactory, projectId) {
                             return ProjectKeysFactory.keys({id: projectId});
-                        },
-                        projectId: function ($stateParams) {
-                            return $stateParams.projectId;
                         }
                     }
+                }
+            },
+            resolve: {
+                projectId: function ($stateParams) {
+                    return $stateParams.projectId;
                 }
             }
         })

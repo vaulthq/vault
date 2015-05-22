@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var less = require('gulp-less');
+var expect = require('gulp-expect-file');
 
 var del = require('del');
 
@@ -26,7 +27,7 @@ var paths = {
         'bower_components/AngularJS-Toaster/toaster.js',
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'bower_components/angular-jwt/dist/angular-jwt.min.js',
-        'bower_components/jquery/dist/jquery.min.js',
+        'bower_components/jquery/jquery.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
@@ -57,24 +58,28 @@ gulp.task('clean', function(cb) {
 
 gulp.task('vendor_scripts', [], function() {
     return gulp.src(paths.vendor_scripts)
+        .pipe(expect(paths.vendor_scripts))
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest('api/public/js'));
 });
 
 gulp.task('clippy', [], function() {
     return gulp.src(paths.clippy)
+        .pipe(expect(paths.clippy))
         .pipe(concat('clippy.js'))
         .pipe(gulp.dest('api/public/js'));
 });
 
 gulp.task('vendor_styles', [], function() {
     return gulp.src(paths.vendor_styles)
+        .pipe(expect(paths.vendor_styles))
         .pipe(concat('vendor_styles.css'))
         .pipe(gulp.dest('api/public/css'));
 });
 
 gulp.task('vendor_fonts', [], function() {
     return gulp.src(paths.vendor_fonts)
+        .pipe(expect(paths.vendor_fonts))
         .pipe(gulp.dest('api/public/fonts'));
 });
 

@@ -53,9 +53,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             data: {
                 access: ['user', 'admin']
             },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, projectId, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
                 $scope.projects = projects;
-                $rootScope.projectId = projectId;
 
                 $scope.login = AuthFactory.getUser();
 
@@ -94,9 +93,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 projects: function(ProjectsFactory) {
                     return ProjectsFactory.query();
-                },
-                projectId: function() {
-                    return 0;
                 }
             }
         })
@@ -113,29 +109,28 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user.project', {
             url: '/project/:projectId',
             views: {
-                'head': {
+                head: {
                     templateUrl: '/t/project/pageHeader.html',
                     controller: 'ProjectController',
                     resolve: {
                         projects: function(projects) {
                             return projects;
-                        },
-                        projectId: function ($stateParams) {
-                            return $stateParams.projectId;
                         }
                     }
                 },
-                'content': {
+                content: {
                     templateUrl: '/t/entry/list.html',
                     controller: 'EntryController',
                     resolve: {
                         entries: function(ProjectKeysFactory, projectId) {
                             return ProjectKeysFactory.keys({id: projectId});
-                        },
-                        projectId: function ($stateParams) {
-                            return $stateParams.projectId;
                         }
                     }
+                }
+            },
+            resolve: {
+                projectId: function ($stateParams) {
+                    return $stateParams.projectId;
                 }
             }
         })
@@ -229,6 +224,154 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     };
 })();
 
+(function() {
+    angular
+        .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, AuthFactory) {
+        $scope.login = login;
+
+        function login() {
+            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', auth);
+
+    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
+        var localToken = 'auth_token';
+        var refreshingToken = null;
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin,
+            getToken: getToken,
+            tokenExpired: tokenExpired,
+            setToken: setToken,
+            refreshToken: refreshToken
+        };
+
+        function getToken() {
+            return localStorage.getItem(localToken);
+        }
+
+        function setToken(token) {
+            localStorage.setItem(localToken, token);
+        }
+
+        function login(token) {
+            setToken(token);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            localStorage.removeItem(localToken);
+            toaster.pop('info', "", "Good bye!");
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function tokenExpired() {
+            return jwtHelper.isTokenExpired(getToken());
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password, remember) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password),
+                remember: $sanitize(remember)
+            }, function (response) {
+                login(response.token);
+                $location.path('/recent');
+                toaster.pop('info', "", "Welcome back, " + getUser().name);
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+
+        function refreshToken() {
+            if (refreshingToken == null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                }).then(function(response) {
+                    var token = response.data.token;
+                    setToken(token);
+                    refreshingToken = null;
+
+                    return token;
+                });
+            }
+
+            return refreshingToken;
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
+
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 400 || rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
+                    AuthFactory.logout();
+                }
+                $location.path('/login');
+            }
+
+            if (rejection.status === 403) {
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
+            }
+
+            if (rejection.status === 419) {
+                toaster.pop('warning', "Validation Error", rejection.data);
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+})();
 (function() {
     angular
         .module('xApp')
@@ -524,154 +667,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     }
 })();
 
-(function() {
-    angular
-        .module('xApp')
-        .controller('AuthController', authController);
-
-    function authController($scope, AuthFactory) {
-        $scope.login = login;
-
-        function login() {
-            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthFactory', auth);
-
-    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
-        var localToken = 'auth_token';
-        var refreshingToken = null;
-
-        return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn,
-            initLogin: initLogin,
-            getToken: getToken,
-            tokenExpired: tokenExpired,
-            setToken: setToken,
-            refreshToken: refreshToken
-        };
-
-        function getToken() {
-            return localStorage.getItem(localToken);
-        }
-
-        function setToken(token) {
-            localStorage.setItem(localToken, token);
-        }
-
-        function login(token) {
-            setToken(token);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        function logout() {
-            localStorage.removeItem(localToken);
-            toaster.pop('info', "", "Good bye!");
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        function getUser() {
-            var token = getToken();
-            if (token) {
-                try {
-                    return jwtHelper.decodeToken(token).user;
-                } catch(err) {}
-            }
-            return [];
-        }
-
-        function tokenExpired() {
-            return jwtHelper.isTokenExpired(getToken());
-        }
-
-        function isLoggedIn() {
-            return getUser().id > 0;
-        }
-
-        function initLogin(username, password, remember) {
-            Api.auth.save({
-                email: $sanitize(username),
-                password: $sanitize(password),
-                remember: $sanitize(remember)
-            }, function (response) {
-                login(response.token);
-                $location.path('/recent');
-                toaster.pop('info', "", "Welcome back, " + getUser().name);
-            }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
-            })
-        }
-
-        function refreshToken() {
-            if (refreshingToken == null) {
-                refreshingToken = $http({
-                    url: '/internal/auth/refresh',
-                    skipAuthorization: true,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + getToken()
-                    }
-                }).then(function(response) {
-                    var token = response.data.token;
-                    setToken(token);
-                    refreshingToken = null;
-
-                    return token;
-                });
-            }
-
-            return refreshingToken;
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthInterceptor', authInterceptor);
-
-    function authInterceptor($q, $injector, $location, toaster) {
-        return {
-            response: response,
-            responseError: error
-        };
-
-        function response(response) {
-            return response || $q.when(response);
-        }
-
-        function error(rejection) {
-            var AuthFactory = $injector.get('AuthFactory');
-
-            if (rejection.status === 400 || rejection.status === 401) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Please log in.');
-                    AuthFactory.logout();
-                }
-                $location.path('/login');
-            }
-
-            if (rejection.status === 403) {
-                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
-            }
-
-            if (rejection.status === 419) {
-                toaster.pop('warning', "Validation Error", rejection.data);
-            }
-
-            return $q.reject(rejection);
-        }
-    }
-
-})();
 (function() {
     angular
         .module('xApp')
