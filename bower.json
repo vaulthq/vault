@@ -27,6 +27,8 @@
     "angular-modal-service": "~0.3.0",
     "angular-bootstrap": "~0.11.2",
     "angular-ui-select": "~0.9.6",
-    "angular-jwt": "~0.0.7"
+    "angular-jwt": "~0.0.7",
+    "jquery": "~1.9.0",
+    "clippy": "https://github.com/smore-inc/clippy.js.git"
   }
 }
