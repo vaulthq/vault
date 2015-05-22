@@ -13,7 +13,7 @@ web:
    - "80:80"
 
 php:
-  image: datadoglt/php:56
+  build: docker/php
   volumes_from: [app]
   working_dir: /var/www
   links:
