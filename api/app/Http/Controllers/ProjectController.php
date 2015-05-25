@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectRequest;
 use App\Vault\Models\Entry;
 use App\Vault\Models\History;
 use App\Vault\Models\Project;
@@ -7,7 +8,6 @@ use App\Vault\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
 {
@@ -21,22 +21,17 @@ class ProjectController extends Controller
 		return Project::all();
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function store()
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @param ProjectRequest $request
+     * @return Response
+     */
+	public function store(ProjectRequest $request)
 	{
-        $validator = Validator::make(Input::all(), Project::$rules);
-
-        if ($validator->fails()) {
-            return Response::make($validator->messages()->first(), 419);
-        }
-
         $model = new Project();
-        $model->name = Input::get('name');
-        $model->description = Input::get('description');
+        $model->name = $request->get('name');
+        $model->description = $request->get('description', '');
         $model->user_id = Auth::user()->id;
 
         $model->save();
@@ -49,84 +44,70 @@ class ProjectController extends Controller
     /**
      * Return list of keys which belong to project
      *
-     * @param $id
+     * @param Project $model
      * @return mixed
      */
-    public function getKeys($id)
+    public function getKeys(Project $model)
     {
-        return Entry::where('project_id', $id)->get();
+        return Entry::where('project_id', $model->id)->get();
     }
 
-    public function getTeams($id)
+    public function getTeams(Project $model)
     {
-        $project = Project::findOrFail($id);
-
-        return $project->teams()->with('owner', 'users')->get();
+        return $model->teams()->with('owner', 'users')->get();
     }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
+    /**
+     * Display the specified resource.
+     *
+     * @param Project $model
+     * @return Response
+     */
+	public function show(Project $model)
 	{
-        return Project::findOrFail($id);
+        return $model;
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Project $model
+     * @param ProjectRequest $request
+     * @return Response
+     */
+	public function update(Project $model, ProjectRequest $request)
 	{
-        $data = json_decode(file_get_contents("php://input", "r"));
-
-        $validator = Validator::make(['name' => isset($data->name) ? $data->name : ''], Project::$rules);
-
-        if ($validator->fails()) {
-            return Response::make($validator->messages()->first(), 419);
-        }
-
-        $model = Project::findOrFail($data->id);
-
         if (!$model->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        $model->name = $data->name;
-        $model->description = $data->description;
+        $model->name = $request->get('name');
+        $model->description = $request->get('description', '');
 
         History::make('project', 'Updated project details.', $model->id);
 
         $model->save();
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param Project $model
+     * @return Response
+     */
+	public function destroy(Project $model)
 	{
-        $model = Project::findOrFail($id);
-
         if (!$model->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        History::make('project', 'Deleted project #' . $id . ' ('.$model->name.').', $id);
+        History::make('project', 'Deleted project #' . $model->id . ' ('.$model->name.').', $model->id);
 
         $model->delete();
 	}
 
-    public function changeOwner($id)
+    public function changeOwner(Project $project)
     {
-        $project = Project::findOrFail($id);
         $newOwner = User::findOrFail(Input::get('owner'));
         $recursive = Input::get('assign', false);
 
@@ -137,7 +118,7 @@ class ProjectController extends Controller
         History::make(
             'project-owner',
             'Changed owner from "'. $project->user_id .'" to "'. $newOwner->id .'"' . ($recursive ? ' (recursive)' : ''),
-            $id
+            $project->id
         );
 
         if ($recursive) {

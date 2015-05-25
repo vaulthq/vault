@@ -78,7 +78,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.logout = function () {
                     Api.auth.get({}, function() {
-                        AuthFactory.logout();
+                        AuthFactory.logout(true);
                         $location.path('/login');
                     })
                 };

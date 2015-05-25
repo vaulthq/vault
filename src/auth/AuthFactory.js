@@ -32,9 +32,13 @@
             $rootScope.$broadcast('auth:login', getUser());
         }
 
-        function logout() {
+        function logout(withMessage) {
             localStorage.removeItem(localToken);
-            toaster.pop('info', "", "Good bye!");
+
+            if (withMessage) {
+                toaster.pop('info', "", "Good bye!");
+            }
+
             $rootScope.$broadcast('auth:login', null);
         }
 

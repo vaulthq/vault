@@ -2,19 +2,17 @@
 
 use Illuminate\Support\Facades\Auth;
 
-class UserUpdateRequest extends FormRequest
+class ProjectRequest extends FormRequest
 {
     public function authorize()
     {
-        return Auth::user()->isAdmin();
+        return true;
     }
 
     public function rules()
     {
         return [
-            'id' => 'required',
-            'group' => 'required',
-            'email' => 'required',
+            'name' => 'required',
         ];
     }
 }
