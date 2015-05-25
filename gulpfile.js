@@ -28,12 +28,13 @@ var paths = {
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'bower_components/angular-jwt/dist/angular-jwt.min.js',
         'bower_components/jquery/jquery.min.js',
+        'bower_components/pushy/js/pushy.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
     ],
     clippy: [
-        'bower_components/clippy/build/clippy.min.js'
+        'bower_components/clippy/build/clippy.min.js',
     ],
     scripts: [
         'src/**/*.js'

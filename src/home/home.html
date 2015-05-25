@@ -1,16 +1,47 @@
-<div class="project-list">
+<div class="pushy pushy-left">
+
+    <div class="project-list">
+
     <div class="heading">
-        <a href="/#/recent">Password Vault</a>
+        <a href="/#/recent">Vault: Projects</a>
     </div>
 
-    <input type="text" placeholder="Filter..." class="form-control filter-input" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus>
-
     <div class="project-scrollbar">
-        <ul class="nav nav-pills nav-stacked">
-            <li ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
-                <a ng-href="/#/project/{{ project.id }}">{{ project.name }}</a>
-            </li>
-        </ul>
+      <table class="table table-hover">
+          <thead>
+          <tr>
+              <th>Name</th>
+              <th></th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr class="filter-row">
+                <td><input type="text" class="form-control input-sm" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus></td>
+                <td></td>
+            </tr>
+            <tr ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
+                <td><a ng-href="/#/project/{{ project.id }}">{{ project.name }}</a></td>
+                <td class="text-right">
+                  <a class="btn btn-success btn-xs" title="Assign Team" ng-click="projectTeams()" ng-if="project.can_edit">
+                      <i class="glyphicon glyphicon-link"></i>
+                  </a>
+                  <a class="btn btn-success btn-xs" title="Show Assigned Teams" ng-click="assignedTeams()" ng-if="!project.can_edit">
+                      <i class="glyphicon glyphicon-question-sign"></i>
+                  </a>
+
+                  <a class="btn btn-warning btn-xs" title="Edit project" ng-click="updateProject()" ng-if="project.can_edit">
+                      <i class="glyphicon glyphicon-edit"></i>
+                  </a>
+                  <a class="btn btn-danger btn-xs" title="Delete project" ng-click="deleteProject()" ng-if="project.can_edit" style="margin-right: 30px">
+                      <i class="glyphicon glyphicon-trash"></i>
+                  </a>
+                  <a class="btn btn-primary btn-xs" title="Project Access Information" ng-click="projectOwnerInfo()" ng-if="!project.can_edit" style="margin-right: 30px">
+                      <i class="glyphicon glyphicon-info-sign"></i>
+                  </a>
+                </td>
+            </tr>
+          </tbody>
+      </table>
     </div>
 
 
@@ -66,11 +97,16 @@
             </li>
         </ul>
     </div>
+  </div>
+    <div class="sideMenu">
+      <a ng-click="toggle()">toggle</a>
+    </div>
 </div>
 
-<div class="right-content">
+<div class="site-overlay"></div>
+
+<div id="container">
     <ui-view/>
     <div ui-view="head"></div>
     <div ui-view="content"></div>
 </div>
-

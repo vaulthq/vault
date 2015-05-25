@@ -50,9 +50,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            data: {
-                access: ['user', 'admin']
-            },
             controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
                 $scope.projects = projects;
 
@@ -88,6 +85,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         templateUrl: '/t/user/profile.html',
                         controller: 'ProfileController'
                     });
+                };
+                $scope.toggle = function() {
+                  $('.pushy').toggleClass("pushy-left pushy-open");
+                  $('#container').toggleClass("container-push");
+                  $('body').toggleClass("pushy-active");
                 }
             },
             resolve: {
