@@ -1,5 +1,6 @@
 @sidebar-width: 400px;
 @sidebar-show-width: 75px;
+@sidebar-show-bg: #3C3D42;
 
 html, body {
   margin: 0;
@@ -29,7 +30,7 @@ body {
   right: 0;
   height: 100%;
   width: @sidebar-show-width;
-  background: #1E1E1E;
+  background: @sidebar-show-bg;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -40,18 +41,18 @@ body {
   display: block;
   width: 100%;
   border-radius: 0;
-  color: #C8C8C6;
+  color: #fff;
   &:hover, &:focus {
-    color: white;
+    color: #C5CAE9;
   }
 }
 
 .side-menu-top .btn-side-menu {
-  border-bottom: 1px solid #313131;
+  border-bottom: 1px solid lighten(@sidebar-show-bg, 10%);
 }
 
 .side-menu-bottom .btn-side-menu {
-  border-top: 1px solid #313131;
+  border-top: 1px solid lighten(@sidebar-show-bg, 10%);
 }
 
 .side-menu-top {
@@ -63,7 +64,6 @@ body {
 }
 .project-list {
   width: @sidebar-width - @sidebar-show-width;
-  border-right: 1px solid #313131;
 
   ::-webkit-scrollbar-track {
     background: #3B424C;
@@ -81,21 +81,21 @@ body {
       border-top-left-radius: 0;
       margin-right: 10px;
       color: #E7EDEA;
-      text-shadow: 1px 1px 2px #373B44;
+      text-shadow: 1px 1px 2px #303F9F;
     }
     &.active a {
       background: #4F565E;
       color: #E7EDEA;
     }
     a:hover {
-      background: #373B44;
+      background: #303F9F;
     }
   }
   .heading {
     text-align: center;
     height: 56px;
-    background: #373B44;
-    border-bottom: 1px solid #4F565E;
+    background: @sidebar-show-bg;
+    border-right: 1px solid lighten(@sidebar-show-bg, 10%);
     padding: 1.1em;
     a {
       font-size: 1.3em;
@@ -145,13 +145,12 @@ body {
 
 .modal-header {
   height: 56px;
-  background: #3B424C;
-  border-bottom: 1px solid #4F565E;
+  background: @sidebar-show-bg;
+  border-bottom: darken(@sidebar-show-bg, 10%);
   padding: 1.1em;
   h3 {
     color: #E7EDEA;
     margin: 0;
-    text-shadow: 1px 1px 2px #373B44;
   }
 }
 
@@ -211,7 +210,7 @@ body {
     height: 100%;
     top: 0;
     z-index: 500;
-    background: #1E1F21;
+    background: lighten(@sidebar-show-bg, 10%);
     -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, .7);
     -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, .7);
     box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, .7);

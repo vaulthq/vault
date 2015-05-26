@@ -24,7 +24,7 @@ body {
   right: 0;
   height: 100%;
   width: 75px;
-  background: #1E1E1E;
+  background: #3c3d42;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -34,17 +34,17 @@ body {
   display: block;
   width: 100%;
   border-radius: 0;
-  color: #C8C8C6;
+  color: #fff;
 }
 .btn-side-menu:hover,
 .btn-side-menu:focus {
-  color: white;
+  color: #C5CAE9;
 }
 .side-menu-top .btn-side-menu {
-  border-bottom: 1px solid #313131;
+  border-bottom: 1px solid #54565d;
 }
 .side-menu-bottom .btn-side-menu {
-  border-top: 1px solid #313131;
+  border-top: 1px solid #54565d;
 }
 .side-menu-top {
   flex: 1;
@@ -54,7 +54,6 @@ body {
 }
 .project-list {
   width: 325px;
-  border-right: 1px solid #313131;
 }
 .project-list ::-webkit-scrollbar-track {
   background: #3B424C;
@@ -73,20 +72,20 @@ body {
   border-top-left-radius: 0;
   margin-right: 10px;
   color: #E7EDEA;
-  text-shadow: 1px 1px 2px #373B44;
+  text-shadow: 1px 1px 2px #303F9F;
 }
 .project-list .nav li.active a {
   background: #4F565E;
   color: #E7EDEA;
 }
 .project-list .nav li a:hover {
-  background: #373B44;
+  background: #303F9F;
 }
 .project-list .heading {
   text-align: center;
   height: 56px;
-  background: #373B44;
-  border-bottom: 1px solid #4F565E;
+  background: #3c3d42;
+  border-right: 1px solid #54565d;
   padding: 1.1em;
 }
 .project-list .heading a {
@@ -130,14 +129,13 @@ body {
 }
 .modal-header {
   height: 56px;
-  background: #3B424C;
-  border-bottom: 1px solid #4F565E;
+  background: #3c3d42;
+  border-bottom: #242427;
   padding: 1.1em;
 }
 .modal-header h3 {
   color: #E7EDEA;
   margin: 0;
-  text-shadow: 1px 1px 2px #373B44;
 }
 .modal-content {
   border: 1px solid #4F565E;
@@ -183,7 +181,7 @@ body {
   height: 100%;
   top: 0;
   z-index: 500;
-  background: #1E1F21;
+  background: #54565d;
   -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
   box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
