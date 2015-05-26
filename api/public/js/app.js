@@ -59,6 +59,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $scope.assignedTeams = teamsAssigned;
 
 
+                var sidebarOpen = false;
+
                 function teamsAssigned(project) {
                     $modal.open({
                         templateUrl: '/t/project-team/assigned.html',
@@ -89,6 +91,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     });
                 }
 
+                $(document).on('click', '.site-overlay', function() {
+                    $scope.toggle(true);
+                }).on('keyup', function(e) {
+                    if (e.keyCode == 27 && sidebarOpen && !$('.modal').length) {
+                        $scope.toggle(true);
+                    }
+                });
 
                 $scope.updateProject = function(project) {
                     $modal.open({
@@ -149,10 +158,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         $('.pushy').removeClass("pushy-open");
                         $('#container').removeClass("container-push");
                         $('body').removeClass("pushy-active");
+                        sidebarOpen = false;
                     } else {
                         $('.pushy').addClass("pushy-open");
                         $('#container').addClass("container-push");
                         $('body').addClass("pushy-active");
+                        sidebarOpen = true;
                     }
                 }
             },
@@ -974,7 +985,7 @@ xApp
             }, function() {
                 $scope.access.splice($scope.access.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.revokeTeam = function(accessId) {
             Api.entryTeams.delete({
@@ -982,7 +993,7 @@ xApp
             }, function() {
                 $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
