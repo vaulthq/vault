@@ -50,14 +50,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state) {
                 $scope.projects = projects;
 
                 $scope.login = AuthFactory.getUser();
 
                 $scope.projectTeams = teams;
                 $scope.assignedTeams = teamsAssigned;
-
 
                 var sidebarOpen = false;
 
