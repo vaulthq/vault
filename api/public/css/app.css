@@ -182,7 +182,7 @@ body {
   width: 400px;
   height: 100%;
   top: 0;
-  z-index: 9999;
+  z-index: 500;
   background: #1E1F21;
   -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
@@ -229,21 +229,6 @@ body {
 }
 .pushy-active #container {
   margin-left: 0;
-}
-.pushy-active .site-overlay {
-  display: block;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 75px;
-  z-index: 9998;
-  background-color: rgba(0, 0, 0, 0.5);
-  -webkit-animation: fade 500ms;
-  -moz-animation: fade 500ms;
-  -ms-animation: fade 500ms;
-  -o-animation: fade 500ms;
-  animation: fade 500ms;
 }
 @keyframes fade {
   0% {

@@ -6,9 +6,6 @@ xApp
 
         $rootScope.projectId = projectId;
 
-        $scope.projectTeams = teams;
-        $scope.assignedTeams = teamsAssigned;
-
         $scope.getProject = function() {
             return $scope.projects[getProjectIndexById($scope.projectId)];
         };
@@ -25,75 +22,6 @@ xApp
             return $scope.projects[getProjectIndexById(model.id)] = model;
         };
 
-        $scope.updateProject = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/project/form.html',
-                controller: 'ModalUpdateProjectController',
-                resolve: {
-                    project: function(Api) {
-                        return Api.project.get({id: $scope.getProject().id});
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.setProject(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        };
-
-        function teams() {
-            $modal.open({
-                templateUrl: '/t/project-team/teams.html',
-                controller: 'ProjectTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.team.query();
-                    },
-                    access: function(Api) {
-                        return Api.projectTeams.query({id: $scope.getProject().id});
-                    },
-                    project: function() {
-                        return $scope.getProject();
-                    }
-                }
-            });
-        }
-
-        function teamsAssigned() {
-            $modal.open({
-                templateUrl: '/t/project-team/assigned.html',
-                controller: 'AssignedTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.assignedTeams.query({id: $scope.getProject().id});
-                    }
-                }
-            });
-        }
-
-        $scope.projectOwnerInfo = function() {
-            $modal.open({
-                templateUrl: '/t/project/owner.html',
-                controller: 'ModalProjectOwnerController',
-                resolve: {
-                    owner: function(Api) {
-                        return Api.user.get({id: $scope.getProject().user_id});
-                    }
-                }
-            });
-        };
-
-        $scope.deleteProject = function() {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-            ProjectFactory.delete({id: $scope.projectId});
-            $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $location.path('/recent');
-        };
     })
     .factory('ProjectsFactory', function ($resource) {
         return $resource("/api/project", {}, {

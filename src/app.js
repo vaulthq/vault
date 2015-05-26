@@ -50,10 +50,81 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter) {
                 $scope.projects = projects;
 
                 $scope.login = AuthFactory.getUser();
+
+                $scope.projectTeams = teams;
+                $scope.assignedTeams = teamsAssigned;
+
+
+                function teamsAssigned(project) {
+                    $modal.open({
+                        templateUrl: '/t/project-team/assigned.html',
+                        controller: 'AssignedTeamController',
+                        resolve: {
+                            teams: function(Api) {
+                                return Api.assignedTeams.query({id: project.id});
+                            }
+                        }
+                    });
+                }
+
+                function teams(project) {
+                    $modal.open({
+                        templateUrl: '/t/project-team/teams.html',
+                        controller: 'ProjectTeamController',
+                        resolve: {
+                            teams: function(Api) {
+                                return Api.team.query();
+                            },
+                            access: function(Api) {
+                                return Api.projectTeams.query({id: project.id});
+                            },
+                            project: function() {
+                                return project;
+                            }
+                        }
+                    });
+                }
+
+
+                $scope.updateProject = function(project) {
+                    $modal.open({
+                        templateUrl: '/t/project/form.html',
+                        controller: 'ModalUpdateProjectController',
+                        resolve: {
+                            project: function(Api) {
+                                return Api.project.get({id: project.id});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $scope.projects[$scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1)] = model;
+                    });
+                };
+
+                $scope.projectOwnerInfo = function(project) {
+                    $modal.open({
+                        templateUrl: '/t/project/owner.html',
+                        controller: 'ModalProjectOwnerController',
+                        resolve: {
+                            owner: function(Api) {
+                                return Api.user.get({id: project.user_id});
+                            }
+                        }
+                    });
+                };
+
+                $scope.deleteProject = function(project) {
+                    if (!confirm('Are you sure?')) {
+                        return;
+                    }
+                    Api.project.delete({id: project.id});
+                    $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
+
+                    $location.path('/recent');
+                };
 
                 $scope.openFirst = function ($event) {
                     if ($event.which === 13) {
@@ -73,23 +144,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     });
                 };
 
-                $scope.logout = function () {
-                    Api.auth.get({}, function() {
-                        AuthFactory.logout(true);
-                        $location.path('/login');
-                    })
-                };
-
-                $scope.profile = function() {
-                    $modal.open({
-                        templateUrl: '/t/user/profile.html',
-                        controller: 'ProfileController'
-                    });
-                };
-                $scope.toggle = function() {
-                  $('.pushy').toggleClass("pushy-left pushy-open");
-                  $('#container').toggleClass("container-push");
-                  $('body').toggleClass("pushy-active");
+                $scope.toggle = function(close) {
+                    if ($('.pushy').hasClass('pushy-open') || close) {
+                        $('.pushy').removeClass("pushy-open");
+                        $('#container').removeClass("container-push");
+                        $('body').removeClass("pushy-active");
+                    } else {
+                        $('.pushy').addClass("pushy-open");
+                        $('#container').addClass("container-push");
+                        $('body').addClass("pushy-active");
+                    }
                 }
             },
             resolve: {
