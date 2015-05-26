@@ -1,28 +1,24 @@
 <div class="pushy pushy-left">
     <div class="project-list">
 
-        <div class="heading">
-            <a ui-sref="user.home">Vault: Projects</a>
-        </div>
+        <h3 class="text-center pushy-title">
+            Vault: Projects
+        </h3>
+
+        <a class="btn btn-default" ng-click="createProject()" title="Create Project">
+            <span class="glyphicon glyphicon-plus"></span> Create new project
+        </a>
+
+        <input type="text" class="form-control input-sm" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus>
 
         <div class="project-scrollbar">
-          <table class="table table-hover">
-              <thead>
-              <tr>
-                  <th>Name</th>
-                  <th></th>
-              </tr>
-              </thead>
+          <table class="table table-hover sidebar-table">
               <tbody>
-                <tr class="filter-row">
-                    <td><input type="text" class="form-control input-sm" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus></td>
-                    <td></td>
-                </tr>
                 <tr ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
                     <td>
                         <a ui-sref="user.project({projectId: project.id})" ng-click="toggle(true)">{{ project.name }}</a>
                     </td>
-                    <td class="text-right">
+                    <td>
                       <a class="btn btn-success btn-xs" title="Assign Team" ng-click="projectTeams(project)" ng-if="project.can_edit">
                           <i class="glyphicon glyphicon-link"></i>
                       </a>
@@ -43,6 +39,7 @@
                 </tr>
               </tbody>
           </table>
+            <div class="clearfix"></div>
         </div>
     </div>
 
@@ -53,10 +50,6 @@
             </a>
             <a class="btn btn-side-menu" ng-click="toggle()" title="Project List" ng-click="toggle(true)">
                 <i class="glyphicon glyphicon-th-list"></i><br>Projects
-            </a>
-
-            <a class="btn btn-side-menu" ng-click="createProject()" title="Create Project">
-                <span class="glyphicon glyphicon-plus"></span><br>Project
             </a>
 
             <a class="btn btn-side-menu" ui-sref="user.teams" title="Manage Teams" ng-click="toggle(true)">

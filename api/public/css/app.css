@@ -18,6 +18,10 @@ body {
 ::-webkit-scrollbar-thumb:window-inactive {
   background: #4F565E;
 }
+.project-scrollbar {
+  flex: 1;
+  overflow-y: scroll;
+}
 .side-menu {
   position: fixed;
   top: 0;
@@ -28,6 +32,7 @@ body {
   display: flex;
   flex-direction: column;
   text-align: center;
+  box-shadow: -10px 0 15px 0 rgba(0, 0, 0, 0.1);
 }
 .btn-side-menu {
   padding: 16px 12px;
@@ -39,6 +44,20 @@ body {
 .btn-side-menu:hover,
 .btn-side-menu:focus {
   color: #C5CAE9;
+}
+.sidebar-table {
+  width: 95%;
+  color: white;
+}
+.sidebar-table > thead > tr > th {
+  border-bottom: 2px solid #46474f;
+}
+.sidebar-table > tbody > tr > td {
+  border-bottom: 1px solid #46474f;
+}
+.sidebar-table > tbody > tr.active > td,
+.sidebar-table > tbody > tr:hover > td {
+  background: #46474f;
 }
 .side-menu-top .btn-side-menu {
   border-bottom: 1px solid #54565d;
@@ -63,49 +82,6 @@ body {
 }
 .project-list ::-webkit-scrollbar-thumb:window-inactive {
   background: #4F565E;
-}
-.project-list .nav li {
-  line-height: 1em;
-}
-.project-list .nav li a {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  margin-right: 10px;
-  color: #E7EDEA;
-  text-shadow: 1px 1px 2px #303F9F;
-}
-.project-list .nav li.active a {
-  background: #4F565E;
-  color: #E7EDEA;
-}
-.project-list .nav li a:hover {
-  background: #303F9F;
-}
-.project-list .heading {
-  text-align: center;
-  height: 56px;
-  background: #3c3d42;
-  border-right: 1px solid #54565d;
-  padding: 1.1em;
-}
-.project-list .heading a {
-  font-size: 1.3em;
-  text-transform: uppercase;
-  color: #E7EDEA;
-}
-.project-list .heading a:hover {
-  text-decoration: none;
-}
-.project-list .filter-input {
-  margin: 10px;
-  width: 380px;
-  background: #3B424C;
-  border: 1px solid #4F565E;
-  color: #E7EDEA;
-}
-.project-scrollbar {
-  height: calc(100% - 170px);
-  overflow: auto;
 }
 .page-header {
   margin: 0;
@@ -175,13 +151,18 @@ body {
 .list-inline {
   margin-bottom: 0;
 }
+.pushy-title {
+  color: white;
+}
 .pushy {
+  display: flex;
+  flex-direction: column;
   position: fixed;
   width: 400px;
   height: 100%;
   top: 0;
   z-index: 500;
-  background: #54565d;
+  background: #2e2f34;
   -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
   box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
