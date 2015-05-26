@@ -29,10 +29,29 @@ body {
   right: 0;
   height: 100%;
   width: @sidebar-show-width;
-  background: black;
+  background: #1E1E1E;
   display: flex;
   flex-direction: column;
   text-align: center;
+}
+
+.btn-side-menu {
+  padding: 16px 12px;
+  display: block;
+  width: 100%;
+  border-radius: 0;
+  color: #C8C8C6;
+  &:hover, &:focus {
+    color: white;
+  }
+}
+
+.side-menu-top .btn-side-menu {
+  border-bottom: 1px solid #313131;
+}
+
+.side-menu-bottom .btn-side-menu {
+  border-top: 1px solid #313131;
 }
 
 .side-menu-top {
@@ -44,6 +63,7 @@ body {
 }
 .project-list {
   width: @sidebar-width - @sidebar-show-width;
+  border-right: 1px solid #313131;
 
   ::-webkit-scrollbar-track {
     background: #3B424C;

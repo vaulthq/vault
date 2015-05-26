@@ -24,10 +24,27 @@ body {
   right: 0;
   height: 100%;
   width: 75px;
-  background: black;
+  background: #1E1E1E;
   display: flex;
   flex-direction: column;
   text-align: center;
+}
+.btn-side-menu {
+  padding: 16px 12px;
+  display: block;
+  width: 100%;
+  border-radius: 0;
+  color: #C8C8C6;
+}
+.btn-side-menu:hover,
+.btn-side-menu:focus {
+  color: white;
+}
+.side-menu-top .btn-side-menu {
+  border-bottom: 1px solid #313131;
+}
+.side-menu-bottom .btn-side-menu {
+  border-top: 1px solid #313131;
 }
 .side-menu-top {
   flex: 1;
@@ -37,6 +54,7 @@ body {
 }
 .project-list {
   width: 325px;
+  border-right: 1px solid #313131;
 }
 .project-list ::-webkit-scrollbar-track {
   background: #3B424C;

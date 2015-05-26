@@ -42,41 +42,43 @@
               </tbody>
           </table>
         </div>
+    </div>
 
-        <div class="side-menu">
-            <div class="side-menu-top">
-                <a class="btn btn-block" ui-sref="user.home">
-                    <i class="glyphicon glyphicon-home"></i><br>Recent
+    <div class="side-menu">
+        <div class="side-menu-top">
+            <a class="btn btn-side-menu" ui-sref="user.home" title="Recently Accessed">
+                <i class="glyphicon glyphicon-home"></i><br>Recent
+            </a>
+            <a class="btn btn-side-menu" ng-click="toggle()" title="Project List">
+                <i class="glyphicon glyphicon-th-list"></i><br>Projects
+            </a>
+
+            <a class="btn btn-side-menu" ng-click="createProject()" title="Create Project">
+                <span class="glyphicon glyphicon-plus"></span><br>Project
+            </a>
+
+            <a class="btn btn-side-menu" ui-sref="user.teams" title="Manage Teams">
+                <span class="glyphicon glyphicon-text-width"></span><br>Teams
+            </a>
+
+            <div ng-if="login.group == 'admin'">
+                <a class="btn btn-side-menu" ui-sref="user.history" title="Action History">
+                    <span class="glyphicon glyphicon-flag"></span><br>History
                 </a>
-                <button class="btn btn-block" ng-click="toggle()">
-                    <i class="glyphicon glyphicon-th-list"></i><br>Projects
-                </button>
-
-                <a class="btn btn-block" title="Create Project" ng-click="createProject()">
-                    <span class="glyphicon glyphicon-plus"></span><br>Project
+                <a class="btn btn-side-menu" ui-sref="user.list" title="Manage Users">
+                    <span class="glyphicon glyphicon-user"></span><br>Users
                 </a>
-
-                <a class="btn btn-block" ui-sref="user.teams" title="Manage Teams">
-                    <span class="glyphicon glyphicon-text-width"></span><br>Teams
-                </a>
-
-                <div ng-if="login.group == 'admin'">
-                    <a class="btn btn-block" ui-sref="user.history" title="Action History">
-                        <span class="glyphicon glyphicon-flag"></span><br>History
-                    </a>
-                    <a class="btn btn-block" ui-sref="user.list" title="Manage Users">
-                        <span class="glyphicon glyphicon-user"></span><br>Users
-                    </a>
-                </div>
             </div>
+        </div>
 
-            <button title="Log Out ({{login.email}})" ng-click="logout()">
-                <span class="glyphicon glyphicon-off"></span><br>Logout
-            </button>
-
-            <button title="Change Account Password" ng-click="profile()">
+        <div class="side-menu-bottom">
+            <a class="btn btn-side-menu" ng-click="profile()" title="Change Account Password">
                 <span class="glyphicon glyphicon-wrench"></span><br>Profile
-            </button>
+            </a>
+
+            <a class="btn btn-side-menu" ng-click="logout()" title="Log Out ({{login.email}})">
+                <span class="glyphicon glyphicon-off"></span><br>Logout
+            </a>
         </div>
     </div>
 </div>
