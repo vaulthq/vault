@@ -1,4 +1,5 @@
 @sidebar-width: 400px;
+@sidebar-show-width: 75px;
 
 html, body {
   margin: 0;
@@ -22,20 +23,27 @@ body {
   background: #4F565E;
 }
 
-.sideMenu {
+.side-menu {
   position: fixed;
   top: 0;
   right: 0;
   height: 100%;
-  width: 50px;
+  width: @sidebar-show-width;
   background: black;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.side-menu-top {
+  flex: 1;
 }
 
 .no-margin {
   margin: 0;
 }
 .project-list {
-  width: @sidebar-width - 50px;
+  width: @sidebar-width - @sidebar-show-width;
 
   ::-webkit-scrollbar-track {
     background: #3B424C;
@@ -173,7 +181,7 @@ body {
 }
 
 .list-inline {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 
@@ -192,11 +200,11 @@ body {
 /* Menu Movement */
 
 .pushy-left{
-    -webkit-transform: translate3d(-@sidebar-width+50px,0,0);
-    -moz-transform: translate3d(-@sidebar-width+50px,0,0);
-    -ms-transform: translate3d(-@sidebar-width+50px,0,0);
-    -o-transform: translate3d(-@sidebar-width+50px,0,0);
-    transform: translate3d(-@sidebar-width+50px,0,0);
+    -webkit-transform: translate3d(-@sidebar-width+@sidebar-show-width,0,0);
+    -moz-transform: translate3d(-@sidebar-width+@sidebar-show-width,0,0);
+    -ms-transform: translate3d(-@sidebar-width+@sidebar-show-width,0,0);
+    -o-transform: translate3d(-@sidebar-width+@sidebar-show-width,0,0);
+    transform: translate3d(-@sidebar-width+@sidebar-show-width,0,0);
 }
 
 .pushy-open{
@@ -225,7 +233,7 @@ body {
 }
 
 #container {
-  margin-left: 50px;
+  margin-left: @sidebar-show-width;
 }
 
 /* Site Overlay */
@@ -242,7 +250,7 @@ body {
     top: 0;
     right: 0;
     bottom: 0;
-    left: 50px;
+    left: @sidebar-show-width;
     z-index: 9998;
     background-color: rgba(0,0,0,0.5);
     -webkit-animation: fade 500ms;
