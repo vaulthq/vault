@@ -1,5 +1,5 @@
 xApp
-    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
+    .controller('ProjectController', function($rootScope, $scope, $modal, $location, projects, projectId) {
 
         $scope.projects = projects;
         $scope.projectId = projectId;

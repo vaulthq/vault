@@ -3,13 +3,13 @@ var xApp = angular.module('xApp', [
     'ngResource',
     'ngAnimate',
     'ngCookies',
-    'shareFlash',
     'ui.bootstrap',
     'ui.router',
     'ui.select',
     'angularMoment',
     'toaster',
-    'angular-jwt'
+    'angular-jwt',
+    'cfp.hotkeys'
 ]);
 
 xApp.config([
@@ -50,7 +50,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state) {
+            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
                 $scope.projects = projects;
 
                 $scope.login = AuthFactory.getUser();
@@ -59,6 +59,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $scope.assignedTeams = teamsAssigned;
 
                 var sidebarOpen = false;
+
+                hotkeys.add({
+                    combo: 'ctrl+p',
+                    description: 'Show project jump window',
+                    allowIn: ['input', 'select', 'textarea'],
+                    callback: function(event, hotkey) {
+                        event.preventDefault();
+                        $scope.$broadcast('openJump');
+                    }
+                });
 
                 function teamsAssigned(project) {
                     $modal.open({

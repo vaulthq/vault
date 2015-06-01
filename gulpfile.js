@@ -11,7 +11,8 @@ var paths = {
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
         'bower_components/AngularJS-Toaster/toaster.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/clippy/build/clippy.css'
+        'bower_components/clippy/build/clippy.css',
+        'bower_components/angular-hotkeys/build/hotkeys.min.css'
     ],
     html_templates: [
         'src/**/*.html'
@@ -29,12 +30,13 @@ var paths = {
         'bower_components/angular-jwt/dist/angular-jwt.min.js',
         'bower_components/jquery/jquery.min.js',
         'bower_components/pushy/js/pushy.min.js',
+        'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
     ],
     clippy: [
-        'bower_components/clippy/build/clippy.min.js',
+        'bower_components/clippy/build/clippy.min.js'
     ],
     scripts: [
         'src/**/*.js'
