@@ -113,19 +113,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     }
                 });
 
-                $scope.updateProject = function(project) {
-                    $modal.open({
-                        templateUrl: '/t/project/form.html',
-                        controller: 'ModalUpdateProjectController',
-                        resolve: {
-                            project: function(Api) {
-                                return Api.project.get({id: project.id});
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $scope.projects[$scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1)] = model;
-                    });
-                };
+                $scope.$on('project:update', function(event, project) {
+                    $scope.projects[$scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1)] = project;
+                });
 
                 $scope.projectOwnerInfo = function(project) {
                     $modal.open({

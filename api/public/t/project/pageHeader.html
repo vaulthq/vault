@@ -3,6 +3,7 @@
         {{ getProject().name }} <small>{{ getProject().description }}</small>
 
         <div class="pull-right">
+            <project-update project="getProject()"></project-update>
             <entry-create project-id="getProject().id"></entry-create>
         </div>
     </h3>
