@@ -1,3 +1,5 @@
+@import 'login';
+
 @sidebar-width: 400px;
 @sidebar-show-width: 75px;
 @sidebar-show-bg: #3C3D42;
@@ -6,6 +8,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -25,6 +28,15 @@ body {
   background: #4F565E;
 }
 
+#toast-container > div {
+  .box-shadow;
+  border-radius: 2px;
+}
+
+.box-shadow {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23);
+}
+
 .project-jump {
   position: absolute;
   top: -350px;
@@ -39,6 +51,11 @@ body {
   &.in {
     top: 15px;
   }
+  .box-shadow;
+}
+
+.content-background {
+  background-color: white;
 }
 
 .project-scrollbar {
@@ -150,7 +167,8 @@ body {
 
 .modal-content {
   border: 1px solid #4F565E;
-  border-radius: 0;
+  border-radius: 2px;
+  .box-shadow;
 }
 
 .modal-footer {
@@ -252,43 +270,4 @@ body {
 
 #container {
   margin-left: @sidebar-show-width;
-}
-
-/* Site Overlay */
-
-.site-overlay {
-    display: none;
-}
-.pushy-active #container {
-  margin-left: 0;
-}
-.pushy-active .site-overlay {
-    display: block;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: @sidebar-show-width;
-    z-index: 480;
-    background-color: rgba(0,0,0,0.5);
-    -webkit-animation: fade 500ms;
-    -moz-animation: fade 500ms;
-    -ms-animation: fade 500ms;
-    -o-animation: fade 500ms;
-    animation: fade 500ms;
-}
-
-@keyframes fade{
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-@-moz-keyframes fade{
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-@-webkit-keyframes fade{
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
 }

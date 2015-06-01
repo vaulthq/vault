@@ -55,11 +55,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.login = AuthFactory.getUser();
 
-                $scope.projectTeams = teams;
-                $scope.assignedTeams = teamsAssigned;
                 $scope.jump = jump;
-
-                var sidebarOpen = false;
 
                 hotkeys.add({
                     combo: 'ctrl+p',
@@ -87,34 +83,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     });
                 }
 
-                function teams(project) {
-                    $modal.open({
-                        templateUrl: '/t/project-team/teams.html',
-                        controller: 'ProjectTeamController',
-                        resolve: {
-                            teams: function(Api) {
-                                return Api.team.query();
-                            },
-                            access: function(Api) {
-                                return Api.projectTeams.query({id: project.id});
-                            },
-                            project: function() {
-                                return project;
-                            }
-                        }
-                    });
-                }
-
-                $(document).on('click', '.site-overlay', function() {
-                    $scope.toggle(true);
-                }).on('keyup', function(e) {
-                    if (e.keyCode == 27 && sidebarOpen && !$('.modal').length) {
-                        $scope.toggle(true);
-                    }
-                });
-
                 $scope.$on('project:update', function(event, project) {
-                    $scope.projects[$scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1)] = project;
+                    $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
                 });
 
                 $scope.projectOwnerInfo = function(project) {
@@ -156,24 +126,10 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         $scope.projects.push(model);
                     });
                 };
-
-                $scope.toggle = function(close) {
-                    if ($('.pushy').hasClass('pushy-open') || close) {
-                        $('.pushy').removeClass("pushy-open");
-                        $('#container').removeClass("container-push");
-                        $('body').removeClass("pushy-active");
-                        sidebarOpen = false;
-                    } else {
-                        $('.pushy').addClass("pushy-open");
-                        $('#container').addClass("container-push");
-                        $('body').addClass("pushy-active");
-                        sidebarOpen = true;
-                    }
-                }
             },
             resolve: {
-                projects: function(ProjectsFactory) {
-                    return ProjectsFactory.query();
+                projects: function(Api) {
+                    return Api.project.query();
                 }
             }
         })
@@ -189,29 +145,20 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         })
         .state('user.project', {
             url: '/project/:projectId',
-            views: {
-                head: {
-                    templateUrl: '/t/project/pageHeader.html',
-                    controller: 'ProjectController',
-                    resolve: {
-                        projects: function(projects) {
-                            return projects;
-                        }
-                    }
-                },
-                content: {
-                    templateUrl: '/t/entry/list.html',
-                    controller: 'EntryController',
-                    resolve: {
-                        entries: function(ProjectKeysFactory, projectId) {
-                            return ProjectKeysFactory.keys({id: projectId});
-                        }
-                    }
-                }
-            },
+            templateUrl: '/t/entry/list.html',
+            controller: 'EntryController',
             resolve: {
-                projectId: function ($stateParams) {
-                    return $stateParams.projectId;
+                project: function ($stateParams, projects) {
+                    return projects.$promise.then(function(projects) {
+                        for (var i=0; i<projects.length; i++) {
+                          if (projects[i].id == $stateParams.projectId) {
+                            return projects[i];
+                          }
+                        }
+                    });
+                },
+                entries: function(Api, $stateParams) {
+                    return Api.projectKeys.query({id: $stateParams.projectId});
                 }
             }
         })
@@ -224,6 +171,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     return Api.user.query();
                 }
             }
+        })
+        .state('user.projects', {
+            url: '/projects',
+            templateUrl: '/t/project/list.html',
+            controller: 'ProjectController'
         })
         .state('user.history', {
             url: '/history',
@@ -279,6 +231,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
+            projectKeys: $resource("/api/project/keys/:id"),
             projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
@@ -353,12 +306,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             $rootScope.$broadcast('auth:login', getUser());
         }
 
-        function logout(withMessage) {
+        function logout() {
             localStorage.removeItem(localToken);
-
-            if (withMessage) {
-                toaster.pop('info', "", "Good bye!");
-            }
 
             $rootScope.$broadcast('auth:login', null);
         }
@@ -391,7 +340,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $location.path('/recent');
                 toaster.pop('info', "", "Welcome back, " + getUser().name);
             }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
+                toaster.pop('error', "Login Failed", response.data[0], 0);
             })
         }
 
@@ -845,6 +794,46 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .directive('projectTeam', directive);
+
+    function directive() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-success btn-xs" title="Assign Team" ng-click="teams()" ng-if="project.can_edit">' +
+                    '<i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            scope: {
+                project: '='
+            },
+            controller: function($scope, $modal) {
+                $scope.teams = teams;
+
+                function teams() {
+                  $modal.open({
+                      templateUrl: '/t/project-team/teams.html',
+                      controller: 'ProjectTeamController',
+                      resolve: {
+                          teams: function(Api) {
+                              return Api.team.query();
+                          },
+                          access: function(Api) {
+                              return Api.projectTeams.query({id: $scope.project.id});
+                          },
+                          project: function() {
+                              return $scope.project;
+                          }
+                      }
+                  });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .directive('projectUpdate', projectUpdateDirective);
 
     function projectUpdateDirective() {
@@ -903,16 +892,24 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($rootScope, $scope, $location, $filter, modal, entries, projectId) {
+    function controller($scope, $location, $filter, modal, entries, project) {
 
         $scope.entries = entries;
-        $rootScope.projectId = projectId;
+        $scope.project = project;
         $scope.activeEntry = $location.search().active || 0;
         $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+
+        $scope.$on('project:update', onProjectUpdate);
+
+        function onProjectUpdate(event, project) {
+            if ($scope.project.id == project.id) {
+                $scope.project = project;
+            }
+        }
 
         function copyFirst($event) {
             if ($event.which === 13) {
@@ -1389,50 +1386,15 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-xApp
-    .controller('ProjectController', function($rootScope, $scope, $modal, $location, projects, projectId) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectController', controller);
 
+    function controller($scope, projects) {
         $scope.projects = projects;
-        $scope.projectId = projectId;
-
-        $rootScope.projectId = projectId;
-
-        $scope.getProject = function() {
-            return $scope.projects[getProjectIndexById($scope.projectId)];
-        };
-
-        var getProjectIndexById = function(projectId) {
-            for (var p in $scope.projects) {
-                if ($scope.projects[p].id == projectId) {
-                    return p;
-                }
-            }
-        };
-
-        $scope.setProject = function(model) {
-            return $scope.projects[getProjectIndexById(model.id)] = model;
-        };
-
-    })
-    .factory('ProjectsFactory', function ($resource) {
-        return $resource("/api/project", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('ProjectFactory', function ($resource) {
-        return $resource("/api/project/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} },
-            keys: { method: 'GET', params: {id: '@id'} }
-        })
-    })
-    .factory('ProjectKeysFactory', function ($resource) {
-        return $resource("/api/project/keys/:id", {}, {
-            keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
-        })
-    });
+    }
+})();
 
 (function() {
     angular

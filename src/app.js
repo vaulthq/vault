@@ -55,11 +55,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.login = AuthFactory.getUser();
 
-                $scope.projectTeams = teams;
-                $scope.assignedTeams = teamsAssigned;
                 $scope.jump = jump;
-
-                var sidebarOpen = false;
 
                 hotkeys.add({
                     combo: 'ctrl+p',
@@ -87,34 +83,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     });
                 }
 
-                function teams(project) {
-                    $modal.open({
-                        templateUrl: '/t/project-team/teams.html',
-                        controller: 'ProjectTeamController',
-                        resolve: {
-                            teams: function(Api) {
-                                return Api.team.query();
-                            },
-                            access: function(Api) {
-                                return Api.projectTeams.query({id: project.id});
-                            },
-                            project: function() {
-                                return project;
-                            }
-                        }
-                    });
-                }
-
-                $(document).on('click', '.site-overlay', function() {
-                    $scope.toggle(true);
-                }).on('keyup', function(e) {
-                    if (e.keyCode == 27 && sidebarOpen && !$('.modal').length) {
-                        $scope.toggle(true);
-                    }
-                });
-
                 $scope.$on('project:update', function(event, project) {
-                    $scope.projects[$scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1)] = project;
+                    $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
                 });
 
                 $scope.projectOwnerInfo = function(project) {
@@ -156,24 +126,10 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         $scope.projects.push(model);
                     });
                 };
-
-                $scope.toggle = function(close) {
-                    if ($('.pushy').hasClass('pushy-open') || close) {
-                        $('.pushy').removeClass("pushy-open");
-                        $('#container').removeClass("container-push");
-                        $('body').removeClass("pushy-active");
-                        sidebarOpen = false;
-                    } else {
-                        $('.pushy').addClass("pushy-open");
-                        $('#container').addClass("container-push");
-                        $('body').addClass("pushy-active");
-                        sidebarOpen = true;
-                    }
-                }
             },
             resolve: {
-                projects: function(ProjectsFactory) {
-                    return ProjectsFactory.query();
+                projects: function(Api) {
+                    return Api.project.query();
                 }
             }
         })
@@ -189,29 +145,20 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         })
         .state('user.project', {
             url: '/project/:projectId',
-            views: {
-                head: {
-                    templateUrl: '/t/project/pageHeader.html',
-                    controller: 'ProjectController',
-                    resolve: {
-                        projects: function(projects) {
-                            return projects;
-                        }
-                    }
-                },
-                content: {
-                    templateUrl: '/t/entry/list.html',
-                    controller: 'EntryController',
-                    resolve: {
-                        entries: function(ProjectKeysFactory, projectId) {
-                            return ProjectKeysFactory.keys({id: projectId});
-                        }
-                    }
-                }
-            },
+            templateUrl: '/t/entry/list.html',
+            controller: 'EntryController',
             resolve: {
-                projectId: function ($stateParams) {
-                    return $stateParams.projectId;
+                project: function ($stateParams, projects) {
+                    return projects.$promise.then(function(projects) {
+                        for (var i=0; i<projects.length; i++) {
+                          if (projects[i].id == $stateParams.projectId) {
+                            return projects[i];
+                          }
+                        }
+                    });
+                },
+                entries: function(Api, $stateParams) {
+                    return Api.projectKeys.query({id: $stateParams.projectId});
                 }
             }
         })
@@ -224,6 +171,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     return Api.user.query();
                 }
             }
+        })
+        .state('user.projects', {
+            url: '/projects',
+            templateUrl: '/t/project/list.html',
+            controller: 'ProjectController'
         })
         .state('user.history', {
             url: '/history',

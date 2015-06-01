@@ -306,7 +306,7 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
 
     /*
      * AngularJS Toaster
-     * Version: 0.4.14
+     * Version: 0.4.13
      *
      * Copyright 2013-2015 Jiri Kavulak.
      * All Rights Reserved.
@@ -319,7 +319,7 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
 
     angular.module('toaster', ['ngAnimate']).constant(
         'toasterConfig', {
-            'limit': 0,                   // limits max number of toasts
+            'limit':          0,                   // limits max number of toasts
             'tap-to-dismiss': true,
 
             /* Options:
@@ -330,31 +330,31 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
              icon-class value
              'close-button': { 'toast-error': true, 'toast-info': false }
              */
-            'close-button': false,
+            'close-button':   false,
 
-            'newest-on-top': true, //'fade-in': 1000,            // done in css
+            'newest-on-top':        true, //'fade-in': 1000,            // done in css
             //'on-fade-in': undefined,    // not implemented
             //'fade-out': 1000,           // done in css
             //'on-fade-out': undefined,   // not implemented
             //'extended-time-out': 1000,  // not implemented
-            'time-out': 5000, // Set timeOut and extendedTimeout to 0 to make it sticky
-            'icon-classes': {
-                error: 'toast-error',
-                info: 'toast-info',
-                wait: 'toast-wait',
+            'time-out':             5000, // Set timeOut and extendedTimeout to 0 to make it sticky
+            'icon-classes':         {
+                error:   'toast-error',
+                info:    'toast-info',
+                wait:    'toast-wait',
                 success: 'toast-success',
                 warning: 'toast-warning'
             },
-            'body-output-type': '', // Options: '', 'trustedHtml', 'template', 'templateWithData'
-            'body-template': 'toasterBodyTmpl.html',
-            'icon-class': 'toast-info',
-            'position-class': 'toast-top-right', // Options (see CSS):
-            // 'toast-top-full-width', 'toast-bottom-full-width', 'toast-center',
-            // 'toast-top-left', 'toast-top-center', 'toast-top-right',
-            // 'toast-bottom-left', 'toast-bottom-center', 'toast-bottom-right',
-            'title-class': 'toast-title',
-            'message-class': 'toast-message',
-            'prevent-duplicates': false,
+            'body-output-type':     '', // Options: '', 'trustedHtml', 'template', 'templateWithData'
+            'body-template':        'toasterBodyTmpl.html',
+            'icon-class':           'toast-info',
+            'position-class':       'toast-top-right', // Options (see CSS):
+                                                       // 'toast-top-full-width', 'toast-bottom-full-width', 'toast-center',
+                                                       // 'toast-top-left', 'toast-top-center', 'toast-top-rigt',
+                                                       // 'toast-bottom-left', 'toast-bottom-center', 'toast-bottom-rigt',
+            'title-class':          'toast-title',
+            'message-class':        'toast-message',
+            'prevent-duplicates':   false,
             'mouseover-timer-stop': true // stop timeout on mouseover and restart timer on mouseout
         }
     ).service(
@@ -364,27 +364,27 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                     if (angular.isObject(type)) {
                         var params = type; // Enable named parameters as pop argument
                         this.toast = {
-                            type: params.type,
-                            title: params.title,
-                            body: params.body,
-                            timeout: params.timeout,
-                            bodyOutputType: params.bodyOutputType,
-                            clickHandler: params.clickHandler,
+                            type:            params.type,
+                            title:           params.title,
+                            body:            params.body,
+                            timeout:         params.timeout,
+                            bodyOutputType:  params.bodyOutputType,
+                            clickHandler:    params.clickHandler,
                             showCloseButton: params.showCloseButton,
-                            uid: params.toastId
+                            uid:             params.toastId
                         };
                         toastId = params.toastId;
                         toasterId = params.toasterId;
                     } else {
                         this.toast = {
-                            type: type,
-                            title: title,
-                            body: body,
-                            timeout: timeout,
-                            bodyOutputType: bodyOutputType,
-                            clickHandler: clickHandler,
+                            type:            type,
+                            title:           title,
+                            body:            body,
+                            timeout:         timeout,
+                            bodyOutputType:  bodyOutputType,
+                            clickHandler:    clickHandler,
                             showCloseButton: showCloseButton,
-                            uid: toastId
+                            uid:             toastId
                         };
                     }
                     $rootScope.$emit('toaster-newToast', toasterId, toastId);
@@ -411,7 +411,7 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                                     toastId
                                 );
                             } else { // 'title' is actually an object with options
-                                this.pop(angular.extend(title, { type: toasterType }));
+                                this.pop(angular.extend(title, {type: toasterType}));
                             }
                         };
                     })(type);
@@ -445,13 +445,13 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                         }
                     },
 
-                    subscribeToNewToastEvent: function (onNewToast) {
+                    subscribeToNewToastEvent:      function (onNewToast) {
                         newToastEventSubscribers.push(onNewToast);
                     },
-                    subscribeToClearToastsEvent: function (onClearToasts) {
+                    subscribeToClearToastsEvent:   function (onClearToasts) {
                         clearToastsEventSubscribers.push(onClearToasts);
                     },
-                    unsubscribeToNewToastEvent: function (onNewToast) {
+                    unsubscribeToNewToastEvent:    function (onNewToast) {
                         var index = newToastEventSubscribers.indexOf(onNewToast);
                         if (index >= 0) {
                             newToastEventSubscribers.splice(index, 1);
@@ -475,10 +475,10 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                     }
                 };
                 return {
-                    setup: toasterFactory.setup,
-                    subscribeToNewToastEvent: toasterFactory.subscribeToNewToastEvent,
-                    subscribeToClearToastsEvent: toasterFactory.subscribeToClearToastsEvent,
-                    unsubscribeToNewToastEvent: toasterFactory.unsubscribeToNewToastEvent,
+                    setup:                         toasterFactory.setup,
+                    subscribeToNewToastEvent:      toasterFactory.subscribeToNewToastEvent,
+                    subscribeToClearToastsEvent:   toasterFactory.subscribeToClearToastsEvent,
+                    unsubscribeToNewToastEvent:    toasterFactory.unsubscribeToNewToastEvent,
                     unsubscribeToClearToastsEvent: toasterFactory.unsubscribeToClearToastsEvent
                 };
             }]
@@ -487,23 +487,23 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
             '$parse', '$rootScope', '$interval', '$sce', 'toasterConfig', 'toaster', 'toasterEventRegistry',
             function ($parse, $rootScope, $interval, $sce, toasterConfig, toaster, toasterEventRegistry) {
                 return {
-                    replace: true,
-                    restrict: 'EA',
-                    scope: true, // creates an internal scope for this directive (one per directive instance)
-                    link: function (scope, elm, attrs) {
+                    replace:    true,
+                    restrict:   'EA',
+                    scope:      true, // creates an internal scope for this directive (one per directive instance)
+                    link:       function (scope, elm, attrs) {
                         var id = 0, mergedConfig;
 
                         // Merges configuration set in directive with default one
                         mergedConfig = angular.extend({}, toasterConfig, scope.$eval(attrs.toasterOptions));
 
                         scope.config = {
-                            toasterId: mergedConfig['toaster-id'],
-                            position: mergedConfig['position-class'],
-                            title: mergedConfig['title-class'],
-                            message: mergedConfig['message-class'],
-                            tap: mergedConfig['tap-to-dismiss'],
-                            closeButton: mergedConfig['close-button'],
-                            animation: mergedConfig['animation-class'],
+                            toasterId:      mergedConfig['toaster-id'],
+                            position:       mergedConfig['position-class'],
+                            title:          mergedConfig['title-class'],
+                            message:        mergedConfig['message-class'],
+                            tap:            mergedConfig['tap-to-dismiss'],
+                            closeButton:    mergedConfig['close-button'],
+                            animation:      mergedConfig['animation-class'],
                             mouseoverTimer: mergedConfig['mouseover-timer-stop']
                         };
 
@@ -524,7 +524,6 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
 
                         scope.configureTimer = function (toast) {
                             var timeout = angular.isNumber(toast.timeout) ? toast.timeout : mergedConfig['time-out'];
-                            if (typeof timeout === "object") timeout = timeout[toast.type];
                             if (timeout > 0) {
                                 setTimeout(toast, timeout);
                             }
@@ -696,14 +695,16 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                                 }
                             };
 
-                            $scope.click = function (toast, isCloseButton) {
-                                if ($scope.config.tap === true || (toast.showCloseButton === true && isCloseButton === true)) {
+                            $scope.click = function (toast) {
+                                if ($scope.config.tap === true || toast.showCloseButton === true) {
                                     var removeToast = true;
                                     if (toast.clickHandler) {
                                         if (angular.isFunction(toast.clickHandler)) {
-                                            removeToast = toast.clickHandler(toast, true);
+                                            removeToast = toast.clickHandler(toast, toast.showCloseButton);
                                         } else if (angular.isFunction($scope.$parent.$eval(toast.clickHandler))) {
-                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(toast, toast.showCloseButton);
+                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(
+                                                toast, toast.showCloseButton
+                                            );
                                         } else {
                                             console.log("TOAST-NOTE: Your click handler is not inside a parent scope of toaster-container.");
                                         }
@@ -714,11 +715,12 @@ angular.module("ui.bootstrap",["ui.bootstrap.transition","ui.bootstrap.collapse"
                                 }
                             };
                         }],
-                    template: '<div id="toast-container" ng-class="[config.position, config.animation]">' + '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster, true)">&times;</button>' + '<div ng-class="config.title">{{toaster.title}}</div>' + '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-default >{{toaster.body}}</div>' + '</div>' + '</div>' + '</div>'
+                    template:   '<div id="toast-container" ng-class="[config.position, config.animation]">' + '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster)">&times;</button>' + '<div ng-class="config.title">{{toaster.title}}</div>' + '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-default >{{toaster.body}}</div>' + '</div>' + '</div>' + '</div>'
                 };
             }]
     );
 })(window, document);
+
 /**
  * State-based routing for AngularJS
  * @version v0.2.15

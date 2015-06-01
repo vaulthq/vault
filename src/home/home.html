@@ -19,9 +19,7 @@
                         <a ui-sref="user.project({projectId: project.id})" ng-click="toggle(true)">{{ project.name }}</a>
                     </td>
                     <td>
-                      <a class="btn btn-success btn-xs" title="Assign Team" ng-click="projectTeams(project)" ng-if="project.can_edit">
-                          <i class="glyphicon glyphicon-link"></i>
-                      </a>
+
                       <a class="btn btn-success btn-xs" title="Show Assigned Teams" ng-click="assignedTeams(project)" ng-if="!project.can_edit">
                           <i class="glyphicon glyphicon-question-sign"></i>
                       </a>
@@ -43,26 +41,26 @@
 
     <div class="side-menu">
         <div class="side-menu-top">
-            <a class="btn btn-side-menu" ui-sref="user.home" title="Recently Accessed" ng-click="toggle(true)">
+            <a class="btn btn-side-menu" ui-sref="user.home" title="Recently Accessed">
                 <i class="glyphicon glyphicon-home"></i><br>Recent
             </a>
-            <a class="btn btn-side-menu" ng-click="jump()" title="Project Jumper" ng-click="toggle(true)">
+            <a class="btn btn-side-menu" ng-click="jump()" title="Project Jumper">
                 <i class="glyphicon glyphicon glyphicon-random"></i><br>Jump
             </a>
-            <a class="btn btn-side-menu" ng-click="toggle()" title="Project List" ng-click="toggle(true)">
+            <a class="btn btn-side-menu" ui-sref="user.projects" title="Project List">
                 <i class="glyphicon glyphicon-th-list"></i><br>Projects
             </a>
 
-            <a class="btn btn-side-menu" ui-sref="user.teams" title="Manage Teams" ng-click="toggle(true)">
+            <a class="btn btn-side-menu" ui-sref="user.teams" title="Manage Teams">
                 <span class="glyphicon glyphicon-text-width"></span><br>Teams
             </a>
 
             <div ng-if="login.group == 'admin'">
-                <a class="btn btn-side-menu" ui-sref="user.history" title="Action History" ng-click="toggle(true)">
-                    <span class="glyphicon glyphicon-flag"></span><br>History
-                </a>
-                <a class="btn btn-side-menu" ui-sref="user.list" title="Manage Users" ng-click="toggle(true)">
+                <a class="btn btn-side-menu" ui-sref="user.list" title="Manage Users">
                     <span class="glyphicon glyphicon-user"></span><br>Users
+                </a>
+                <a class="btn btn-side-menu" ui-sref="user.history" title="Action History">
+                    <span class="glyphicon glyphicon-flag"></span><br>History
                 </a>
             </div>
         </div>
@@ -74,12 +72,6 @@
     </div>
 </div>
 
-<div class="site-overlay"></div>
-
-<div id="container">
-    <ui-view/>
-    <div ui-view="head"></div>
-    <div ui-view="content"></div>
-</div>
+<div id="container" class="content-background"><ui-view/></div>
 
 <project-jump projects="projects"></project-jump>

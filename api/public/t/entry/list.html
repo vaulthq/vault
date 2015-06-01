@@ -1,3 +1,14 @@
+<div class="page-header">
+    <h3>
+        {{ project.name }} <small>{{ project.description }}</small>
+
+        <div class="pull-right">
+            <project-update project="project"></project-update>
+            <entry-create project-id="project.id"></entry-create>
+        </div>
+    </h3>
+</div>
+
 <div class="content">
     <loader when="!entries.$resolved"></loader>
 
