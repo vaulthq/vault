@@ -820,15 +820,25 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         description: 'Close project jump',
                         allowIn: ['input', 'select'],
                         callback: function(event, hotkey) {
-                            $scope.isActive = false;
-                            hotkeys.del('esc');
+                            close();
                         }
                     });
                 });
 
+                function close() {
+                    $scope.isActive = false;
+                    hotkeys.del('esc');
+
+                    window.focus();
+
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                }
+
                 function openProject(project) {
                     $state.go('user.project', {projectId: project.id});
-                    $scope.isActive = false;
+                    close();
                 }
             }
         };
