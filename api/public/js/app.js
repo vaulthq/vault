@@ -839,8 +839,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     $scope.isActive = false;
                     hotkeys.del('esc');
 
-                    window.focus();
-
                     if (document.activeElement) {
                         document.activeElement.blur();
                     }
