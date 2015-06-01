@@ -814,15 +814,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.$on('openJump', function () {
                     $scope.isActive = true;
-                });
 
-                hotkeys.add({
-                    combo: 'esc',
-                    description: 'Close project jump',
-                    allowIn: ['input', 'select'],
-                    callback: function(event, hotkey) {
-                        $scope.isActive = false;
-                    }
+                    hotkeys.add({
+                        combo: 'esc',
+                        description: 'Close project jump',
+                        allowIn: ['input', 'select'],
+                        callback: function(event, hotkey) {
+                            $scope.isActive = false;
+                            hotkeys.del('esc');
+                        }
+                    });
                 });
 
                 function openProject(project) {
