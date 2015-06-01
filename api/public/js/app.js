@@ -804,7 +804,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             restrict: 'E',
             template:
                 '<div class="project-jump" ng-class="{in: isActive}"><ui-select ng-model="project" on-select="openProject($item)" focus-on="openJump">' +
-                    '<ui-select-match>Quick project jump</ui-select-match>' +
+                    '<ui-select-match placeholder="Quick project jump">{{ $select.selected.name }}</ui-select-match>' +
                     '<ui-select-choices repeat="project.id as pro in projects | filter: {name: $select.search}">' +
                         '<div ng-bind-html="pro.name | highlight: $select.search"></div>' +
                         '<div class="muted small">{{ pro.description }}</div>' +
@@ -819,9 +819,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.$on('toggleJump', function () {
                     $scope.isActive = !$scope.isActive;
+                    $scope.$broadcast('openJump');
 
                     if ($scope.isActive) {
-                        $scope.$broadcast('openJump');
                         hotkeys.add({
                             combo: 'esc',
                             description: 'Close project jump',
@@ -838,15 +838,14 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 function close() {
                     $scope.isActive = false;
                     hotkeys.del('esc');
-
-                    if (document.activeElement) {
-                        document.activeElement.blur();
-                    }
                 }
 
                 function openProject(project) {
                     $state.go('user.project', {projectId: project.id});
                     close();
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
                 }
             }
         };
