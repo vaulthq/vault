@@ -57,6 +57,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.projectTeams = teams;
                 $scope.assignedTeams = teamsAssigned;
+                $scope.jump = jump;
 
                 var sidebarOpen = false;
 
@@ -66,9 +67,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     allowIn: ['input', 'select', 'textarea'],
                     callback: function(event, hotkey) {
                         event.preventDefault();
-                        $scope.$broadcast('openJump');
+                        jump();
                     }
                 });
+
+                function jump() {
+                    $scope.$broadcast('toggleJump');
+                }
 
                 function teamsAssigned(project) {
                     $modal.open({

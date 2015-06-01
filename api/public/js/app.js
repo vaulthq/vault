@@ -57,6 +57,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
                 $scope.projectTeams = teams;
                 $scope.assignedTeams = teamsAssigned;
+                $scope.jump = jump;
 
                 var sidebarOpen = false;
 
@@ -66,9 +67,13 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     allowIn: ['input', 'select', 'textarea'],
                     callback: function(event, hotkey) {
                         event.preventDefault();
-                        $scope.$broadcast('openJump');
+                        jump();
                     }
                 });
+
+                function jump() {
+                    $scope.$broadcast('toggleJump');
+                }
 
                 function teamsAssigned(project) {
                     $modal.open({
@@ -812,17 +817,22 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $scope.openProject = openProject;
                 $scope.isActive = false;
 
-                $scope.$on('openJump', function () {
-                    $scope.isActive = true;
+                $scope.$on('toggleJump', function () {
+                    $scope.isActive = !$scope.isActive;
 
-                    hotkeys.add({
-                        combo: 'esc',
-                        description: 'Close project jump',
-                        allowIn: ['input', 'select'],
-                        callback: function(event, hotkey) {
-                            close();
-                        }
-                    });
+                    if ($scope.isActive) {
+                        $scope.$broadcast('openJump');
+                        hotkeys.add({
+                            combo: 'esc',
+                            description: 'Close project jump',
+                            allowIn: ['input', 'select'],
+                            callback: function() {
+                                close();
+                            }
+                        });
+                    } else {
+                        close();
+                    }
                 });
 
                 function close() {
