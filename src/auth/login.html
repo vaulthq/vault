@@ -1,13 +1,16 @@
-<form class="form-signin center-block" role="form" ng-submit="login()" trigger-change>
-    <input type="text" class="form-control" placeholder="Email address" ng-model="email" required autofocus><br>
-    <input type="password" class="form-control" placeholder="Password" ng-model="password" required>
-    <br>
-    <br>
-    <button class="btn btn-primary btn-block" type="submit">Sign In</button>
-    <!--<div class="checkbox">-->
-        <!--<label>-->
-            <!--<input type="checkbox" ng-model="remember"> Stay signed in-->
-        <!--</label>-->
-    <!--</div>-->
-    <br>
-</form>
+<div class="login-screen"></div>
+
+<div id="login" class="signin-card">
+  <h1 class="display1">Vault</h1>
+  <p class="subhead">Pasword manager</p>
+  <form ng-submit="login()" trigger-change role="form">
+    <div id="form-login-username" class="form-group">
+      <input id="username" class="form-control" type="text" size="18" placeholder="Email address" ng-model="email" required autofocus>
+    </div>
+    <div id="form-login-password" class="form-group">
+      <input id="passwd" class="form-control" type="password" size="18" placeholder="Password" ng-model="password" required>
+    </div>
+
+    <button class="btn btn-block btn-primary" type="submit" name="Submit">Sign in</button>
+  </form>
+</div>

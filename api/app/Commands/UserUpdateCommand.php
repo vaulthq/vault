@@ -79,8 +79,6 @@ class UserUpdateCommand extends Command implements SelfHandling
 
         $model->save();
 
-        event(new UserCreated($model));
-
         return $model;
     }
 

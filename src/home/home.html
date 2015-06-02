@@ -1,76 +1,35 @@
-<div class="project-list">
-    <div class="heading">
-        <a href="/#/recent">Password Vault</a>
-    </div>
+    <div class="side-menu">
+        <div class="side-menu-top">
+            <a class="btn btn-side-menu" ui-sref="user.home" title="Recently Accessed">
+                <i class="glyphicon glyphicon-home"></i><br>Recent
+            </a>
+            <a class="btn btn-side-menu" ng-click="jump()" title="Project Jumper">
+                <i class="glyphicon glyphicon glyphicon-random"></i><br>Jump
+            </a>
+            <a class="btn btn-side-menu" ui-sref="user.projects" title="Project List">
+                <i class="glyphicon glyphicon-th-list"></i><br>Projects
+            </a>
 
-    <input type="text" placeholder="Filter..." class="form-control filter-input" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus>
+            <a class="btn btn-side-menu" ui-sref="user.teams" title="Manage Teams">
+                <span class="glyphicon glyphicon-text-width"></span><br>Teams
+            </a>
 
-    <div class="project-scrollbar">
-        <ul class="nav nav-pills nav-stacked">
-            <li ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
-                <a ng-href="/#/project/{{ project.id }}">{{ project.name }}</a>
-            </li>
-        </ul>
-    </div>
-
-
-    <div class="ending">
-        <ul class="bottom-nav">
-            <li>
-                <span class="dropdown">
-                    <a title="Settings" class="dropdown-toggle">
-                        <span class="glyphicon glyphicon-wrench"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a title="Log Out ({{login.email}})" ng-click="logout()">
-                                <span class="glyphicon glyphicon-off"></span> Log Out
-                            </a>
-                        </li>
-                        <li>
-                            <a title="Change Account Password" ng-click="profile()">
-                                <span class="glyphicon glyphicon-asterisk"></span> Change Password
-                            </a>
-                        </li>
-                    </ul>
-                </span>
-            </li>
-            <li>
-                <span class="dropdown">
-                    <a title="Management" class="dropdown-toggle">
-                        <span class="glyphicon glyphicon-certificate"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li ng-show="login.group == 'admin'">
-                            <a href="/#/history" title="Action History">
-                                <span class="glyphicon glyphicon-flag"></span> Action History
-                            </a>
-                        </li>
-                        <li ng-show="login.group == 'admin'">
-                            <a href="/#/users" title="Manage Users">
-                                <span class="glyphicon glyphicon-user"></span> Manage Users
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/#/teams" title="Manage Teams">
-                                <span class="glyphicon glyphicon-text-width"></span> Manage Teams
-                            </a>
-                        </li>
-                    </ul>
-                </span>
-            </li>
-            <li class="double">
-                <a title="Create Project" ng-click="createProject()">
-                    <span class="glyphicon glyphicon-plus"></span>
+            <div ng-if="login.group == 'admin'">
+                <a class="btn btn-side-menu" ui-sref="user.list" title="Manage Users">
+                    <span class="glyphicon glyphicon-user"></span><br>Users
                 </a>
-            </li>
-        </ul>
+                <a class="btn btn-side-menu" ui-sref="user.history" title="Action History">
+                    <span class="glyphicon glyphicon-flag"></span><br>History
+                </a>
+            </div>
+        </div>
+
+        <div class="side-menu-bottom">
+            <profile></profile>
+            <logout></logout>
+        </div>
     </div>
-</div>
 
-<div class="right-content">
-    <ui-view/>
-    <div ui-view="head"></div>
-    <div ui-view="content"></div>
-</div>
+<div id="container" class="content-background"><ui-view/></div>
 
+<project-jump projects="projects"></project-jump>

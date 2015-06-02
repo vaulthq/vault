@@ -3,13 +3,13 @@ var xApp = angular.module('xApp', [
     'ngResource',
     'ngAnimate',
     'ngCookies',
-    'shareFlash',
     'ui.bootstrap',
     'ui.router',
     'ui.select',
     'angularMoment',
     'toaster',
-    'angular-jwt'
+    'angular-jwt',
+    'cfp.hotkeys'
 ]);
 
 xApp.config([
@@ -50,49 +50,34 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            data: {
-                access: ['user', 'admin']
-            },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
                 $scope.projects = projects;
 
                 $scope.login = AuthFactory.getUser();
 
-                $scope.openFirst = function ($event) {
-                    if ($event.which === 13) {
-                        var project = $filter('filter')(projects, $scope.projectFilter)[0];
-                        if (project) {
-                            $location.path('/project/' + project.id);
-                        }
+                $scope.jump = jump;
+
+                hotkeys.add({
+                    combo: 'ctrl+p',
+                    description: 'Show project jump window',
+                    allowIn: ['input', 'select', 'textarea'],
+                    callback: function(event, hotkey) {
+                        event.preventDefault();
+                        jump();
                     }
-                };
+                });
 
-                $scope.createProject = function() {
-                    $modal.open({
-                        templateUrl: '/t/project/form.html',
-                        controller: 'ModalCreateProjectController'
-                    }).result.then(function (model) {
-                        $scope.projects.push(model);
-                    });
-                };
-
-                $scope.logout = function () {
-                    Api.auth.get({}, function() {
-                        AuthFactory.logout();
-                        $location.path('/login');
-                    })
-                };
-
-                $scope.profile = function() {
-                    $modal.open({
-                        templateUrl: '/t/user/profile.html',
-                        controller: 'ProfileController'
-                    });
+                function jump() {
+                    $scope.$broadcast('toggleJump');
                 }
+
+                $scope.$on('project:update', function(event, project) {
+                    $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
+                });
             },
             resolve: {
-                projects: function(ProjectsFactory) {
-                    return ProjectsFactory.query();
+                projects: function(Api) {
+                    return Api.project.query();
                 }
             }
         })
@@ -107,30 +92,24 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             }
         })
         .state('user.project', {
-            url: '/project/:projectId',
-            views: {
-                head: {
-                    templateUrl: '/t/project/pageHeader.html',
-                    controller: 'ProjectController',
-                    resolve: {
-                        projects: function(projects) {
-                            return projects;
-                        }
-                    }
-                },
-                content: {
-                    templateUrl: '/t/entry/list.html',
-                    controller: 'EntryController',
-                    resolve: {
-                        entries: function(ProjectKeysFactory, projectId) {
-                            return ProjectKeysFactory.keys({id: projectId});
-                        }
-                    }
-                }
-            },
+            url: '/project/:projectId/:active?',
+            templateUrl: '/t/entry/list.html',
+            controller: 'EntryController',
             resolve: {
-                projectId: function ($stateParams) {
-                    return $stateParams.projectId;
+                project: function ($stateParams, projects) {
+                    return projects.$promise.then(function(projects) {
+                        for (var i=0; i<projects.length; i++) {
+                          if (projects[i].id == $stateParams.projectId) {
+                            return projects[i];
+                          }
+                        }
+                    });
+                },
+                entries: function(Api, $stateParams) {
+                    return Api.projectKeys.query({id: $stateParams.projectId});
+                },
+                active: function($stateParams) {
+                    return $stateParams.active;
                 }
             }
         })
@@ -141,6 +120,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 users: function(Api) {
                     return Api.user.query();
+                }
+            }
+        })
+        .state('user.projects', {
+            url: '/projects/:active?',
+            templateUrl: '/t/project/list.html',
+            controller: 'ProjectController',
+            resolve: {
+                active: function($stateParams) {
+                    return $stateParams.active;
                 }
             }
         })
@@ -198,6 +187,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
+            projectKeys: $resource("/api/project/keys/:id"),
             projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
@@ -274,7 +264,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
         function logout() {
             localStorage.removeItem(localToken);
-            toaster.pop('info', "", "Good bye!");
+
             $rootScope.$broadcast('auth:login', null);
         }
 
@@ -306,7 +296,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $location.path('/recent');
                 toaster.pop('info', "", "Welcome back, " + getUser().name);
             }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
+                toaster.pop('error', "Login Failed", response.data[0], 0);
             })
         }
 
@@ -650,6 +640,192 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .directive('logout', logoutDirective);
+
+    function logoutDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-side-menu" ng-click="logout()" title="Log Out ({{login.email}})">' +
+                    '<span class="glyphicon glyphicon-off"></span><br>Logout' +
+                '</a>',
+            controller: function($scope, Api, AuthFactory, $location) {
+                $scope.logout = logout;
+
+                function logout() {
+                    Api.auth.get({}, function() {
+                        AuthFactory.logout(true);
+                        $location.path('/login');
+                    })
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('profile', profileDirective);
+
+    function profileDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-side-menu" ng-click="profile()" title="Change Account Password">' +
+                    '<span class="glyphicon glyphicon-wrench"></span><br>Profile' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.profile = profile;
+
+                function profile() {
+                    $modal.open({
+                        templateUrl: '/t/user/profile.html',
+                        controller: 'ProfileController'
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectJump', projectJumpDirective);
+
+    function projectJumpDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<div class="project-jump" ng-class="{in: isActive}"><ui-select ng-model="project" on-select="openProject($item)" focus-on="openJump">' +
+                    '<ui-select-match placeholder="Quick project jump">{{ $select.selected.name }}</ui-select-match>' +
+                    '<ui-select-choices repeat="project.id as pro in projects | filter: {name: $select.search}">' +
+                        '<div ng-bind-html="pro.name | highlight: $select.search"></div>' +
+                        '<div class="muted small">{{ pro.description }}</div>' +
+                    '</ui-select-choices>' +
+                '</ui-select></div>',
+            scope: {
+                projects: '='
+            },
+            controller: function($scope, $state, hotkeys) {
+                $scope.openProject = openProject;
+                $scope.isActive = false;
+
+                $scope.$on('toggleJump', function () {
+                    $scope.isActive = !$scope.isActive;
+                    $scope.$broadcast('openJump');
+
+                    if ($scope.isActive) {
+                        hotkeys.add({
+                            combo: 'esc',
+                            description: 'Close project jump',
+                            allowIn: ['input', 'select'],
+                            callback: function() {
+                                close();
+                            }
+                        });
+                    } else {
+                        close();
+                    }
+                });
+
+                function close() {
+                    $scope.isActive = false;
+                    hotkeys.del('esc');
+                }
+
+                function openProject(project) {
+                    $state.go('user.project', {projectId: project.id});
+                    close();
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectTeam', directive);
+
+    function directive() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-success btn-xs" title="Assign Team" ng-click="teams()" ng-if="project.can_edit">' +
+                    '<i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            scope: {
+                project: '='
+            },
+            controller: function($scope, $modal) {
+                $scope.teams = teams;
+
+                function teams() {
+                  $modal.open({
+                      templateUrl: '/t/project-team/teams.html',
+                      controller: 'ProjectTeamController',
+                      resolve: {
+                          teams: function(Api) {
+                              return Api.team.query();
+                          },
+                          access: function(Api) {
+                              return Api.projectTeams.query({id: $scope.project.id});
+                          },
+                          project: function() {
+                              return $scope.project;
+                          }
+                      }
+                  });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectUpdate', projectUpdateDirective);
+
+    function projectUpdateDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-warning btn-xs" title="Edit project" ng-click="update()" ng-if="project.can_edit">' +
+                    '<i class="glyphicon glyphicon-edit"></i>' +
+                '</a>',
+            scope: {
+                project: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.update = updateProject;
+
+                function updateProject() {
+                    $modal.open({
+                        templateUrl: '/t/project/form.html',
+                        controller: 'ModalUpdateProjectController',
+                        resolve: {
+                            project: function(Api) {
+                                return Api.project.get({id: $scope.project.id});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('project:update', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .directive('triggerChange', triggerChangeDirective);
 
     function triggerChangeDirective() {
@@ -672,11 +848,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($rootScope, $scope, $location, $filter, modal, entries, projectId) {
+    function controller($scope, $filter, modal, entries, project, active) {
 
         $scope.entries = entries;
-        $rootScope.projectId = projectId;
-        $scope.activeEntry = $location.search().active || 0;
+        $scope.project = project;
+        $scope.activeId = active;
+
         $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
@@ -748,7 +925,7 @@ xApp
         };
     });
 xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id) {
+    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, project_id) {
         $scope.entry = {
             project_id: project_id
         };
@@ -757,9 +934,6 @@ xApp
             EntriesFactory.create($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };
@@ -852,7 +1026,7 @@ xApp
             }, function() {
                 $scope.access.splice($scope.access.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.revokeTeam = function(accessId) {
             Api.entryTeams.delete({
@@ -860,7 +1034,7 @@ xApp
             }, function() {
                 $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
@@ -869,7 +1043,7 @@ xApp
 })();
 
 xApp
-    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, shareFlash, entry, GROUPS) {
+    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -877,9 +1051,6 @@ xApp
             EntryFactory.update($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };
@@ -888,6 +1059,7 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+
 xApp.
     controller('ProfileController', function($scope, $modalInstance, toaster, Api) {
         $scope.profile = {
@@ -1051,70 +1223,6 @@ xApp.
         }
     });
 
-angular.module('shareFlash', [])
-    .factory('shareFlash', ['$rootScope', '$timeout', function($rootScope, $timeout) {
-        var messages = [];
-
-        var reset;
-        var cleanup = function() {
-            $timeout.cancel(reset);
-            reset = $timeout(function() { messages = []; });
-        };
-
-        var emit = function() {
-            $rootScope.$emit('flash:message', messages, cleanup);
-        };
-
-        $rootScope.$on('$locationChangeSuccess', emit);
-        $rootScope.$on('closeFlash', emit);
-
-        var asMessage = function(level, text) {
-            if (!text) {
-                text = level;
-                level = 'success';
-            }
-            return { level: level, text: text };
-        };
-
-        var asArrayOfMessages = function(level, text) {
-            if (level instanceof Array) return level.map(function(message) {
-                return message.text ? message : asMessage(message);
-            });
-            return text ? [{ level: level, text: text }] : [asMessage(level)];
-        };
-
-        var flash = function(level, text) {
-            if (level == []) {
-                emit([]);
-                return;
-            }
-            emit(messages = asArrayOfMessages(level, text));
-        };
-
-        ['error', 'warning', 'info', 'success'].forEach(function (level) {
-            flash[level] = function (text) { flash(level, text); };
-        });
-
-        return flash;
-    }])
-
-    .directive('flashMessages', [function() {
-        var directive = { restrict: 'EA', replace: true };
-        directive.template = '<div class="flash-message" ng-if="messages.length > 0"><div ng-repeat="m in messages" class="alert alert-{{m.level}} text-center" ng-click="closeFlash()">{{m.text}}</div></div>';
-
-        directive.controller = ['$scope', '$rootScope', function($scope, $rootScope) {
-            $rootScope.$on('flash:message', function(_, messages, done) {
-                $scope.messages = messages;
-                done();
-            });
-
-            $scope.closeFlash = function() {
-                $rootScope.$emit('closeFlash');
-            }
-        }];
-
-        return directive;
-    }]);
 (function () {
     angular
         .module('xApp')
@@ -1187,11 +1295,11 @@ xApp
     });
 
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory) {
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
         $scope.project = {};
 
         $scope.ok = function () {
-            ProjectsFactory.create($scope.project,
+            Api.project.save($scope.project,
                 function(response) {
                     $modalInstance.close(response);
                 }
@@ -1202,6 +1310,7 @@ xApp
             $modalInstance.dismiss();
         };
     });
+
 xApp
     .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
         $scope.owner = owner;
@@ -1227,122 +1336,65 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
-xApp
-    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectController', controller);
+
+    function controller($scope, $modal, Api, projects, active) {
 
         $scope.projects = projects;
-        $scope.projectId = projectId;
+        $scope.activeId = active;
 
-        $rootScope.projectId = projectId;
+        $scope.create = createProject;
+        $scope.teams = teamsAssigned;
+        $scope.info = projectOwnerInfo;
+        $scope.delete = deleteProject;
 
-        $scope.projectTeams = teams;
-        $scope.assignedTeams = teamsAssigned;
-
-        $scope.getProject = function() {
-            return $scope.projects[getProjectIndexById($scope.projectId)];
-        };
-
-        var getProjectIndexById = function(projectId) {
-            for (var p in $scope.projects) {
-                if ($scope.projects[p].id == projectId) {
-                    return p;
-                }
-            }
-        };
-
-        $scope.setProject = function(model) {
-            return $scope.projects[getProjectIndexById(model.id)] = model;
-        };
-
-        $scope.updateProject = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/project/form.html',
-                controller: 'ModalUpdateProjectController',
-                resolve: {
-                    project: function(Api) {
-                        return Api.project.get({id: $scope.getProject().id});
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.setProject(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        };
-
-        function teams() {
+        function createProject() {
             $modal.open({
-                templateUrl: '/t/project-team/teams.html',
-                controller: 'ProjectTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.team.query();
-                    },
-                    access: function(Api) {
-                        return Api.projectTeams.query({id: $scope.getProject().id});
-                    },
-                    project: function() {
-                        return $scope.getProject();
-                    }
-                }
+                templateUrl: '/t/project/form.html',
+                controller: 'ModalCreateProjectController'
+            }).result.then(function (model) {
+                $scope.projects.push(model);
             });
         }
 
-        function teamsAssigned() {
+        function teamsAssigned(project) {
             $modal.open({
                 templateUrl: '/t/project-team/assigned.html',
                 controller: 'AssignedTeamController',
                 resolve: {
                     teams: function(Api) {
-                        return Api.assignedTeams.query({id: $scope.getProject().id});
+                        return Api.assignedTeams.query({id: project.id});
                     }
                 }
             });
         }
 
-        $scope.projectOwnerInfo = function() {
+        function projectOwnerInfo(project) {
             $modal.open({
                 templateUrl: '/t/project/owner.html',
                 controller: 'ModalProjectOwnerController',
                 resolve: {
                     owner: function(Api) {
-                        return Api.user.get({id: $scope.getProject().user_id});
+                        return Api.user.get({id: project.user_id});
                     }
                 }
             });
-        };
+        }
 
-        $scope.deleteProject = function() {
+        function deleteProject(project) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            ProjectFactory.delete({id: $scope.projectId});
-            $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $location.path('/recent');
-        };
-    })
-    .factory('ProjectsFactory', function ($resource) {
-        return $resource("/api/project", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('ProjectFactory', function ($resource) {
-        return $resource("/api/project/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} },
-            keys: { method: 'GET', params: {id: '@id'} }
-        })
-    })
-    .factory('ProjectKeysFactory', function ($resource) {
-        return $resource("/api/project/keys/:id", {}, {
-            keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
-        })
-    });
+
+            Api.project.delete({id: project.id});
+            $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
+        }
+
+    }
+})();
 
 (function() {
     angular

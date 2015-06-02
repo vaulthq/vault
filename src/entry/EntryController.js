@@ -3,11 +3,12 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($rootScope, $scope, $location, $filter, modal, entries, projectId) {
+    function controller($scope, $filter, modal, entries, project, active) {
 
         $scope.entries = entries;
-        $rootScope.projectId = projectId;
-        $scope.activeEntry = $location.search().active || 0;
+        $scope.project = project;
+        $scope.activeId = active;
+
         $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);

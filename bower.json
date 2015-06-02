@@ -26,9 +26,10 @@
     "AngularJS-Toaster": "~0.4.8",
     "angular-modal-service": "~0.3.0",
     "angular-bootstrap": "~0.11.2",
-    "angular-ui-select": "~0.9.6",
+    "angular-ui-select": "~0.12.0",
     "angular-jwt": "~0.0.7",
     "jquery": "~1.9.0",
-    "clippy": "https://github.com/smore-inc/clippy.js.git"
+    "clippy": "https://github.com/smore-inc/clippy.js.git",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5"
   }
 }

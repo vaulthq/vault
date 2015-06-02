@@ -19,17 +19,14 @@
         </thead>
         <tr ng-repeat="entry in recent">
             <td>{{ entry.id }}</td>
-            <td>{{ entry.project_name }}</td>
-            <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
+            <td><a ui-sref="user.projects({active: entry.project_id})" title="Go to projects">{{ entry.project_name }}</a></td>
+            <td><a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to entry">{{ entry.name }}</a></td>
             <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
             <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
                 <copy-password entry="entry"></copy-password>
                 <show-password entry-id="entry.id"></show-password>
-                <a ng-href="/#/project/{{ entry.project_id }}?active={{ entry.id }}" class="btn btn-info btn-xs" title="Go to entry">
-                    <i class="glyphicon glyphicon-chevron-right"></i>
-                </a>
             </td>
         </tr>
     </table>

@@ -47,7 +47,7 @@
             }, function() {
                 $scope.access.splice($scope.access.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.revokeTeam = function(accessId) {
             Api.entryTeams.delete({
@@ -55,7 +55,7 @@
             }, function() {
                 $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        }
+        };
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');

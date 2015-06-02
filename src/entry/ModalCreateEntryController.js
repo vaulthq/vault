@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, shareFlash, project_id) {
+    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, project_id) {
         $scope.entry = {
             project_id: project_id
         };
@@ -8,9 +8,6 @@ xApp
             EntriesFactory.create($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };

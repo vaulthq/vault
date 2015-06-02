@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Password Vault</title>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/css/vendor_styles.css">
     <link rel="stylesheet" href="/css/app.css">
     <script src="/js/vendor.js"></script>
@@ -13,8 +14,6 @@
 <body>
 
 <div ui-view></div>
-
-<flash:messages></flash:messages>
 
 <script type="text/ng-template" id="template/modal/backdrop.html">
     <div class="modal-backdrop fade"
@@ -44,4 +43,3 @@
 
 </body>
 </html>
-

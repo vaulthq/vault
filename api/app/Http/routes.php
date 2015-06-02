@@ -9,9 +9,9 @@ Route::group(['prefix' => 'internal'], function() {
 });
 
 Route::group(array('prefix' => 'api', 'middleware' => 'jwt.auth'), function() {
-	Route::get('project/keys/{id}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
-	Route::get('project/teams/{id}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
-	Route::get('project/changeOwner/{id}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
+	Route::get('project/keys/{project}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
+	Route::get('project/teams/{project}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
+	Route::get('project/changeOwner/{project}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
 	Route::resource('project', 'ProjectController');
 
 	Route::resource('profile', 'ProfileController');

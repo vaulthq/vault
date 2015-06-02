@@ -1,116 +1,59 @@
-xApp
-    .controller('ProjectController', function($rootScope, $scope, shareFlash, $modal, $location, projects, projectId, ProjectFactory) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectController', controller);
+
+    function controller($scope, $modal, Api, projects, active) {
 
         $scope.projects = projects;
-        $scope.projectId = projectId;
+        $scope.activeId = active;
 
-        $rootScope.projectId = projectId;
+        $scope.create = createProject;
+        $scope.teams = teamsAssigned;
+        $scope.info = projectOwnerInfo;
+        $scope.delete = deleteProject;
 
-        $scope.projectTeams = teams;
-        $scope.assignedTeams = teamsAssigned;
-
-        $scope.getProject = function() {
-            return $scope.projects[getProjectIndexById($scope.projectId)];
-        };
-
-        var getProjectIndexById = function(projectId) {
-            for (var p in $scope.projects) {
-                if ($scope.projects[p].id == projectId) {
-                    return p;
-                }
-            }
-        };
-
-        $scope.setProject = function(model) {
-            return $scope.projects[getProjectIndexById(model.id)] = model;
-        };
-
-        $scope.updateProject = function() {
-            var modalInstance = $modal.open({
-                templateUrl: '/t/project/form.html',
-                controller: 'ModalUpdateProjectController',
-                resolve: {
-                    project: function(Api) {
-                        return Api.project.get({id: $scope.getProject().id});
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (model) {
-                $scope.setProject(model);
-                shareFlash([]);
-            }, function() {
-                shareFlash([]);
-            });
-        };
-
-        function teams() {
+        function createProject() {
             $modal.open({
-                templateUrl: '/t/project-team/teams.html',
-                controller: 'ProjectTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.team.query();
-                    },
-                    access: function(Api) {
-                        return Api.projectTeams.query({id: $scope.getProject().id});
-                    },
-                    project: function() {
-                        return $scope.getProject();
-                    }
-                }
+                templateUrl: '/t/project/form.html',
+                controller: 'ModalCreateProjectController'
+            }).result.then(function (model) {
+                $scope.projects.push(model);
             });
         }
 
-        function teamsAssigned() {
+        function teamsAssigned(project) {
             $modal.open({
                 templateUrl: '/t/project-team/assigned.html',
                 controller: 'AssignedTeamController',
                 resolve: {
                     teams: function(Api) {
-                        return Api.assignedTeams.query({id: $scope.getProject().id});
+                        return Api.assignedTeams.query({id: project.id});
                     }
                 }
             });
         }
 
-        $scope.projectOwnerInfo = function() {
+        function projectOwnerInfo(project) {
             $modal.open({
                 templateUrl: '/t/project/owner.html',
                 controller: 'ModalProjectOwnerController',
                 resolve: {
                     owner: function(Api) {
-                        return Api.user.get({id: $scope.getProject().user_id});
+                        return Api.user.get({id: project.user_id});
                     }
                 }
             });
-        };
+        }
 
-        $scope.deleteProject = function() {
+        function deleteProject(project) {
             if (!confirm('Are you sure?')) {
                 return;
             }
-            ProjectFactory.delete({id: $scope.projectId});
-            $scope.projects.splice(getProjectIndexById($scope.projectId), 1);
-            $location.path('/recent');
-        };
-    })
-    .factory('ProjectsFactory', function ($resource) {
-        return $resource("/api/project", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('ProjectFactory', function ($resource) {
-        return $resource("/api/project/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} },
-            keys: { method: 'GET', params: {id: '@id'} }
-        })
-    })
-    .factory('ProjectKeysFactory', function ($resource) {
-        return $resource("/api/project/keys/:id", {}, {
-            keys: { method: 'GET', params: {id: '@id'}, isArray: true  }
-        })
-    });
+
+            Api.project.delete({id: project.id});
+            $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
+        }
+
+    }
+})();

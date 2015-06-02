@@ -26,6 +26,7 @@ class RouteServiceProvider extends ServiceProvider {
 
 		$router->model('entry', 'App\Vault\Models\Entry');
 		$router->model('user', 'App\Vault\Models\User');
+		$router->model('project', 'App\Vault\Models\Project');
 	}
 
 	/**
