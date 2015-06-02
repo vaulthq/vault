@@ -66,7 +66,7 @@
                 $location.path('/recent');
                 toaster.pop('info', "", "Welcome back, " + getUser().name);
             }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0], 0);
+                toaster.pop('error', "Login Failed", response.data[0]);
             })
         }
 
