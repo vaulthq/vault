@@ -98,18 +98,25 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 project: function ($stateParams, projects) {
                     return projects.$promise.then(function(projects) {
-                        for (var i=0; i<projects.length; i++) {
-                          if (projects[i].id == $stateParams.projectId) {
-                            return projects[i];
-                          }
-                        }
+                      return _.find(
+                        projects,
+                        _.matchesProperty('id', parseInt($stateParams.projectId))
+                        )
                     });
                 },
-                entries: function(Api, $stateParams) {
+                entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
                 },
-                active: function($stateParams) {
-                    return $stateParams.active;
+                active: function($stateParams, entries) {
+                  if ($stateParams.active) {
+                    return entries.$promise.then(function(entries) {
+                       return _.find(
+                         entries,
+                         _.matchesProperty('id', parseInt($stateParams.active))
+                         )
+                     });
+                  }
+                  return {};
                 }
             }
         })

@@ -98,18 +98,25 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 project: function ($stateParams, projects) {
                     return projects.$promise.then(function(projects) {
-                        for (var i=0; i<projects.length; i++) {
-                          if (projects[i].id == $stateParams.projectId) {
-                            return projects[i];
-                          }
-                        }
+                      return _.find(
+                        projects,
+                        _.matchesProperty('id', parseInt($stateParams.projectId))
+                        )
                     });
                 },
-                entries: function(Api, $stateParams) {
+                entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
                 },
-                active: function($stateParams) {
-                    return $stateParams.active;
+                active: function($stateParams, entries) {
+                  if ($stateParams.active) {
+                    return entries.$promise.then(function(entries) {
+                       return _.find(
+                         entries,
+                         _.matchesProperty('id', parseInt($stateParams.active))
+                         )
+                     });
+                  }
+                  return {};
                 }
             }
         })
@@ -852,10 +859,11 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 
         $scope.entries = entries;
         $scope.project = project;
-        $scope.activeId = active;
+
+        $scope.active = active;
+
         $scope.search = {};
 
-        $scope.copyFirst = copyFirst;
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
 
@@ -871,12 +879,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             callback: function(event, hotkey) {
                 event.preventDefault();
                 var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.activeId;
+                    return x.id == $scope.active.id;
                 });
 
                 var previous = getFiltered()[current - 1];
                 if (previous) {
-                    $scope.activeId = previous.id;
+                    $scope.active = previous;
                 }
             }
         });
@@ -888,12 +896,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             callback: function(event, hotkey) {
                 event.preventDefault();
                 var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.activeId;
+                    return x.id == $scope.active.id;
                 });
 
                 var next = getFiltered()[current + 1];
                 if (next) {
-                    $scope.activeId = next.id;
+                    $scope.active = next;
                 }
             }
         });
@@ -902,17 +910,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             return $filter('filter')($scope.entries, $scope.search);
         }
 
-        function setActive(id) {
-            $scope.activeId = id;
-        }
-
-        function copyFirst($event) {
-            //if ($event.which === 13) {
-            //    var entry = ;
-            //    if (entry) {
-            //        modal.showPassword(entry.id);
-            //    }
-            //}
+        function setActive(entry) {
+            $scope.active = entry;
         }
 
         function onEntryCreate(event, model) {
@@ -925,6 +924,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             if (index >= 0) {
                 $scope.entries[index] = model;
             }
+
+            setActive(model);
         }
 
         function onEntryDelete(event, model) {
@@ -933,6 +934,8 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             if (index >= 0) {
                 $scope.entries.splice(index, 1);
             }
+
+            setActive({});
         }
 
         function getEntryIndex(entry) {
@@ -1266,6 +1269,14 @@ xApp.
     filter('userGroup', function(GROUPS) {
         return function(input) {
             return GROUPS[input];
+        }
+    })
+    .filter('nl2br', function($sce){
+        return function(msg,is_xhtml) {
+            var is_xhtml = is_xhtml || true;
+            var breakTag = (is_xhtml) ? '<br />' : '<br>';
+            var msg = (msg + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+            return $sce.trustAsHtml(msg);
         }
     });
 

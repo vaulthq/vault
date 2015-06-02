@@ -159,6 +159,15 @@ body {
 ::-webkit-scrollbar-thumb:window-inactive {
   background: #4F565E;
 }
+.nl2br {
+  white-space: pre-line;
+}
+.nice-flow {
+  -webkit-transition: width 0.3s ease, margin 0.3s ease;
+  -moz-transition: width 0.3s ease, margin 0.3s ease;
+  -o-transition: width 0.3s ease, margin 0.3s ease;
+  transition: width 0.3s ease, margin 0.3s ease;
+}
 #toast-container > div {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   border-radius: 2px;

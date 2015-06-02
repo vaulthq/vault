@@ -15,52 +15,68 @@
 <div class="content">
     <loader when="!entries.$resolved"></loader>
 
-    <table class="table table-hover" ng-if="entries.length > 0">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Updated</th>
-            <th style="min-width: 130px"></th>
-        </tr>
-        </thead>
-        <tbody>
-            <tr class="filter-row">
-                <td>
-                    <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
-                        <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                </td>
-                <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus ng-keypress="copyFirst($event)"></td>
-                <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
-                <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-                <td colspan="2"></td>
+    <div class="row">
+      <div ng-class="{'col-sm-8': active && active.id, 'col-sm-12': !active || !active.id}" class="nice-flow">
+        <table class="table table-hover" ng-if="entries.length > 0">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Updated</th>
+                <th style="min-width: 130px"></th>
             </tr>
+            </thead>
+            <tbody>
+                <tr class="filter-row">
+                    <td>
+                        <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+                    </td>
+                    <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus></td>
+                    <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
+                    <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
+                    <td colspan="2"></td>
+                </tr>
 
-            <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == activeId}" ng-click="setActive(entry.id)">
-                <td>{{ entry.id }}</td>
-                <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
-                <td><span title="{{entry.note}}">{{ entry.username }}</span></td>
-                <td><span title="{{entry.note}}">{{ entry.url }}</span></td>
-                <td><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span></td>
-                <td class="text-right">
-                    <entry-access-info entry="entry"></entry-access-info>
+                <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == active.id}">
+                    <td ng-click="setActive(entry)">{{ entry.id }}</td>
+                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.name }}</span></td>
+                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.username }}</span></td>
+                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.url }}</span></td>
+                    <td ng-click="setActive(entry)"><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span></td>
+                    <td class="text-right">
+                        <div ng-if="entry.can_edit">
+                            <copy-password entry="entry"></copy-password>
+                            <show-password entry-id="entry.id"></show-password>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-                    <div ng-if="entry.can_edit">
-                        <copy-password entry="entry"></copy-password>
-                        <show-password entry-id="entry.id"></show-password>
-                        <entry-share entry="entry"></entry-share>
-                        <entry-update entry-id="entry.id"></entry-update>
-                        <entry-delete entry="entry"></entry-delete>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <div ng-if="entries.$resolved && entries.length == 0">
+            This project has no added keys.
+        </div>
+      </div>
+      <div ng-class="{'col-sm-4': active && active.id}" class="nice-flow" ng-show="active && active.id">
+        <h4>
+          {{ active.name }}
+          <div class="pull-right">
+            <entry-access-info entry="active"></entry-access-info>
 
-    <div ng-if="entries.$resolved && entries.length == 0">
-        This project has no added keys.
+            <div ng-if="active.can_edit">
+              <entry-share entry="active"></entry-share>
+              <entry-update entry-id="active.id"></entry-update>
+              <entry-delete entry="active"></entry-delete>
+            </div>
+          </div>
+        </h4>
+        <br><br>
+        <p class="nl2br">{{ active.note }}</p>
+      </div>
     </div>
+
 </div>

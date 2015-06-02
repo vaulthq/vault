@@ -7,10 +7,11 @@
 
         $scope.entries = entries;
         $scope.project = project;
-        $scope.activeId = active;
+
+        $scope.active = active;
+
         $scope.search = {};
 
-        $scope.copyFirst = copyFirst;
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
 
@@ -26,12 +27,12 @@
             callback: function(event, hotkey) {
                 event.preventDefault();
                 var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.activeId;
+                    return x.id == $scope.active.id;
                 });
 
                 var previous = getFiltered()[current - 1];
                 if (previous) {
-                    $scope.activeId = previous.id;
+                    $scope.active = previous;
                 }
             }
         });
@@ -43,12 +44,12 @@
             callback: function(event, hotkey) {
                 event.preventDefault();
                 var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.activeId;
+                    return x.id == $scope.active.id;
                 });
 
                 var next = getFiltered()[current + 1];
                 if (next) {
-                    $scope.activeId = next.id;
+                    $scope.active = next;
                 }
             }
         });
@@ -57,17 +58,8 @@
             return $filter('filter')($scope.entries, $scope.search);
         }
 
-        function setActive(id) {
-            $scope.activeId = id;
-        }
-
-        function copyFirst($event) {
-            //if ($event.which === 13) {
-            //    var entry = ;
-            //    if (entry) {
-            //        modal.showPassword(entry.id);
-            //    }
-            //}
+        function setActive(entry) {
+            $scope.active = entry;
         }
 
         function onEntryCreate(event, model) {
@@ -80,6 +72,8 @@
             if (index >= 0) {
                 $scope.entries[index] = model;
             }
+
+            setActive(model);
         }
 
         function onEntryDelete(event, model) {
@@ -88,6 +82,8 @@
             if (index >= 0) {
                 $scope.entries.splice(index, 1);
             }
+
+            setActive({});
         }
 
         function getEntryIndex(entry) {
