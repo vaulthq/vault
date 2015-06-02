@@ -1,9 +1,9 @@
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory) {
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
         $scope.project = {};
 
         $scope.ok = function () {
-            ProjectsFactory.create($scope.project,
+            Api.project.save($scope.project,
                 function(response) {
                     $modalInstance.close(response);
                 }

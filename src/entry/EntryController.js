@@ -3,24 +3,17 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $location, $filter, modal, entries, project) {
+    function controller($scope, $filter, modal, entries, project, active) {
 
         $scope.entries = entries;
         $scope.project = project;
-        $scope.activeEntry = $location.search().active || 0;
+        $scope.activeId = active;
+
         $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-
-        $scope.$on('project:update', onProjectUpdate);
-
-        function onProjectUpdate(event, project) {
-            if ($scope.project.id == project.id) {
-                $scope.project = project;
-            }
-        }
 
         function copyFirst($event) {
             if ($event.which === 13) {

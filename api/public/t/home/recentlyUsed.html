@@ -27,7 +27,7 @@
             <td class="text-right">
                 <copy-password entry="entry"></copy-password>
                 <show-password entry-id="entry.id"></show-password>
-                <a ng-href="/#/project/{{ entry.project_id }}?active={{ entry.id }}" class="btn btn-info btn-xs" title="Go to entry">
+                <a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" class="btn btn-info btn-xs" title="Go to entry">
                     <i class="glyphicon glyphicon-chevron-right"></i>
                 </a>
             </td>

@@ -3,7 +3,9 @@
         {{ project.name }} <small>{{ project.description }}</small>
 
         <div class="pull-right">
-            <project-update project="project"></project-update>
+            <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
+                <i class="glyphicon glyphicon-chevron-right"></i>
+            </a>
             <entry-create project-id="project.id"></entry-create>
         </div>
     </h3>
@@ -33,10 +35,10 @@
                 <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus ng-keypress="copyFirst($event)"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-                <td colspan="2"></td>
+                <td colspan="2"></t
             </tr>
 
-            <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeEntry}">
+            <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeId}">
                 <td>{{ entry.id }}</td>
                 <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
                 <td><span title="{{entry.note}}">{{ entry.username }}</span></td>

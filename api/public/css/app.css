@@ -190,14 +190,17 @@ body {
   overflow-y: scroll;
 }
 .side-menu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 75px;
-  background: #3c3d42;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  background: #2e2f34;
+  right: 0;
+  width: 75px;
+  background: #3c3d42;
   text-align: center;
   box-shadow: -10px 0 15px 0 rgba(0, 0, 0, 0.1);
 }
@@ -300,14 +303,6 @@ body {
   font-weight: normal;
   font-style: normal;
 }
-.form-signin {
-  background: #F1F1F1;
-  max-width: 340px;
-  margin-top: 170px;
-  padding: 30px;
-  padding-bottom: 10px;
-  border: 1px solid #E0E0E0;
-}
 .table > thead > tr.filter-row > th,
 .table > tbody > tr.filter-row > th,
 .table > tfoot > tr.filter-row > th,
@@ -318,54 +313,6 @@ body {
 }
 .list-inline {
   margin-bottom: 0;
-}
-.pushy-title {
-  color: white;
-}
-.pushy {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  width: 400px;
-  height: 100%;
-  top: 0;
-  z-index: 500;
-  background: #2e2f34;
-  -webkit-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
-  -moz-box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
-  box-shadow: inset -10px 0 6px -9px rgba(0, 0, 0, 0.7);
-}
-/* Menu Movement */
-.pushy-left {
-  -webkit-transform: translate3d(-325px, 0, 0);
-  -moz-transform: translate3d(-325px, 0, 0);
-  -ms-transform: translate3d(-325px, 0, 0);
-  -o-transform: translate3d(-325px, 0, 0);
-  transform: translate3d(-325px, 0, 0);
-}
-.pushy-open {
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
-  -ms-transform: translate3d(0, 0, 0);
-  -o-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-}
-.container-push,
-.push-push {
-  -webkit-transform: translate3d(400px, 0, 0);
-  -moz-transform: translate3d(400px, 0, 0);
-  -ms-transform: translate3d(400px, 0, 0);
-  -o-transform: translate3d(400px, 0, 0);
-  transform: translate3d(400px, 0, 0);
-}
-/* Menu Transitions */
-.pushy,
-#container,
-.push {
-  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.16, 0.68, 0.43, 0.99);
-  -moz-transition: -moz-transform 0.2s cubic-bezier(0.16, 0.68, 0.43, 0.99);
-  -o-transition: -o-transform 0.2s cubic-bezier(0.16, 0.68, 0.43, 0.99);
-  transition: transform 0.2s cubic-bezier(0.16, 0.68, 0.43, 0.99);
 }
 #container {
   margin-left: 75px;

@@ -1,44 +1,3 @@
-<div class="pushy pushy-left">
-    <div class="project-list">
-
-        <h3 class="text-center pushy-title">
-            Vault: Projects
-        </h3>
-
-        <a class="btn btn-default" ng-click="createProject()" title="Create Project">
-            <span class="glyphicon glyphicon-plus"></span> Create new project
-        </a>
-
-        <input type="text" class="form-control input-sm" ng-model="projectFilter.name" ng-keypress="openFirst($event)" app-focus>
-
-        <div class="project-scrollbar">
-          <table class="table table-hover sidebar-table">
-              <tbody>
-                <tr ng-repeat="project in projects | filter:projectFilter" ng-class="{'active': projectId == project.id}">
-                    <td>
-                        <a ui-sref="user.project({projectId: project.id})" ng-click="toggle(true)">{{ project.name }}</a>
-                    </td>
-                    <td>
-
-                      <a class="btn btn-success btn-xs" title="Show Assigned Teams" ng-click="assignedTeams(project)" ng-if="!project.can_edit">
-                          <i class="glyphicon glyphicon-question-sign"></i>
-                      </a>
-
-
-                      <a class="btn btn-danger btn-xs" title="Delete project" ng-click="deleteProject(project)" ng-if="project.can_edit" style="margin-right: 30px">
-                          <i class="glyphicon glyphicon-trash"></i>
-                      </a>
-                      <a class="btn btn-primary btn-xs" title="Project Access Information" ng-click="projectOwnerInfo(project)" ng-if="!project.can_edit" style="margin-right: 30px">
-                          <i class="glyphicon glyphicon-info-sign"></i>
-                      </a>
-                    </td>
-                </tr>
-              </tbody>
-          </table>
-            <div class="clearfix"></div>
-        </div>
-    </div>
-
     <div class="side-menu">
         <div class="side-menu-top">
             <a class="btn btn-side-menu" ui-sref="user.home" title="Recently Accessed">
@@ -70,7 +29,6 @@
             <logout></logout>
         </div>
     </div>
-</div>
 
 <div id="container" class="content-background"><ui-view/></div>
 

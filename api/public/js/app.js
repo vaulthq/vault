@@ -71,61 +71,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     $scope.$broadcast('toggleJump');
                 }
 
-                function teamsAssigned(project) {
-                    $modal.open({
-                        templateUrl: '/t/project-team/assigned.html',
-                        controller: 'AssignedTeamController',
-                        resolve: {
-                            teams: function(Api) {
-                                return Api.assignedTeams.query({id: project.id});
-                            }
-                        }
-                    });
-                }
-
                 $scope.$on('project:update', function(event, project) {
                     $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
                 });
-
-                $scope.projectOwnerInfo = function(project) {
-                    $modal.open({
-                        templateUrl: '/t/project/owner.html',
-                        controller: 'ModalProjectOwnerController',
-                        resolve: {
-                            owner: function(Api) {
-                                return Api.user.get({id: project.user_id});
-                            }
-                        }
-                    });
-                };
-
-                $scope.deleteProject = function(project) {
-                    if (!confirm('Are you sure?')) {
-                        return;
-                    }
-                    Api.project.delete({id: project.id});
-                    $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
-
-                    $location.path('/recent');
-                };
-
-                $scope.openFirst = function ($event) {
-                    if ($event.which === 13) {
-                        var project = $filter('filter')(projects, $scope.projectFilter)[0];
-                        if (project) {
-                            $location.path('/project/' + project.id);
-                        }
-                    }
-                };
-
-                $scope.createProject = function() {
-                    $modal.open({
-                        templateUrl: '/t/project/form.html',
-                        controller: 'ModalCreateProjectController'
-                    }).result.then(function (model) {
-                        $scope.projects.push(model);
-                    });
-                };
             },
             resolve: {
                 projects: function(Api) {
@@ -144,7 +92,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             }
         })
         .state('user.project', {
-            url: '/project/:projectId',
+            url: '/project/:projectId/:active?',
             templateUrl: '/t/entry/list.html',
             controller: 'EntryController',
             resolve: {
@@ -159,6 +107,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 },
                 entries: function(Api, $stateParams) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
+                },
+                active: function($stateParams) {
+                    return $stateParams.active;
                 }
             }
         })
@@ -173,9 +124,14 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             }
         })
         .state('user.projects', {
-            url: '/projects',
+            url: '/projects/:active?',
             templateUrl: '/t/project/list.html',
-            controller: 'ProjectController'
+            controller: 'ProjectController',
+            resolve: {
+                active: function($stateParams) {
+                    return $stateParams.active;
+                }
+            }
         })
         .state('user.history', {
             url: '/history',
@@ -892,24 +848,17 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $location, $filter, modal, entries, project) {
+    function controller($scope, $filter, modal, entries, project, active) {
 
         $scope.entries = entries;
         $scope.project = project;
-        $scope.activeEntry = $location.search().active || 0;
+        $scope.activeId = active;
+
         $scope.copyFirst = copyFirst;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-
-        $scope.$on('project:update', onProjectUpdate);
-
-        function onProjectUpdate(event, project) {
-            if ($scope.project.id == project.id) {
-                $scope.project = project;
-            }
-        }
 
         function copyFirst($event) {
             if ($event.which === 13) {
@@ -1346,11 +1295,11 @@ xApp
     });
 
 xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, ProjectsFactory) {
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
         $scope.project = {};
 
         $scope.ok = function () {
-            ProjectsFactory.create($scope.project,
+            Api.project.save($scope.project,
                 function(response) {
                     $modalInstance.close(response);
                 }
@@ -1361,6 +1310,7 @@ xApp
             $modalInstance.dismiss();
         };
     });
+
 xApp
     .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
         $scope.owner = owner;
@@ -1391,8 +1341,58 @@ xApp
         .module('xApp')
         .controller('ProjectController', controller);
 
-    function controller($scope, projects) {
+    function controller($scope, $modal, Api, projects, active) {
+
         $scope.projects = projects;
+        $scope.activeId = active;
+
+        $scope.create = createProject;
+        $scope.teams = teamsAssigned;
+        $scope.info = projectOwnerInfo;
+        $scope.delete = deleteProject;
+
+        function createProject() {
+            $modal.open({
+                templateUrl: '/t/project/form.html',
+                controller: 'ModalCreateProjectController'
+            }).result.then(function (model) {
+                $scope.projects.push(model);
+            });
+        }
+
+        function teamsAssigned(project) {
+            $modal.open({
+                templateUrl: '/t/project-team/assigned.html',
+                controller: 'AssignedTeamController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.assignedTeams.query({id: project.id});
+                    }
+                }
+            });
+        }
+
+        function projectOwnerInfo(project) {
+            $modal.open({
+                templateUrl: '/t/project/owner.html',
+                controller: 'ModalProjectOwnerController',
+                resolve: {
+                    owner: function(Api) {
+                        return Api.user.get({id: project.user_id});
+                    }
+                }
+            });
+        }
+
+        function deleteProject(project) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+
+            Api.project.delete({id: project.id});
+            $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
+        }
+
     }
 })();
 
