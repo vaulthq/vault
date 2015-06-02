@@ -61,7 +61,7 @@
             This project has no added keys.
         </div>
       </div>
-      <div ng-class="{'col-sm-4': active && active.id}" class="nice-flow" ng-show="active && active.id">
+      <div ng-class="{'col-sm-4': active && active.id, 'invisible': !active || !active.id}" class="invisible-flow">
         <h4>
           {{ active.name }}
           <div class="pull-right">
