@@ -7,6 +7,7 @@
         return {
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
+            projectKeys: $resource("/api/project/keys/:id"),
             projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),

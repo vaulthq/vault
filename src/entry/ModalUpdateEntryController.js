@@ -1,5 +1,5 @@
 xApp
-    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, shareFlash, entry, GROUPS) {
+    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -7,9 +7,6 @@ xApp
             EntryFactory.update($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
-                },
-                function(err) {
-                    shareFlash('danger', err.data);
                 }
             );
         };

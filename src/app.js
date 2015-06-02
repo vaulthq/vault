@@ -3,13 +3,13 @@ var xApp = angular.module('xApp', [
     'ngResource',
     'ngAnimate',
     'ngCookies',
-    'shareFlash',
     'ui.bootstrap',
     'ui.router',
     'ui.select',
     'angularMoment',
     'toaster',
-    'angular-jwt'
+    'angular-jwt',
+    'cfp.hotkeys'
 ]);
 
 xApp.config([
@@ -50,49 +50,34 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .state('user', {
             abstract: true,
             templateUrl: '/t/home/home.html',
-            data: {
-                access: ['user', 'admin']
-            },
-            controller: function($scope, $rootScope, $location, $modal, shareFlash, projects, AuthFactory, Api, $filter) {
+            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
                 $scope.projects = projects;
 
                 $scope.login = AuthFactory.getUser();
 
-                $scope.openFirst = function ($event) {
-                    if ($event.which === 13) {
-                        var project = $filter('filter')(projects, $scope.projectFilter)[0];
-                        if (project) {
-                            $location.path('/project/' + project.id);
-                        }
+                $scope.jump = jump;
+
+                hotkeys.add({
+                    combo: 'ctrl+p',
+                    description: 'Show project jump window',
+                    allowIn: ['input', 'select', 'textarea'],
+                    callback: function(event, hotkey) {
+                        event.preventDefault();
+                        jump();
                     }
-                };
+                });
 
-                $scope.createProject = function() {
-                    $modal.open({
-                        templateUrl: '/t/project/form.html',
-                        controller: 'ModalCreateProjectController'
-                    }).result.then(function (model) {
-                        $scope.projects.push(model);
-                    });
-                };
-
-                $scope.logout = function () {
-                    Api.auth.get({}, function() {
-                        AuthFactory.logout(true);
-                        $location.path('/login');
-                    })
-                };
-
-                $scope.profile = function() {
-                    $modal.open({
-                        templateUrl: '/t/user/profile.html',
-                        controller: 'ProfileController'
-                    });
+                function jump() {
+                    $scope.$broadcast('toggleJump');
                 }
+
+                $scope.$on('project:update', function(event, project) {
+                    $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
+                });
             },
             resolve: {
-                projects: function(ProjectsFactory) {
-                    return ProjectsFactory.query();
+                projects: function(Api) {
+                    return Api.project.query();
                 }
             }
         })
@@ -107,30 +92,24 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             }
         })
         .state('user.project', {
-            url: '/project/:projectId',
-            views: {
-                head: {
-                    templateUrl: '/t/project/pageHeader.html',
-                    controller: 'ProjectController',
-                    resolve: {
-                        projects: function(projects) {
-                            return projects;
-                        }
-                    }
-                },
-                content: {
-                    templateUrl: '/t/entry/list.html',
-                    controller: 'EntryController',
-                    resolve: {
-                        entries: function(ProjectKeysFactory, projectId) {
-                            return ProjectKeysFactory.keys({id: projectId});
-                        }
-                    }
-                }
-            },
+            url: '/project/:projectId/:active?',
+            templateUrl: '/t/entry/list.html',
+            controller: 'EntryController',
             resolve: {
-                projectId: function ($stateParams) {
-                    return $stateParams.projectId;
+                project: function ($stateParams, projects) {
+                    return projects.$promise.then(function(projects) {
+                        for (var i=0; i<projects.length; i++) {
+                          if (projects[i].id == $stateParams.projectId) {
+                            return projects[i];
+                          }
+                        }
+                    });
+                },
+                entries: function(Api, $stateParams) {
+                    return Api.projectKeys.query({id: $stateParams.projectId});
+                },
+                active: function($stateParams) {
+                    return $stateParams.active;
                 }
             }
         })
@@ -141,6 +120,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 users: function(Api) {
                     return Api.user.query();
+                }
+            }
+        })
+        .state('user.projects', {
+            url: '/projects/:active?',
+            templateUrl: '/t/project/list.html',
+            controller: 'ProjectController',
+            resolve: {
+                active: function($stateParams) {
+                    return $stateParams.active;
                 }
             }
         })
