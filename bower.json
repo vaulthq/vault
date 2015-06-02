@@ -30,6 +30,7 @@
     "angular-jwt": "~0.0.7",
     "jquery": "~1.9.0",
     "clippy": "https://github.com/smore-inc/clippy.js.git",
-    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5"
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
+    "lodash": "~3.9.3"
   }
 }

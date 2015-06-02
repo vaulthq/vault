@@ -36,10 +36,10 @@
                 <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus ng-keypress="copyFirst($event)"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
                 <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-                <td colspan="2"></t
+                <td colspan="2"></td>
             </tr>
 
-            <tr ng-repeat="entry in entries | filter:search" ng-class="{'list-group-item-warning': entry.id == activeId}">
+            <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == activeId}" ng-click="setActive(entry.id)">
                 <td>{{ entry.id }}</td>
                 <td><span title="{{entry.note}}">{{ entry.name }}</span></td>
                 <td><span title="{{entry.note}}">{{ entry.username }}</span></td>

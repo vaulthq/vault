@@ -296,7 +296,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 $location.path('/recent');
                 toaster.pop('info', "", "Welcome back, " + getUser().name);
             }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0], 0);
+                toaster.pop('error', "Login Failed", response.data[0]);
             })
         }
 
@@ -848,25 +848,71 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, modal, entries, project, active) {
+    function controller($scope, $filter, hotkeys, modal, entries, project, active, $state) {
 
         $scope.entries = entries;
         $scope.project = project;
         $scope.activeId = active;
+        $scope.search = {};
 
         $scope.copyFirst = copyFirst;
+        $scope.setActive = setActive;
+        $scope.getFiltered = getFiltered;
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
 
-        function copyFirst($event) {
-            if ($event.which === 13) {
-                var entry = $filter('filter')($scope.entries, $scope.search)[0];
-                if (entry) {
-                    modal.showPassword(entry.id);
+
+        hotkeys.add({
+            combo: 'up',
+            description: 'Show project jump window',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                event.preventDefault();
+                var current = _.findIndex(getFiltered(), function(x) {
+                    return x.id == $scope.activeId;
+                });
+
+                var previous = getFiltered()[current - 1];
+                if (previous) {
+                    $scope.activeId = previous.id;
                 }
             }
+        });
+
+        hotkeys.add({
+            combo: 'down',
+            description: 'Show project jump window',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                event.preventDefault();
+                var current = _.findIndex(getFiltered(), function(x) {
+                    return x.id == $scope.activeId;
+                });
+
+                var next = getFiltered()[current + 1];
+                if (next) {
+                    $scope.activeId = next.id;
+                }
+            }
+        });
+
+        function getFiltered() {
+            return $filter('filter')($scope.entries, $scope.search);
+        }
+
+        function setActive(id) {
+            $scope.activeId = id;
+        }
+
+        function copyFirst($event) {
+            //if ($event.which === 13) {
+            //    var entry = ;
+            //    if (entry) {
+            //        modal.showPassword(entry.id);
+            //    }
+            //}
         }
 
         function onEntryCreate(event, model) {
@@ -1268,6 +1314,7 @@ xApp
             query: { method: 'GET', isArray: true }
         });
     });
+
 xApp
     .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
         $scope.users = users;
