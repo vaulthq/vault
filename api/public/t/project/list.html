@@ -35,7 +35,7 @@
 
             <tr ng-repeat="project in projects | filter:search" ng-class="{'list-group-item-warning': project.id == activeId}">
                 <td>{{ project.id }}</td>
-                <td>{{ project.name }}</td>
+                <td><a ui-sref="user.project({projectId: project.id})" title="Go to project">{{ project.name }}</a></td>
                 <td><span title="{{project.description}}">{{ project.description }}</span></td>
                 <td><span am-time-ago="project.updated_at" title="{{ project.updated_at }}, created: {{ project.created_at }}"></span></td>
                 <td class="text-right">
@@ -54,9 +54,6 @@
 
                     <a class="btn btn-primary btn-xs" title="Project Access Information" ng-click="info(project)" ng-if="!project.can_edit">
                         <i class="glyphicon glyphicon-info-sign"></i>
-                    </a>
-                    <a ui-sref="user.project({projectId: project.id})" class="btn btn-info btn-xs" title="Go to project">
-                        <i class="glyphicon glyphicon-chevron-right"></i>
                     </a>
                 </td>
             </tr>

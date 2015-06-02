@@ -1,11 +1,12 @@
 <div class="page-header">
     <h3>
+        <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
+            <i class="glyphicon glyphicon-chevron-left"></i>
+        </a>
+
         {{ project.name }} <small>{{ project.description }}</small>
 
         <div class="pull-right">
-            <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
-                <i class="glyphicon glyphicon-chevron-right"></i>
-            </a>
             <entry-create project-id="project.id"></entry-create>
         </div>
     </h3>
