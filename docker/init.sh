@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 if [ ! -f /var/www/api/.env ]; then
    echo "[info] copy .env"
@@ -13,21 +12,10 @@ fi
 
 chmod 777 -R /var/www/api/storage
 
-
 echo "[info] Waiting for mysql"
-RET=1
-RETRY=0
-until [ $RETRY -ge 15 ] || [ $RET -eq 0 ]; do
-    echo "[info] Waiting for confirmation of MySQL service startup"
-    php -r 'return @fsockopen("mysql", "3306", $errNo, $errStr, 1) or exit(1);'
-    RET=$?
-    RETRY=$[$RETRY+1]
-done
+sleep 10
 
 echo "[info] Migrating database"
 php /var/www/api/artisan migrate --no-interaction --env=local || true
 echo "[info] Seeding database"
 php /var/www/api/artisan db:seed --no-interaction --env=local || true
-
-echo "Run: $@"
-exec "$@"
