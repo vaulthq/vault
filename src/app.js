@@ -150,6 +150,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 }
             }
         })
+        .state('user.api', {
+            url: '/api',
+            templateUrl: '/t/api/list.html',
+            controller: 'ApiController',
+            resolve: {
+                apis: function(Api) {
+                    return Api.apis.query();
+                }
+            }
+        })
         .state('user.teams', {
             url: '/teams',
             templateUrl: '/t/team/teamList.html',

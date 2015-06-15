@@ -8,7 +8,11 @@ Route::group(['prefix' => 'internal'], function() {
 	Route::controller('auth', 'AuthController');
 });
 
-Route::group(array('prefix' => 'api', 'middleware' => 'jwt.auth'), function() {
+Route::group(['prefix' => 'api'], function() {
+
+});
+
+Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::get('project/keys/{project}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
 	Route::get('project/teams/{project}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
 	Route::get('project/changeOwner/{project}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
@@ -27,6 +31,12 @@ Route::group(array('prefix' => 'api', 'middleware' => 'jwt.auth'), function() {
 
 	Route::resource('entry', 'EntryController');
 	Route::resource('entryTeams', 'EntryTeamsController');
+
+	Route::group(['prefix' => 'apis'], function() {
+		Route::get('/', 'ApiKeyController@index');
+		Route::post('/', 'ApiKeyController@create');
+		Route::delete('/{apiKey}', 'ApiKeyController@delete');
+	});
 
 	Route::group(['before' => 'admin'], function() {
 		Route::resource('history', 'HistoryController');

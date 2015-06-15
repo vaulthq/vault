@@ -150,6 +150,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 }
             }
         })
+        .state('user.api', {
+            url: '/api',
+            templateUrl: '/t/api/list.html',
+            controller: 'ApiController',
+            resolve: {
+                apis: function(Api) {
+                    return Api.apis.query();
+                }
+            }
+        })
         .state('user.teams', {
             url: '/teams',
             templateUrl: '/t/team/teamList.html',
@@ -198,6 +208,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
+            apis: $resource("/api/apis/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
@@ -219,6 +230,32 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             method: 'DELETE', params: {id: '@id'}
         }
     };
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ApiController', ctrl);
+
+    function ctrl($scope, Api, apis) {
+        $scope.apis = apis;
+        $scope.revoke = revoke;
+
+        $scope.$on('key:create', onKeyCreate);
+
+        function revoke(api) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+
+            Api.apis.remove({id: api.id});
+            $scope.apis.splice($scope.apis.map(function(x) { return x.id; }).indexOf(api.id), 1);
+        }
+
+        function onKeyCreate(e, key) {
+            $scope.apis.push(key);
+        }
+    }
 })();
 
 (function() {
@@ -369,223 +406,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     }
 
 })();
-(function() {
-    angular
-        .module('xApp')
-        .controller('EntryController', controller);
-
-    function controller($scope, $filter, modal, entries, project, active) {
-
-        $scope.entries = entries;
-        $scope.project = project;
-        $scope.activeId = active;
-
-        $scope.copyFirst = copyFirst;
-
-        $scope.$on('entry:create', onEntryCreate);
-        $scope.$on('entry:update', onEntryUpdate);
-        $scope.$on('entry:delete', onEntryDelete);
-
-        function copyFirst($event) {
-            if ($event.which === 13) {
-                var entry = $filter('filter')($scope.entries, $scope.search)[0];
-                if (entry) {
-                    modal.showPassword(entry.id);
-                }
-            }
-        }
-
-        function onEntryCreate(event, model) {
-            $scope.entries.push(model);
-        }
-
-        function onEntryUpdate(event, model) {
-            var index = getEntryIndex(model);
-
-            if (index >= 0) {
-                $scope.entries[index] = model;
-            }
-        }
-
-        function onEntryDelete(event, model) {
-            var index = getEntryIndex(model);
-
-            if (index >= 0) {
-                $scope.entries.splice(index, 1);
-            }
-        }
-
-        function getEntryIndex(entry) {
-            return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
-        }
-    }
-})();
-
-xApp
-    .factory('EntriesFactory', function ($resource) {
-        return $resource("/api/entry", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('EntryFactory', function ($resource) {
-        return $resource("/api/entry/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            password: { method: 'GET', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('EntryAccessFactory', function ($resource) {
-        return $resource("/api/entry/access/:id", {}, {
-            query: { method: 'GET', params: {id: '@id'}, isArray: true }
-        })
-    });
-
-xApp
-    .controller('ModalAccessController', function($scope, $modalInstance, access) {
-        $scope.access = access;
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, project_id) {
-        $scope.entry = {
-            project_id: project_id
-        };
-
-        $scope.ok = function () {
-            EntriesFactory.create($scope.entry,
-                function(response) {
-                    $modalInstance.close(response);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-
-xApp
-    .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
-        $scope.password = password;
-        $scope.entry = entry;
-
-        $scope.shown = false;
-
-        $scope.ok = function () {
-            $modalInstance.close();
-        };
-
-        $scope.show = function() {
-            $scope.shown = true;
-        }
-
-        $scope.hide = function() {
-            $scope.shown = false;
-        }
-
-        $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-        };
-
-        $scope.download = function() {
-            var a = document.createElement('a');
-            a.href = 'data:application/octet-stream;charset=utf-8,' + encodeURI($scope.password.password);
-            a.target = '_blank';
-            a.download = $scope.entry.username ? $scope.entry.username : $scope.entry.id;
-            document.body.appendChild(a);
-            a.click();
-            a.parentNode.removeChild(a);
-        }
-    });
-
-(function() {
-    angular
-        .module('xApp')
-        .controller('ModalShareController', shareController);
-
-    function shareController($scope, $modalInstance, Api, users, access, entry, teams, entryTeams) {
-        $scope.users = users;
-        $scope.access = access;
-        $scope.entry = entry;
-        $scope.teams = teams;
-        $scope.entryTeams = entryTeams;
-
-        $scope.share = {
-            user: 0,
-            team: 0
-        };
-
-        $scope.users.$promise.then(function() {
-            $scope.share.user = $scope.users[0].id || 0;
-        });
-
-        $scope.teams.$promise.then(function() {
-            $scope.share.team = $scope.teams[0].id || 0;
-        });
-
-        $scope.shareUser = function() {
-            Api.share.save({
-                user_id: $scope.share.user,
-                id: $scope.entry.id
-            }, function(response) {
-                $scope.access.push(response);
-            });
-        };
-
-        $scope.shareTeam = function() {
-            Api.entryTeams.save({
-                team_id: $scope.share.team,
-                id: $scope.entry.id
-            }, function(response) {
-                $scope.entryTeams.push(response);
-            });
-        };
-
-        $scope.revokeUser = function(accessId) {
-            Api.share.delete({
-                id: accessId
-            }, function() {
-                $scope.access.splice($scope.access.map(function(i) {return i.id;}).indexOf(accessId), 1);
-            });
-        };
-
-        $scope.revokeTeam = function(accessId) {
-            Api.entryTeams.delete({
-                id: accessId
-            }, function() {
-                $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
-            });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    }
-})();
-
-xApp
-    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
-        $scope.entry = entry;
-        $scope.groups = GROUPS;
-
-        $scope.ok = function () {
-            EntryFactory.update($scope.entry,
-                function(response) {
-                    $modalInstance.close(response);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-
 (function() {
     angular
         .module('xApp')
@@ -855,6 +675,29 @@ xApp
                     );
                 } else {
                     elem[0].select();
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('keyCreate', dir);
+
+    function dir() {
+        return {
+            restrict: 'E',
+            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            controller: function($rootScope, $scope, Api, toaster) {
+                $scope.create = createKey;
+
+                function createKey() {
+                    Api.apis.save({}).$promise.then(function(key) {
+                        toaster.pop('success', "Key successfully created.");
+                        $rootScope.$broadcast('key:create', key);
+                    });
                 }
             }
         };
