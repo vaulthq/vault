@@ -105,7 +105,7 @@ gulp.task('html_templates', [], function() {
         .pipe(gulp.dest('api/public/t'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['default'], function() {
   gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.html_templates, ['html_templates']);
   gulp.watch(paths.styles, ['styles']);
