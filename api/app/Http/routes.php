@@ -8,8 +8,8 @@ Route::group(['prefix' => 'internal'], function() {
 	Route::controller('auth', 'AuthController');
 });
 
-Route::group(['prefix' => 'api'], function() {
-
+Route::group(['prefix' => 'api', 'middleware' => 'api.key'], function() {
+	Route::get('deployKey', 'DeployKeyController@find');
 });
 
 Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
