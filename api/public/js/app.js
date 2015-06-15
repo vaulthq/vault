@@ -97,6 +97,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             controller: 'EntryController',
             resolve: {
                 project: function ($stateParams, projects) {
+                    console.log($stateParams.projectId);
                     return projects.$promise.then(function(projects) {
                       return _.find(
                         projects,
