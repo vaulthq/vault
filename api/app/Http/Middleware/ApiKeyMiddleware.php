@@ -30,6 +30,10 @@ class ApiKeyMiddleware
             abort(401, 'No Authorization header provided.');
         }
 
+        if (strpos($apiKey, 'Basic ') === 0) {
+            $apiKey = substr($apiKey, 5, strlen($apiKey));
+        }
+
         $unwrapped = base64_decode($apiKey);
         $parts = explode(':', $unwrapped);
 
