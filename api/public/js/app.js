@@ -99,11 +99,19 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 project: function ($stateParams, projects) {
                     console.log($stateParams.projectId);
                     return projects.$promise.then(function(projects) {
-                      return _.find(
-                        projects,
-                        _.matchesProperty('id', parseInt($stateParams.projectId))
-                        )
+                        for (var i=0; i<projects.length; i++) {
+                            if (projects[i].id == parseInt($stateParams.projectId)) {
+                                return projects[i];
+                            }
+                        }
+                        console.log('neradau');
                     });
+                    //return projects.$promise.then(function(projects) {
+                    //  return _.find(
+                    //    projects,
+                    //    _.matchesProperty('id', parseInt($stateParams.projectId))
+                    //    )
+                    //});
                 },
                 entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
