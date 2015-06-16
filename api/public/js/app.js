@@ -97,7 +97,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             controller: 'EntryController',
             resolve: {
                 project: function ($stateParams, projects) {
-                    console.log($stateParams.projectId);
                     return projects.$promise.then(function(projects) {
                         for (var i=0; i<projects.length; i++) {
                             if (projects[i].id == parseInt($stateParams.projectId)) {
@@ -106,12 +105,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         }
                         console.log('neradau');
                     });
-                    //return projects.$promise.then(function(projects) {
-                    //  return _.find(
-                    //    projects,
-                    //    _.matchesProperty('id', parseInt($stateParams.projectId))
-                    //    )
-                    //});
                 },
                 entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
@@ -1178,6 +1171,15 @@ xApp
         };
     });
 
+xApp
+    .controller('HistoryController', function($scope, history) {
+        $scope.history = history;
+    })
+    .factory('HistoryFactory', function ($resource) {
+        return $resource("/api/history", {}, {
+            query: { method: 'GET', isArray: true }
+        })
+    });
 xApp.
     controller('ProfileController', function($scope, $modalInstance, toaster, Api) {
         $scope.profile = {
@@ -1377,15 +1379,6 @@ xApp.
 })();
 
 xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
-        })
-    });
-xApp
     .controller('HomeController', function($scope, recent) {
         $scope.recent = recent;
     })
@@ -1394,134 +1387,6 @@ xApp
             query: { method: 'GET', isArray: true }
         });
     });
-
-xApp
-    .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
-        $scope.users = users;
-        $scope.project = project;
-        $scope.form = {owner: 0, assign: 0};
-
-        $scope.project.$promise.then(function() {
-            $scope.form.owner = $scope.project.user_id;
-        });
-
-        $scope.ok = function () {
-            Api.projectOwner.get({
-                id: $scope.project.id,
-                owner: $scope.form.owner,
-                assign: $scope.form.assign
-            }, function() {
-                $modalInstance.close();
-                toaster.pop('success', 'Project owner has been changed.');
-            });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    });
-
-xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
-        $scope.project = {};
-
-        $scope.ok = function () {
-            Api.project.save($scope.project,
-                function(response) {
-                    $modalInstance.close(response);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    });
-
-xApp
-    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
-        $scope.owner = owner;
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-xApp
-    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, project) {
-        $scope.project = project;
-
-        $scope.ok = function() {
-            Api.project.update(
-                $scope.project,
-                function() {
-                    $modalInstance.close($scope.project);
-                }
-            );
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-(function() {
-    angular
-        .module('xApp')
-        .controller('ProjectController', controller);
-
-    function controller($scope, $modal, Api, projects, active) {
-
-        $scope.projects = projects;
-        $scope.activeId = active;
-
-        $scope.create = createProject;
-        $scope.teams = teamsAssigned;
-        $scope.info = projectOwnerInfo;
-        $scope.delete = deleteProject;
-
-        function createProject() {
-            $modal.open({
-                templateUrl: '/t/project/form.html',
-                controller: 'ModalCreateProjectController'
-            }).result.then(function (model) {
-                $scope.projects.push(model);
-            });
-        }
-
-        function teamsAssigned(project) {
-            $modal.open({
-                templateUrl: '/t/project-team/assigned.html',
-                controller: 'AssignedTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.assignedTeams.query({id: project.id});
-                    }
-                }
-            });
-        }
-
-        function projectOwnerInfo(project) {
-            $modal.open({
-                templateUrl: '/t/project/owner.html',
-                controller: 'ModalProjectOwnerController',
-                resolve: {
-                    owner: function(Api) {
-                        return Api.user.get({id: project.user_id});
-                    }
-                }
-            });
-        }
-
-        function deleteProject(project) {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-
-            Api.project.delete({id: project.id});
-            $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
-        }
-
-    }
-})();
 
 (function() {
     angular
@@ -1757,6 +1622,134 @@ xApp
         function cancel() {
             $modalInstance.dismiss();
         }
+    }
+})();
+
+xApp
+    .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
+        $scope.users = users;
+        $scope.project = project;
+        $scope.form = {owner: 0, assign: 0};
+
+        $scope.project.$promise.then(function() {
+            $scope.form.owner = $scope.project.user_id;
+        });
+
+        $scope.ok = function () {
+            Api.projectOwner.get({
+                id: $scope.project.id,
+                owner: $scope.form.owner,
+                assign: $scope.form.assign
+            }, function() {
+                $modalInstance.close();
+                toaster.pop('success', 'Project owner has been changed.');
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    });
+
+xApp
+    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
+        $scope.project = {};
+
+        $scope.ok = function () {
+            Api.project.save($scope.project,
+                function(response) {
+                    $modalInstance.close(response);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    });
+
+xApp
+    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
+        $scope.owner = owner;
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+xApp
+    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, project) {
+        $scope.project = project;
+
+        $scope.ok = function() {
+            Api.project.update(
+                $scope.project,
+                function() {
+                    $modalInstance.close($scope.project);
+                }
+            );
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectController', controller);
+
+    function controller($scope, $modal, Api, projects, active) {
+
+        $scope.projects = projects;
+        $scope.activeId = active;
+
+        $scope.create = createProject;
+        $scope.teams = teamsAssigned;
+        $scope.info = projectOwnerInfo;
+        $scope.delete = deleteProject;
+
+        function createProject() {
+            $modal.open({
+                templateUrl: '/t/project/form.html',
+                controller: 'ModalCreateProjectController'
+            }).result.then(function (model) {
+                $scope.projects.push(model);
+            });
+        }
+
+        function teamsAssigned(project) {
+            $modal.open({
+                templateUrl: '/t/project-team/assigned.html',
+                controller: 'AssignedTeamController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.assignedTeams.query({id: project.id});
+                    }
+                }
+            });
+        }
+
+        function projectOwnerInfo(project) {
+            $modal.open({
+                templateUrl: '/t/project/owner.html',
+                controller: 'ModalProjectOwnerController',
+                resolve: {
+                    owner: function(Api) {
+                        return Api.user.get({id: project.user_id});
+                    }
+                }
+            });
+        }
+
+        function deleteProject(project) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+
+            Api.project.delete({id: project.id});
+            $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
+        }
+
     }
 })();
 

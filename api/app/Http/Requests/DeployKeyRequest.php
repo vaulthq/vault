@@ -11,6 +11,7 @@ class DeployKeyRequest extends FormRequest
     {
         return [
             'host' => 'required',
+            'user' => 'required'
         ];
     }
 }

@@ -97,7 +97,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             controller: 'EntryController',
             resolve: {
                 project: function ($stateParams, projects) {
-                    console.log($stateParams.projectId);
                     return projects.$promise.then(function(projects) {
                         for (var i=0; i<projects.length; i++) {
                             if (projects[i].id == parseInt($stateParams.projectId)) {
@@ -106,12 +105,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                         }
                         console.log('neradau');
                     });
-                    //return projects.$promise.then(function(projects) {
-                    //  return _.find(
-                    //    projects,
-                    //    _.matchesProperty('id', parseInt($stateParams.projectId))
-                    //    )
-                    //});
                 },
                 entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
