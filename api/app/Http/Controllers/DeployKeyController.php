@@ -12,7 +12,11 @@ class DeployKeyController extends Controller
         $host = $request->get('host');
         $username = $request->get('user');
 
-        $availableKeys = Entry::where('url', $username . '@' . $host)->get();
+        $availableKeys = Entry::where('url', $username . '@' . $host)
+            ->orWhere(function($query) use ($username, $host) {
+                $query->where('url', $host)->where('username', $username);
+            })
+            ->get();
 
         foreach ($availableKeys as $key) {
             if ($key->can_edit) {
