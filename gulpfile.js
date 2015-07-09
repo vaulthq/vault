@@ -31,12 +31,10 @@ var paths = {
         'bower_components/jquery/jquery.min.js',
         'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'bower_components/lodash/lodash.min.js',
+        'bower_components/clippy/build/clippy.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
-    ],
-    clippy: [
-        'bower_components/clippy/build/clippy.min.js'
     ],
     scripts: [
         'src/**/*.js'
@@ -63,13 +61,6 @@ gulp.task('vendor_scripts', [], function() {
     return gulp.src(paths.vendor_scripts)
         .pipe(expect(paths.vendor_scripts))
         .pipe(concat('vendor.js'))
-        .pipe(gulp.dest('api/public/js'));
-});
-
-gulp.task('clippy', [], function() {
-    return gulp.src(paths.clippy)
-        .pipe(expect(paths.clippy))
-        .pipe(concat('clippy.js'))
         .pipe(gulp.dest('api/public/js'));
 });
 
@@ -111,4 +102,4 @@ gulp.task('watch', ['default'], function() {
   gulp.watch(paths.styles, ['styles']);
 });
 
-gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'clippy', 'scripts', 'styles']);
+gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles']);
