@@ -11,6 +11,10 @@ xApp
             );
         };
 
+        $scope.generate = function() {
+            $scope.entry.password = Password.generate(16);
+        };
+
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
