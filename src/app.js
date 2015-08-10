@@ -110,15 +110,23 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                     return Api.projectKeys.query({id: $stateParams.projectId});
                 },
                 active: function($stateParams, entries) {
-                  if ($stateParams.active) {
-                    return entries.$promise.then(function(entries) {
-                       return _.find(
-                         entries,
-                         _.matchesProperty('id', parseInt($stateParams.active))
-                         )
-                     });
-                  }
-                  return {};
+                    if ($stateParams.active) {
+                        return entries.$promise.then(function(entries) {
+                            var key = _.find(
+                                entries,
+                                _.matchesProperty('id', parseInt($stateParams.active))
+                            );
+
+                            if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
+                                key = _.find(
+                                    entries,
+                                    _.matchesProperty('id', $stateParams.active)
+                                );
+                            }
+                            return key;
+                        });
+                    }
+                    return {};
                 }
             }
         })

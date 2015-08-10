@@ -19,7 +19,6 @@
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
 
-console.log($scope.active);
         hotkeys.add({
             combo: 'up',
             description: 'Show project jump window',
