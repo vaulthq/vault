@@ -16,7 +16,7 @@
     <loader when="!entries.$resolved"></loader>
 
     <div class="row">
-      <div ng-class="{'col-sm-8': active && active.id, 'col-sm-12': !active || !active.id}" class="nice-flow">
+      <div class="col-sm-8 nice-flow">
         <table class="table table-hover" ng-if="entries.length > 0">
             <thead>
             <tr>
@@ -61,7 +61,7 @@
             This project has no added keys.
         </div>
       </div>
-      <div ng-class="{'col-sm-4': active && active.id, 'invisible': !active || !active.id}" class="invisible-flow">
+      <div class="col-sm-4 invisible-flow" ng-if="active && active.id">
         <h4>
           {{ active.name }}
           <div class="pull-right">

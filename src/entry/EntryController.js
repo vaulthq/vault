@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, modal, entries, project, active, $state) {
+    function controller($scope, $filter, hotkeys, entries, project, active) {
 
         $scope.entries = entries;
         $scope.project = project;

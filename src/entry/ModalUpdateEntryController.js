@@ -12,7 +12,9 @@ xApp
         };
 
         $scope.generate = function() {
-            $scope.entry.password = Password.generate(16);
+            if (confirm('Replace password with random one?')) {
+                $scope.entry.password = Password.generate(16);
+            }
         };
 
         $scope.cancel = function () {
