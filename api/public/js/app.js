@@ -933,7 +933,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
 
-
+console.log($scope.active);
         hotkeys.add({
             combo: 'up',
             description: 'Show project jump window',
@@ -1576,63 +1576,6 @@ xApp
 (function() {
     angular
         .module('xApp')
-        .controller('AssignedTeamController', teamController);
-
-    function teamController($scope, $modalInstance, teams) {
-        $scope.teams = teams;
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .controller('ProjectTeamController', teamController);
-
-    function teamController($scope, $modalInstance, Api, teams, project, access) {
-        $scope.teams = teams;
-        $scope.access = access;
-        $scope.project = project;
-
-        $scope.canAccess = function(team) {
-            return getAccessIndexForUserId(team.id) != -1;
-        };
-
-        $scope.grant = function(team) {
-            Api.projectTeams.save({
-                team_id: team.id,
-                project_id: $scope.project.id
-            }, function (response) {
-                $scope.access.push(response);
-            });
-        };
-
-        $scope.revoke = function(team) {
-            var accessIndex = getAccessIndexForUserId(team.id);
-
-            Api.projectTeams.delete({
-                id: $scope.access[accessIndex].id
-            }, function() {
-                $scope.access.splice(accessIndex, 1);
-            });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-
-        function getAccessIndexForUserId(teamId) {
-            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
         .controller('createTeamController', createTeamController);
 
     function createTeamController($scope, $modalInstance, Api) {
@@ -1807,6 +1750,63 @@ xApp
         function cancel() {
             $modalInstance.dismiss();
         }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('AssignedTeamController', teamController);
+
+    function teamController($scope, $modalInstance, teams) {
+        $scope.teams = teams;
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectTeamController', teamController);
+
+    function teamController($scope, $modalInstance, Api, teams, project, access) {
+        $scope.teams = teams;
+        $scope.access = access;
+        $scope.project = project;
+
+        $scope.canAccess = function(team) {
+            return getAccessIndexForUserId(team.id) != -1;
+        };
+
+        $scope.grant = function(team) {
+            Api.projectTeams.save({
+                team_id: team.id,
+                project_id: $scope.project.id
+            }, function (response) {
+                $scope.access.push(response);
+            });
+        };
+
+        $scope.revoke = function(team) {
+            var accessIndex = getAccessIndexForUserId(team.id);
+
+            Api.projectTeams.delete({
+                id: $scope.access[accessIndex].id
+            }, function() {
+                $scope.access.splice(accessIndex, 1);
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+
+        function getAccessIndexForUserId(teamId) {
+            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
+        };
     }
 })();
 
