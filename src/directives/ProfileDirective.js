@@ -7,7 +7,7 @@
         return {
             restrict: 'E',
             template:
-                '<a class="btn btn-side-menu" ng-click="profile()" title="Change Account Password">' +
+                '<a class="btn btn-side-menu" ng-click="profile()" title="Edit Profile">' +
                     '<span class="glyphicon glyphicon-wrench"></span><br>Profile' +
                 '</a>',
             controller: function($scope, $modal) {

@@ -1,5 +1,9 @@
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalUpdateUserController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, user, GROUPS) {
         $scope.user = user;
         $scope.groups = GROUPS;
 
@@ -14,4 +18,5 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
+})();
