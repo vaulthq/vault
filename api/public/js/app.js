@@ -223,6 +223,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             entryTeams: $resource("/api/entryTeams/:id", null, enableCustom),
+            entryTags: $resource("/api/entryTags/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
@@ -641,7 +642,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             restrict: 'E',
             template:
                 '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
-                    '<i class="glyphicon glyphicon-link"></i>' +
+                    '<i class="glyphicon glyphicon-link"></i> Share' +
                 '</a>',
             scope: {
                 entry: '='
@@ -682,6 +683,54 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .directive('entryTag', entryTagDirective);
+
+    function entryTagDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="tag()" class="btn btn-default btn-xs" title="Manage Tags">' +
+                    '<i class="glyphicon glyphicon-tag"></i> Tag' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                //$scope.share = shareEntry;
+                //
+                //function shareEntry() {
+                //    $modal.open({
+                //        templateUrl: '/t/entry/share.html',
+                //        controller: 'ModalShareController',
+                //        resolve: {
+                //            users: function(Api) {
+                //                return Api.user.query();
+                //            },
+                //            access: function(Api) {
+                //                return Api.share.query({id: $scope.entry.id});
+                //            },
+                //            entry: function() {
+                //                return $scope.entry;
+                //            },
+                //            teams: function(Api) {
+                //                return Api.team.query();
+                //            },
+                //            entryTeams: function(Api) {
+                //                return Api.entryTeams.query({id: $scope.entry.id});
+                //            }
+                //        }
+                //    }).result.then(function (model) {
+                //        $rootScope.$broadcast('entry:share', model);
+                //    });
+                //}
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .directive('entryUpdate', entryUpdateDirective);
 
     function entryUpdateDirective() {
@@ -689,7 +738,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             restrict: 'E',
             template:
                 '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
-                    '<i class="glyphicon glyphicon-edit"></i>' +
+                    '<i class="glyphicon glyphicon-edit"></i> Edit' +
                 '</a>',
             scope: {
                 entryId: '='
@@ -1004,6 +1053,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         $scope.active = active;
 
         $scope.search = {};
+        $scope.tags = [];
 
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;

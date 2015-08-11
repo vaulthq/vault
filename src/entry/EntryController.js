@@ -11,6 +11,7 @@
         $scope.active = active;
 
         $scope.search = {};
+        $scope.tags = [];
 
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
