@@ -8,7 +8,7 @@
             restrict: 'E',
             template:
                 '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
-                    '<i class="glyphicon glyphicon-link"></i>' +
+                    '<i class="glyphicon glyphicon-link"></i> Share' +
                 '</a>',
             scope: {
                 entry: '='

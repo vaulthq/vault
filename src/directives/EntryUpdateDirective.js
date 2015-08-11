@@ -8,7 +8,7 @@
             restrict: 'E',
             template:
                 '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
-                    '<i class="glyphicon glyphicon-edit"></i>' +
+                    '<i class="glyphicon glyphicon-edit"></i> Edit' +
                 '</a>',
             scope: {
                 entryId: '='

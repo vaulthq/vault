@@ -31,6 +31,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 
 	Route::resource('entry', 'EntryController');
 	Route::resource('entryTeams', 'EntryTeamsController');
+	Route::resource('entryTags', 'EntryTagController');
 
 	Route::group(['prefix' => 'apis'], function() {
 		Route::get('/', 'ApiKeyController@index');

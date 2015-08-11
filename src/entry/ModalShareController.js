@@ -16,11 +16,11 @@
         };
 
         $scope.users.$promise.then(function() {
-            $scope.share.user = $scope.users[0].id || 0;
+            $scope.share.user = $scope.users[0] ? $scope.users[0].id : 0;
         });
 
         $scope.teams.$promise.then(function() {
-            $scope.share.team = $scope.teams[0].id || 0;
+            $scope.share.team = $scope.teams[0] ? $scope.teams[0].id : 0;
         });
 
         $scope.shareUser = function() {
