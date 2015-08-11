@@ -9,7 +9,8 @@ var xApp = angular.module('xApp', [
     'angularMoment',
     'toaster',
     'angular-jwt',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'colorpicker.module'
 ]);
 
 xApp.config([
@@ -696,33 +697,24 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 entry: '='
             },
             controller: function($rootScope, $scope, $modal) {
-                //$scope.share = shareEntry;
-                //
-                //function shareEntry() {
-                //    $modal.open({
-                //        templateUrl: '/t/entry/share.html',
-                //        controller: 'ModalShareController',
-                //        resolve: {
-                //            users: function(Api) {
-                //                return Api.user.query();
-                //            },
-                //            access: function(Api) {
-                //                return Api.share.query({id: $scope.entry.id});
-                //            },
-                //            entry: function() {
-                //                return $scope.entry;
-                //            },
-                //            teams: function(Api) {
-                //                return Api.team.query();
-                //            },
-                //            entryTeams: function(Api) {
-                //                return Api.entryTeams.query({id: $scope.entry.id});
-                //            }
-                //        }
-                //    }).result.then(function (model) {
-                //        $rootScope.$broadcast('entry:share', model);
-                //    });
-                //}
+                $scope.tag = tagEntry;
+
+                function tagEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/tag.html',
+                        controller: 'ModalTagController',
+                        resolve: {
+                            entry: function() {
+                                return $scope.entry;
+                            },
+                            tags: function(Api) {
+                                return Api.entryTags.query();
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:tag', model);
+                    });
+                }
             }
         };
     }
@@ -1285,11 +1277,11 @@ xApp
         };
 
         $scope.users.$promise.then(function() {
-            $scope.share.user = $scope.users[0].id || 0;
+            $scope.share.user = $scope.users[0] ? $scope.users[0].id : 0;
         });
 
         $scope.teams.$promise.then(function() {
-            $scope.share.team = $scope.teams[0].id || 0;
+            $scope.share.team = $scope.teams[0] ? $scope.teams[0].id : 0;
         });
 
         $scope.shareUser = function() {
@@ -1323,6 +1315,57 @@ xApp
                 id: accessId
             }, function() {
                 $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalTagController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, entry, tags) {
+        $scope.tags = tags;
+        $scope.entry = entry;
+
+        $scope.tag_color = '#dbdbdb';
+        $scope.tag_name = '';
+
+        $scope.createTag = function() {
+            Api.entryTags.save({color: $scope.tag_color, name: $scope.tag_name, entryId: entry.id}, function(res) {
+                $scope.entry.tags.push(res);
+                $scope.tags.push(res);
+                $scope.tag_color = '#dbdbdb';
+                $scope.tag_name = '';
+            });
+        };
+
+        $scope.removeTag = function(tag) {
+            Api.entryTags.delete({id: tag.id}, function() {
+                var index = $scope.entry.tags.map(function (e) { return e.id; }).indexOf(tag.id);
+                $scope.entry.tags.splice(index, 1);
+
+                if (_.findWhere($scope.tags, {name: tag.name, entry_id: entry.id})) {
+                    var tagIndex = $scope.tags.map(function (e) { return e.name; }).indexOf(tag.name);
+                    $scope.tags.splice(tagIndex, 1);
+                }
+            });
+        };
+
+        $scope.addTag = function(tag) {
+            Api.entryTags.save({color: tag.color, name: tag.name, entryId: entry.id}, function(res) {
+                $scope.entry.tags.push(res);
+            });
+        };
+
+        $scope.availableTags = function() {
+            return _.filter($scope.tags, function(obj) {
+                return !_.findWhere($scope.entry.tags, {name: obj.name});
             });
         };
 

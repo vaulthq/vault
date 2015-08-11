@@ -12,7 +12,8 @@ var paths = {
         'bower_components/AngularJS-Toaster/toaster.css',
         'bower_components/angular-ui-select/dist/select.min.css',
         'bower_components/clippy/build/clippy.css',
-        'bower_components/angular-hotkeys/build/hotkeys.min.css'
+        'bower_components/angular-hotkeys/build/hotkeys.min.css',
+        'bower_components/angular-bootstrap-colorpicker/css/colorpicker.min.css'
     ],
     html_templates: [
         'src/**/*.html'
@@ -32,6 +33,7 @@ var paths = {
         'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'bower_components/lodash/lodash.min.js',
         'bower_components/clippy/build/clippy.js',
+        'bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'

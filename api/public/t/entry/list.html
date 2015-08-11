@@ -80,13 +80,11 @@
                 </div>
             </h4>
             <br>
-            <ui-select ng-model="tag" on-select="submitTag($item)">
-                <ui-select-match placeholder="Enter new tag...">{{ $select.selected.name }}</ui-select-match>
-                <ui-select-choices repeat="tag.id as pro in tags | filter: {name: $select.search}">
-                    <div ng-bind-html="pro.name | highlight: $select.search"></div>
-                    <div class="muted small">{{ pro.color }}</div>
-                </ui-select-choices>
-            </ui-select>
+            <ul class="list-inline" style="font-size: 15px">
+                <li ng-repeat="tag in active.tags">
+                    <span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+                </li>
+            </ul>
             <br><br>
 
             <p class="nl2br">{{ active.note }}</p>

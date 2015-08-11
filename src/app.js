@@ -9,7 +9,8 @@ var xApp = angular.module('xApp', [
     'angularMoment',
     'toaster',
     'angular-jwt',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'colorpicker.module'
 ]);
 
 xApp.config([

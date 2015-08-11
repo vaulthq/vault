@@ -12,6 +12,8 @@ class EntryTag extends Model
 	 */
 	protected $table = 'entry_tag';
 
+    protected $hidden = ['created_at', 'updated_at', 'user_id'];
+
     public static $rules = [
         'name' => 'required',
         'color' => 'required',

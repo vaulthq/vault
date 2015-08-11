@@ -14,33 +14,24 @@
                 entry: '='
             },
             controller: function($rootScope, $scope, $modal) {
-                //$scope.share = shareEntry;
-                //
-                //function shareEntry() {
-                //    $modal.open({
-                //        templateUrl: '/t/entry/share.html',
-                //        controller: 'ModalShareController',
-                //        resolve: {
-                //            users: function(Api) {
-                //                return Api.user.query();
-                //            },
-                //            access: function(Api) {
-                //                return Api.share.query({id: $scope.entry.id});
-                //            },
-                //            entry: function() {
-                //                return $scope.entry;
-                //            },
-                //            teams: function(Api) {
-                //                return Api.team.query();
-                //            },
-                //            entryTeams: function(Api) {
-                //                return Api.entryTeams.query({id: $scope.entry.id});
-                //            }
-                //        }
-                //    }).result.then(function (model) {
-                //        $rootScope.$broadcast('entry:share', model);
-                //    });
-                //}
+                $scope.tag = tagEntry;
+
+                function tagEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/tag.html',
+                        controller: 'ModalTagController',
+                        resolve: {
+                            entry: function() {
+                                return $scope.entry;
+                            },
+                            tags: function(Api) {
+                                return Api.entryTags.query();
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:tag', model);
+                    });
+                }
             }
         };
     }

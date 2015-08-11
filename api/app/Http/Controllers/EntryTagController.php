@@ -4,6 +4,7 @@ use App\Vault\Models\Entry;
 use App\Vault\Models\EntryTag;
 use App\Vault\Models\History;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -18,7 +19,13 @@ class EntryTagController extends Controller
 	 */
 	public function index()
 	{
-		//
+		$tags = DB::table('entry_tag')
+			->select('id', 'entry_id', 'name', 'color')
+			->groupBy('name')
+			->orderBy('name')
+			->get();
+
+		return $tags;
 	}
 
 
@@ -40,9 +47,9 @@ class EntryTagController extends Controller
 	 */
 	public function store()
 	{
-		$name = Input::get('name');
+		$name = strtoupper(Input::get('name'));
 		$color = Input::get('color');
-		$entryId = Input::get('id');
+		$entryId = Input::get('entryId');
 
         $validator = Validator::make([
             'color' => $color,
@@ -58,6 +65,10 @@ class EntryTagController extends Controller
         if (!$entry->can_edit) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
+
+		if ($entry->tags->contains('name', $name)) {
+			return Response::make('Tag already present.', 419);
+		}
 
         $model = new EntryTag();
 		$model->user_id = Auth::user()->id;
