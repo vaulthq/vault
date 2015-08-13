@@ -11,6 +11,12 @@ xApp
             );
         };
 
+        $scope.generate = function() {
+            if (confirm('Replace password with random one?')) {
+                $scope.entry.password = Password.generate(16);
+            }
+        };
+
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };

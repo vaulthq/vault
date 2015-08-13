@@ -9,7 +9,8 @@ var xApp = angular.module('xApp', [
     'angularMoment',
     'toaster',
     'angular-jwt',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'colorpicker.module'
 ]);
 
 xApp.config([
@@ -98,25 +99,35 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 project: function ($stateParams, projects) {
                     return projects.$promise.then(function(projects) {
-                      return _.find(
-                        projects,
-                        _.matchesProperty('id', parseInt($stateParams.projectId))
-                        )
+                        for (var i=0; i<projects.length; i++) {
+                            if (projects[i].id == parseInt($stateParams.projectId)) {
+                                return projects[i];
+                            }
+                        }
+                        console.log('neradau');
                     });
                 },
                 entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
                 },
                 active: function($stateParams, entries) {
-                  if ($stateParams.active) {
-                    return entries.$promise.then(function(entries) {
-                       return _.find(
-                         entries,
-                         _.matchesProperty('id', parseInt($stateParams.active))
-                         )
-                     });
-                  }
-                  return {};
+                    if ($stateParams.active) {
+                        return entries.$promise.then(function(entries) {
+                            var key = _.find(
+                                entries,
+                                _.matchesProperty('id', parseInt($stateParams.active))
+                            );
+
+                            if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
+                                key = _.find(
+                                    entries,
+                                    _.matchesProperty('id', $stateParams.active)
+                                );
+                            }
+                            return key;
+                        });
+                    }
+                    return {};
                 }
             }
         })
@@ -147,6 +158,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 history: function(HistoryFactory) {
                     return HistoryFactory.query();
+                }
+            }
+        })
+        .state('user.api', {
+            url: '/api',
+            templateUrl: '/t/api/list.html',
+            controller: 'ApiController',
+            resolve: {
+                apis: function(Api) {
+                    return Api.apis.query();
                 }
             }
         })
@@ -198,10 +219,12 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             projectOwner: $resource("/api/project/changeOwner/:id", null, enableCustom),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
+            apis: $resource("/api/apis/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),
             teamMembers: $resource("/api/teamMembers/:id", null, enableCustom),
             projectTeams: $resource("/api/projectTeams/:id", null, enableCustom),
             entryTeams: $resource("/api/entryTeams/:id", null, enableCustom),
+            entryTags: $resource("/api/entryTags/:id", null, enableCustom),
             authStatus: $resource("/internal/auth/status", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
@@ -224,151 +247,100 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
-        .controller('AuthController', authController);
+        .controller('ApiController', ctrl);
 
-    function authController($scope, AuthFactory) {
-        $scope.login = login;
+    function ctrl($scope, Api, apis) {
+        $scope.apis = apis;
+        $scope.revoke = revoke;
 
-        function login() {
-            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
+        $scope.$on('key:create', onKeyCreate);
+
+        function revoke(api) {
+            if (!confirm('Are you sure?')) {
+                return;
+            }
+
+            Api.apis.remove({id: api.id});
+            $scope.apis.splice($scope.apis.map(function(x) { return x.id; }).indexOf(api.id), 1);
+        }
+
+        function onKeyCreate(e, key) {
+            $scope.apis.push(key);
         }
     }
 })();
 
-(function() {
+(function () {
     angular
         .module('xApp')
-        .factory('AuthFactory', auth);
+        .directive('clippy', dir);
 
-    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
-        var localToken = 'auth_token';
-        var refreshingToken = null;
-
+    function dir() {
         return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn,
-            initLogin: initLogin,
-            getToken: getToken,
-            tokenExpired: tokenExpired,
-            setToken: setToken,
-            refreshToken: refreshToken
-        };
+            restrict: 'E',
+            controller: function() {
+                var enabled = localStorage.getItem('clippy') || false;
 
-        function getToken() {
-            return localStorage.getItem(localToken);
-        }
-
-        function setToken(token) {
-            localStorage.setItem(localToken, token);
-        }
-
-        function login(token) {
-            setToken(token);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        function logout() {
-            localStorage.removeItem(localToken);
-
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        function getUser() {
-            var token = getToken();
-            if (token) {
-                try {
-                    return jwtHelper.decodeToken(token).user;
-                } catch(err) {}
-            }
-            return [];
-        }
-
-        function tokenExpired() {
-            return jwtHelper.isTokenExpired(getToken());
-        }
-
-        function isLoggedIn() {
-            return getUser().id > 0;
-        }
-
-        function initLogin(username, password, remember) {
-            Api.auth.save({
-                email: $sanitize(username),
-                password: $sanitize(password),
-                remember: $sanitize(remember)
-            }, function (response) {
-                login(response.token);
-                $location.path('/recent');
-                toaster.pop('info', "", "Welcome back, " + getUser().name);
-            }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
-            })
-        }
-
-        function refreshToken() {
-            if (refreshingToken == null) {
-                refreshingToken = $http({
-                    url: '/internal/auth/refresh',
-                    skipAuthorization: true,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + getToken()
-                    }
-                }).then(function(response) {
-                    var token = response.data.token;
-                    setToken(token);
-                    refreshingToken = null;
-
-                    return token;
-                });
-            }
-
-            return refreshingToken;
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthInterceptor', authInterceptor);
-
-    function authInterceptor($q, $injector, $location, toaster) {
-        return {
-            response: response,
-            responseError: error
-        };
-
-        function response(response) {
-            return response || $q.when(response);
-        }
-
-        function error(rejection) {
-            var AuthFactory = $injector.get('AuthFactory');
-
-            if (rejection.status === 400 || rejection.status === 401) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Please log in.');
-                    AuthFactory.logout();
+                if (String(enabled).toLowerCase() == 'true') {
+                    runClippy();
                 }
-                $location.path('/login');
             }
-
-            if (rejection.status === 403) {
-                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
-            }
-
-            if (rejection.status === 419) {
-                toaster.pop('warning', "Validation Error", rejection.data);
-            }
-
-            return $q.reject(rejection);
-        }
+        };
     }
 
+    function runClippy() {
+        clippy.load('Clippy', function(agent){
+            agent.show();
+            agent.reposition = function () {
+                if (!this._el.is(':visible')) return;
+                var o = this._el.offset();
+                var bH = this._el.outerHeight();
+                var bW = this._el.outerWidth();
+
+                var wW = $(window).width();
+                var wH = $(window).height();
+                var sT = $(window).scrollTop();
+                var sL = $(window).scrollLeft();
+                var top = o.top - sT;
+                var left = o.left - sL;
+                var m = 5;
+                if (top - m < 0) {
+                    top = m;
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                } else if ((top + bH + m) > wH) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    top = wH - bH - m;
+                }
+
+                if (left - m < 0) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    left = m;
+                } else if (left + bW + m > wW) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    left = wW - bW - m;
+                }
+
+                this._el.css({left:left, top:top});
+                // reposition balloon
+                this._balloon.reposition();
+            };
+            agent._balloon.WORD_SPEAK_TIME = 200;
+            agent._balloon.CLOSE_BALLOON_DELAY = 15000;
+            var loop = setInterval(function () {
+                agent.speak(fortunes[Math.floor(Math.random()*fortunes.length)]);
+            }, 30000);
+        });
+    }
 })();
+
 (function() {
     angular
         .module('xApp')
@@ -380,6 +352,9 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             template:
                 '<a ng-click="download()" class="btn btn-default btn-xs" title="Copy password" ng-if="isState(\'download\')">' +
                     '<i class="glyphicon glyphicon-open"></i>' +
+                '</a>' +
+                '<a class="btn btn-default btn-xs" title="Please wait..." ng-if="isState(\'waiting\')">' +
+                    '<i class="fa fa-spinner fa-spin"></i>' +
                 '</a>' +
                 '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
                     '<i class="glyphicon glyphicon-save"></i>' +
@@ -403,6 +378,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
                 }
 
                 function downloadPassword() {
+                    $scope.state = 'waiting';
                     Api.entryPassword.password({id: $scope.entry.id}, function(response) {
                         $scope.password = response.password;
                         response.$promise.then(function() {
@@ -523,7 +499,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             restrict: 'E',
             template:
                 '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
-                    '<i class="glyphicon glyphicon-link"></i>' +
+                    '<i class="glyphicon glyphicon-link"></i> Share' +
                 '</a>',
             scope: {
                 entry: '='
@@ -564,6 +540,45 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .directive('entryTag', entryTagDirective);
+
+    function entryTagDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="tag()" class="btn btn-default btn-xs" title="Manage Tags">' +
+                    '<i class="glyphicon glyphicon-tag"></i> Tag' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.tag = tagEntry;
+
+                function tagEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/tag.html',
+                        controller: 'ModalTagController',
+                        resolve: {
+                            entry: function() {
+                                return $scope.entry;
+                            },
+                            tags: function(Api) {
+                                return Api.entryTags.query();
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:tag', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .directive('entryUpdate', entryUpdateDirective);
 
     function entryUpdateDirective() {
@@ -571,7 +586,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             restrict: 'E',
             template:
                 '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
-                    '<i class="glyphicon glyphicon-edit"></i>' +
+                    '<i class="glyphicon glyphicon-edit"></i> Edit' +
                 '</a>',
             scope: {
                 entryId: '='
@@ -647,6 +662,29 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .directive('keyCreate', dir);
+
+    function dir() {
+        return {
+            restrict: 'E',
+            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            controller: function($rootScope, $scope, Api, toaster) {
+                $scope.create = createKey;
+
+                function createKey() {
+                    Api.apis.save({}).$promise.then(function(key) {
+                        toaster.pop('success', "Key successfully created.");
+                        $rootScope.$broadcast('key:create', key);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
         .directive('logout', logoutDirective);
 
     function logoutDirective() {
@@ -679,7 +717,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         return {
             restrict: 'E',
             template:
-                '<a class="btn btn-side-menu" ng-click="profile()" title="Change Account Password">' +
+                '<a class="btn btn-side-menu" ng-click="profile()" title="Edit Profile">' +
                     '<span class="glyphicon glyphicon-wrench"></span><br>Profile' +
                 '</a>',
             controller: function($scope, $modal) {
@@ -853,9 +891,157 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, AuthFactory) {
+        $scope.login = login;
+
+        function login() {
+            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', auth);
+
+    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
+        var localToken = 'auth_token';
+        var refreshingToken = null;
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin,
+            getToken: getToken,
+            tokenExpired: tokenExpired,
+            setToken: setToken,
+            refreshToken: refreshToken
+        };
+
+        function getToken() {
+            return localStorage.getItem(localToken);
+        }
+
+        function setToken(token) {
+            localStorage.setItem(localToken, token);
+        }
+
+        function login(token) {
+            setToken(token);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            localStorage.removeItem(localToken);
+
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function tokenExpired() {
+            return jwtHelper.isTokenExpired(getToken());
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password, remember) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password),
+                remember: $sanitize(remember)
+            }, function (response) {
+                login(response.token);
+                $location.path('/recent');
+                toaster.pop('info', "", "Welcome back, " + getUser().name);
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+
+        function refreshToken() {
+            if (refreshingToken == null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                }).then(function(response) {
+                    var token = response.data.token;
+                    setToken(token);
+                    refreshingToken = null;
+
+                    return token;
+                });
+            }
+
+            return refreshingToken;
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
+
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 400 || rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
+                    AuthFactory.logout();
+                }
+                $location.path('/login');
+            }
+
+            if (rejection.status === 403) {
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
+            }
+
+            if (rejection.status === 419) {
+                toaster.pop('warning', "Validation Error", rejection.data);
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+})();
+(function() {
+    angular
+        .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, modal, entries, project, active, $state) {
+    function controller($scope, $filter, hotkeys, entries, project, active) {
 
         $scope.entries = entries;
         $scope.project = project;
@@ -863,6 +1049,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         $scope.active = active;
 
         $scope.search = {};
+        $scope.tags = [];
 
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
@@ -870,7 +1057,6 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-
 
         hotkeys.add({
             combo: 'up',
@@ -987,10 +1173,61 @@ xApp
             );
         };
 
+        $scope.generate = function() {
+            $scope.entry.password = Password.generate(16);
+        };
+
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
     });
+
+
+var Password = {
+
+    _pattern : /[a-zA-Z0-9_\-\+\.]/,
+
+
+    _getRandomByte : function()
+    {
+        // http://caniuse.com/#feat=getrandomvalues
+        if(window.crypto && window.crypto.getRandomValues)
+        {
+            var result = new Uint8Array(1);
+            window.crypto.getRandomValues(result);
+            return result[0];
+        }
+        else if(window.msCrypto && window.msCrypto.getRandomValues)
+        {
+            var result = new Uint8Array(1);
+            window.msCrypto.getRandomValues(result);
+            return result[0];
+        }
+        else
+        {
+            return Math.floor(Math.random() * 256);
+        }
+    },
+
+    generate : function(length)
+    {
+        return Array.apply(null, {'length': length})
+            .map(function()
+            {
+                var result;
+                while(true)
+                {
+                    result = String.fromCharCode(this._getRandomByte());
+                    if(this._pattern.test(result))
+                    {
+                        return result;
+                    }
+                }
+            }, this)
+            .join('');
+    }
+
+};
 
 xApp
     .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
@@ -1044,11 +1281,11 @@ xApp
         };
 
         $scope.users.$promise.then(function() {
-            $scope.share.user = $scope.users[0].id || 0;
+            $scope.share.user = $scope.users[0] ? $scope.users[0].id : 0;
         });
 
         $scope.teams.$promise.then(function() {
-            $scope.share.team = $scope.teams[0].id || 0;
+            $scope.share.team = $scope.teams[0] ? $scope.teams[0].id : 0;
         });
 
         $scope.shareUser = function() {
@@ -1091,6 +1328,57 @@ xApp
     }
 })();
 
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalTagController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, entry, tags) {
+        $scope.tags = tags;
+        $scope.entry = entry;
+
+        $scope.tag_color = '#dbdbdb';
+        $scope.tag_name = '';
+
+        $scope.createTag = function() {
+            Api.entryTags.save({color: $scope.tag_color, name: $scope.tag_name, entryId: entry.id}, function(res) {
+                $scope.entry.tags.push(res);
+                $scope.tags.push(res);
+                $scope.tag_color = '#dbdbdb';
+                $scope.tag_name = '';
+            });
+        };
+
+        $scope.removeTag = function(tag) {
+            Api.entryTags.delete({id: tag.id}, function() {
+                var index = $scope.entry.tags.map(function (e) { return e.id; }).indexOf(tag.id);
+                $scope.entry.tags.splice(index, 1);
+
+                if (_.findWhere($scope.tags, {name: tag.name, entry_id: entry.id})) {
+                    var tagIndex = $scope.tags.map(function (e) { return e.name; }).indexOf(tag.name);
+                    $scope.tags.splice(tagIndex, 1);
+                }
+            });
+        };
+
+        $scope.addTag = function(tag) {
+            Api.entryTags.save({color: tag.color, name: tag.name, entryId: entry.id}, function(res) {
+                $scope.entry.tags.push(res);
+            });
+        };
+
+        $scope.availableTags = function() {
+            return _.filter($scope.tags, function(obj) {
+                return !_.findWhere($scope.entry.tags, {name: obj.name});
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+})();
+
 xApp
     .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
         $scope.entry = entry;
@@ -1104,26 +1392,10 @@ xApp
             );
         };
 
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    });
-
-xApp.
-    controller('ProfileController', function($scope, $modalInstance, toaster, Api) {
-        $scope.profile = {
-            old: '',
-            new: '',
-            repeat: ''
-        };
-
-        $scope.ok = function () {
-            Api.profile.save($scope.profile,
-                function() {
-                    toaster.pop('success', 'Password successfully changed!');
-                    $modalInstance.close();
-                }
-            );
+        $scope.generate = function() {
+            if (confirm('Replace password with random one?')) {
+                $scope.entry.password = Password.generate(16);
+            }
         };
 
         $scope.cancel = function () {
@@ -1709,8 +1981,12 @@ xApp
         };
     });
 
-xApp
-    .controller('ModalUpdateUserController', function($scope, $modalInstance, Api, user, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalUpdateUserController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, user, GROUPS) {
         $scope.user = user;
         $scope.groups = GROUPS;
 
@@ -1725,7 +2001,41 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProfileController', ctrl);
+
+    function ctrl($scope, $modalInstance, toaster, Api) {
+        $scope.profile = {
+            old: '',
+            new: '',
+            repeat: ''
+        };
+
+        $scope.clippy = String(localStorage.getItem('clippy')) == 'false';
+
+        $scope.ok = function() {
+            Api.profile.save($scope.profile,
+                function() {
+                    toaster.pop('success', 'Password successfully changed!');
+                    $modalInstance.close();
+                }
+            );
+        };
+
+        $scope.toggleClippy = function() {
+            localStorage.setItem('clippy', $scope.clippy);
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+})();
 
 (function() {
     angular

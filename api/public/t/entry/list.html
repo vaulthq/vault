@@ -4,7 +4,8 @@
             <i class="glyphicon glyphicon-chevron-left"></i>
         </a>
 
-        {{ project.name }} <small>{{ project.description }}</small>
+        {{ project.name }}
+        <small>{{ project.description }}</small>
 
         <div class="pull-right">
             <entry-create project-id="project.id"></entry-create>
@@ -16,19 +17,19 @@
     <loader when="!entries.$resolved"></loader>
 
     <div class="row">
-      <div ng-class="{'col-sm-8': active && active.id, 'col-sm-12': !active || !active.id}" class="nice-flow">
-        <table class="table table-hover" ng-if="entries.length > 0">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Title</th>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Updated</th>
-                <th style="min-width: 130px"></th>
-            </tr>
-            </thead>
-            <tbody>
+        <div class="col-sm-8 nice-flow">
+            <table class="table table-hover" ng-if="entries.length > 0">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Updated</th>
+                    <th style="min-width: 130px"></th>
+                </tr>
+                </thead>
+                <tbody>
                 <tr class="filter-row">
                     <td>
                         <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
@@ -46,7 +47,9 @@
                     <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.name }}</span></td>
                     <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.username }}</span></td>
                     <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.url }}</span></td>
-                    <td ng-click="setActive(entry)"><span am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span></td>
+                    <td ng-click="setActive(entry)"><span am-time-ago="entry.updated_at"
+                                                          title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
+                    </td>
                     <td class="text-right">
                         <div ng-if="entry.can_edit">
                             <copy-password entry="entry"></copy-password>
@@ -54,29 +57,38 @@
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-        <div ng-if="entries.$resolved && entries.length == 0">
-            This project has no added keys.
-        </div>
-      </div>
-      <div ng-class="{'col-sm-4': active && active.id, 'invisible': !active || !active.id}" class="invisible-flow">
-        <h4>
-          {{ active.name }}
-          <div class="pull-right">
-            <entry-access-info entry="active"></entry-access-info>
-
-            <div ng-if="active.can_edit">
-              <entry-share entry="active"></entry-share>
-              <entry-update entry-id="active.id"></entry-update>
-              <entry-delete entry="active"></entry-delete>
+            <div ng-if="entries.$resolved && entries.length == 0">
+                This project has no added keys.
             </div>
-          </div>
-        </h4>
-        <br><br>
-        <p class="nl2br">{{ active.note }}</p>
-      </div>
+        </div>
+
+        <div class="col-sm-4 invisible-flow" ng-if="active && active.id">
+            <h4>
+                {{ active.name }}
+                <div class="pull-right">
+                    <entry-access-info entry="active"></entry-access-info>
+
+                    <div ng-if="active.can_edit">
+                        <entry-tag entry="active"></entry-tag>
+                        <entry-share entry="active"></entry-share>
+                        <entry-update entry-id="active.id"></entry-update>
+                        <entry-delete entry="active"></entry-delete>
+                    </div>
+                </div>
+            </h4>
+            <br>
+            <ul class="list-inline" style="font-size: 15px">
+                <li ng-repeat="tag in active.tags">
+                    <span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+                </li>
+            </ul>
+            <br><br>
+
+            <p class="nl2br">{{ active.note }}</p>
+        </div>
     </div>
 
 </div>

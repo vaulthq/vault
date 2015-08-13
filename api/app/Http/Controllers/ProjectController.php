@@ -49,7 +49,7 @@ class ProjectController extends Controller
      */
     public function getKeys(Project $model)
     {
-        return Entry::where('project_id', $model->id)->get();
+        return Entry::with('tags')->where('entry.project_id', $model->id)->get();
     }
 
     public function getTeams(Project $model)

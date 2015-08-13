@@ -51,11 +51,15 @@ class Entry extends Model
         return $this->hasMany('App\Vault\Models\Share', 'entry_id');
     }
 
+    public function tags()
+    {
+        return $this->hasMany('App\Vault\Models\EntryTag', 'entry_id');
+    }
+
     public function teamShares()
     {
         return $this->hasMany('App\Vault\Models\EntryTeam', 'entry_id');
     }
-
 
     private function fixNewLines($str)
     {

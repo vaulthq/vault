@@ -18,25 +18,7 @@ Make sure that you have `docker-compose >1.2` installed:
 
 Start containers and configure:
 
-    make
-
-To reload containers and restart:
-
-    make reload
-
-To stop **vault** containers:
-
-    make stop
-
-To run them again:
-
-    make
-
-## Compile assets
-
-To compile assets, run:
-
-    make assets
+    docker-compose pull && docker-compose up
 
 ## Login details
 

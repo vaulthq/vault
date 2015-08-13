@@ -10,6 +10,9 @@
                 '<a ng-click="download()" class="btn btn-default btn-xs" title="Copy password" ng-if="isState(\'download\')">' +
                     '<i class="glyphicon glyphicon-open"></i>' +
                 '</a>' +
+                '<a class="btn btn-default btn-xs" title="Please wait..." ng-if="isState(\'waiting\')">' +
+                    '<i class="fa fa-spinner fa-spin"></i>' +
+                '</a>' +
                 '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
                     '<i class="glyphicon glyphicon-save"></i>' +
                 '</a>',
@@ -32,6 +35,7 @@
                 }
 
                 function downloadPassword() {
+                    $scope.state = 'waiting';
                     Api.entryPassword.password({id: $scope.entry.id}, function(response) {
                         $scope.password = response.password;
                         response.$promise.then(function() {

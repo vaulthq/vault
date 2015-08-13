@@ -12,7 +12,9 @@ var paths = {
         'bower_components/AngularJS-Toaster/toaster.css',
         'bower_components/angular-ui-select/dist/select.min.css',
         'bower_components/clippy/build/clippy.css',
-        'bower_components/angular-hotkeys/build/hotkeys.min.css'
+        'bower_components/angular-hotkeys/build/hotkeys.min.css',
+        'bower_components/font-awesome/css/font-awesome.min.css',
+        'bower_components/angular-bootstrap-colorpicker/css/colorpicker.min.css'
     ],
     html_templates: [
         'src/**/*.html'
@@ -31,12 +33,11 @@ var paths = {
         'bower_components/jquery/jquery.min.js',
         'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'bower_components/lodash/lodash.min.js',
+        'bower_components/clippy/build/clippy.js',
+        'bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js',
         'js_vendor/moment.min.js',
         'js_vendor/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
-    ],
-    clippy: [
-        'bower_components/clippy/build/clippy.min.js'
     ],
     scripts: [
         'src/**/*.js'
@@ -46,6 +47,7 @@ var paths = {
     ],
     vendor_fonts: [
         'bower_components/bootstrap/dist/fonts/*',
+        'bower_components/font-awesome/fonts/*',
         'styles/fonts/*'
     ],
     cleanup: [
@@ -63,13 +65,6 @@ gulp.task('vendor_scripts', [], function() {
     return gulp.src(paths.vendor_scripts)
         .pipe(expect(paths.vendor_scripts))
         .pipe(concat('vendor.js'))
-        .pipe(gulp.dest('api/public/js'));
-});
-
-gulp.task('clippy', [], function() {
-    return gulp.src(paths.clippy)
-        .pipe(expect(paths.clippy))
-        .pipe(concat('clippy.js'))
         .pipe(gulp.dest('api/public/js'));
 });
 
@@ -105,10 +100,10 @@ gulp.task('html_templates', [], function() {
         .pipe(gulp.dest('api/public/t'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['default'], function() {
   gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.html_templates, ['html_templates']);
   gulp.watch(paths.styles, ['styles']);
 });
 
-gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'clippy', 'scripts', 'styles']);
+gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles']);

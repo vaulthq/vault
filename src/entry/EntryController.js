@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, modal, entries, project, active, $state) {
+    function controller($scope, $filter, hotkeys, entries, project, active) {
 
         $scope.entries = entries;
         $scope.project = project;
@@ -11,6 +11,7 @@
         $scope.active = active;
 
         $scope.search = {};
+        $scope.tags = [];
 
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
@@ -18,7 +19,6 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-
 
         hotkeys.add({
             combo: 'up',

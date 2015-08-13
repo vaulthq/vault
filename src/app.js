@@ -9,7 +9,8 @@ var xApp = angular.module('xApp', [
     'angularMoment',
     'toaster',
     'angular-jwt',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'colorpicker.module'
 ]);
 
 xApp.config([
@@ -98,25 +99,35 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 project: function ($stateParams, projects) {
                     return projects.$promise.then(function(projects) {
-                      return _.find(
-                        projects,
-                        _.matchesProperty('id', parseInt($stateParams.projectId))
-                        )
+                        for (var i=0; i<projects.length; i++) {
+                            if (projects[i].id == parseInt($stateParams.projectId)) {
+                                return projects[i];
+                            }
+                        }
+                        console.log('neradau');
                     });
                 },
                 entries: function($stateParams, Api) {
                     return Api.projectKeys.query({id: $stateParams.projectId});
                 },
                 active: function($stateParams, entries) {
-                  if ($stateParams.active) {
-                    return entries.$promise.then(function(entries) {
-                       return _.find(
-                         entries,
-                         _.matchesProperty('id', parseInt($stateParams.active))
-                         )
-                     });
-                  }
-                  return {};
+                    if ($stateParams.active) {
+                        return entries.$promise.then(function(entries) {
+                            var key = _.find(
+                                entries,
+                                _.matchesProperty('id', parseInt($stateParams.active))
+                            );
+
+                            if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
+                                key = _.find(
+                                    entries,
+                                    _.matchesProperty('id', $stateParams.active)
+                                );
+                            }
+                            return key;
+                        });
+                    }
+                    return {};
                 }
             }
         })
@@ -147,6 +158,16 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             resolve: {
                 history: function(HistoryFactory) {
                     return HistoryFactory.query();
+                }
+            }
+        })
+        .state('user.api', {
+            url: '/api',
+            templateUrl: '/t/api/list.html',
+            controller: 'ApiController',
+            resolve: {
+                apis: function(Api) {
+                    return Api.apis.query();
                 }
             }
         })

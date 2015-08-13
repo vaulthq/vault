@@ -38,7 +38,12 @@
     </div>
     <div class="modal-footer">
         <show-password entry-id="entry.id" element-class="'btn btn-info pull-left'" ng-if="entry.id > 0"></show-password>
+        <div style="width: 5px; height: 1px" class="pull-left" ng-if="entry.id > 0"></div>
+
         <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
+
+        <button class="btn btn-default pull-left" title="Generate random password" ng-click="generate()">Random</button>
+
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
 </form>
