@@ -13,6 +13,7 @@ var paths = {
         'bower_components/angular-ui-select/dist/select.min.css',
         'bower_components/clippy/build/clippy.css',
         'bower_components/angular-hotkeys/build/hotkeys.min.css',
+        'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/angular-bootstrap-colorpicker/css/colorpicker.min.css'
     ],
     html_templates: [
@@ -46,6 +47,7 @@ var paths = {
     ],
     vendor_fonts: [
         'bower_components/bootstrap/dist/fonts/*',
+        'bower_components/font-awesome/fonts/*',
         'styles/fonts/*'
     ],
     cleanup: [
