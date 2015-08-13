@@ -1,5 +1,9 @@
-xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalCreateUserController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
 
@@ -14,4 +18,6 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
+})();
+

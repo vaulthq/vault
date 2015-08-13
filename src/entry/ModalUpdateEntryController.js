@@ -1,5 +1,7 @@
-xApp
-    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -21,3 +23,4 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+})();

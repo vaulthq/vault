@@ -1,5 +1,9 @@
-xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalCreateProjectController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api) {
         $scope.project = {};
 
         $scope.ok = function () {
@@ -13,4 +17,6 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss();
         };
-    });
+    }
+})();
+
