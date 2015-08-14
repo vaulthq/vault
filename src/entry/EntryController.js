@@ -1,7 +1,20 @@
 (function() {
     angular
         .module('xApp')
-        .controller('EntryController', controller);
+        .controller('EntryController', controller)
+        .factory('EntryFactory', function ($resource) {
+            return $resource("/api/entry/:id", {}, {
+                show: { method: 'GET' },
+                update: { method: 'PUT', params: {id: '@id'} },
+                password: { method: 'GET', params: {id: '@id'} },
+                delete: { method: 'DELETE', params: {id: '@id'} }
+            })
+        })
+        .factory('EntryAccessFactory', function ($resource) {
+            return $resource("/api/entry/access/:id", {}, {
+                query: { method: 'GET', params: {id: '@id'}, isArray: true }
+            })
+        });
 
     function controller($scope, $filter, hotkeys, entries, project, active) {
 
@@ -91,24 +104,3 @@
         }
     }
 })();
-
-xApp
-    .factory('EntriesFactory', function ($resource) {
-        return $resource("/api/entry", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('EntryFactory', function ($resource) {
-        return $resource("/api/entry/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            password: { method: 'GET', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('EntryAccessFactory', function ($resource) {
-        return $resource("/api/entry/access/:id", {}, {
-            query: { method: 'GET', params: {id: '@id'}, isArray: true }
-        })
-    });

@@ -30,6 +30,8 @@ class EntryController extends Controller
 
         History::make('entry', 'Created new entry.', $model->id);
 
+        $model->load('tags');
+
         return $model;
     }
 

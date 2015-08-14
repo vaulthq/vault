@@ -1,5 +1,9 @@
-xApp
-    .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalChangeProjectOwnerController', ctrl);
+
+    function ctrl($scope, $modalInstance, toaster, Api, users, project) {
         $scope.users = users;
         $scope.project = project;
         $scope.form = {owner: 0, assign: 0};
@@ -22,4 +26,5 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss();
         };
-    });
+    }
+})();

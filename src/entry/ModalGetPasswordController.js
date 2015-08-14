@@ -1,5 +1,7 @@
-xApp
-    .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
         $scope.password = password;
         $scope.entry = entry;
 
@@ -11,11 +13,11 @@ xApp
 
         $scope.show = function() {
             $scope.shown = true;
-        }
+        };
 
         $scope.hide = function() {
             $scope.shown = false;
-        }
+        };
 
         $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
@@ -31,3 +33,5 @@ xApp
             a.parentNode.removeChild(a);
         }
     });
+
+})();

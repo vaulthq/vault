@@ -1,210 +1,211 @@
-var xApp = angular.module('xApp', [
-    'ngSanitize',
-    'ngResource',
-    'ngAnimate',
-    'ngCookies',
-    'ui.bootstrap',
-    'ui.router',
-    'ui.select',
-    'angularMoment',
-    'toaster',
-    'angular-jwt',
-    'cfp.hotkeys',
-    'colorpicker.module'
-]);
+(function() {
+    angular
+        .module('xApp', dependencies())
+        .config(config);
 
-xApp.config([
-    '$stateProvider',
-    '$urlRouterProvider',
-    '$httpProvider',
-    'uiSelectConfig',
-    'jwtInterceptorProvider',
-function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtInterceptorProvider) {
+    function dependencies() {
+        return [
+            'ngSanitize',
+            'ngResource',
+            'ngAnimate',
+            'ngCookies',
+            'ui.bootstrap',
+            'ui.router',
+            'ui.select',
+            'angularMoment',
+            'toaster',
+            'angular-jwt',
+            'cfp.hotkeys',
+            'colorpicker.module'
+        ];
+    }
 
-    uiSelectConfig.theme = 'bootstrap';
+    function config($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtInterceptorProvider) {
+        uiSelectConfig.theme = 'bootstrap';
 
-    $stateProvider
-        .state('anon', {
-            abstract: true,
-            template: "<ui-view/>",
-            data: {
-                access: ['anon']
-            }
-        })
-        .state('anon.check', {
-            url: '',
-            controller: function($location, AuthFactory) {
-                if (AuthFactory.isLoggedIn()) {
-                    $location.path('/recent');
-                } else {
-                    $location.path('/login');
+        $stateProvider
+            .state('anon', {
+                abstract: true,
+                template: "<ui-view/>",
+                data: {
+                    access: ['anon']
                 }
-            }
-        })
-        .state('anon.login', {
-            url: '/login',
-            templateUrl: '/t/auth/login.html',
-            controller: 'AuthController'
-        });
-
-    $stateProvider
-        .state('user', {
-            abstract: true,
-            templateUrl: '/t/home/home.html',
-            controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
-                $scope.projects = projects;
-
-                $scope.login = AuthFactory.getUser();
-
-                $scope.jump = jump;
-
-                hotkeys.add({
-                    combo: 'ctrl+p',
-                    description: 'Show project jump window',
-                    allowIn: ['input', 'select', 'textarea'],
-                    callback: function(event, hotkey) {
-                        event.preventDefault();
-                        jump();
+            })
+            .state('anon.check', {
+                url: '',
+                controller: function($location, AuthFactory) {
+                    if (AuthFactory.isLoggedIn()) {
+                        $location.path('/recent');
+                    } else {
+                        $location.path('/login');
                     }
-                });
+                }
+            })
+            .state('anon.login', {
+                url: '/login',
+                templateUrl: '/t/auth/login.html',
+                controller: 'AuthController'
+            });
 
-                function jump() {
-                    $scope.$broadcast('toggleJump');
-                }
+        $stateProvider
+            .state('user', {
+                abstract: true,
+                templateUrl: '/t/home/home.html',
+                controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
+                    $scope.projects = projects;
 
-                $scope.$on('project:update', function(event, project) {
-                    $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
-                });
-            },
-            resolve: {
-                projects: function(Api) {
-                    return Api.project.query();
-                }
-            }
-        })
-        .state('user.home', {
-            url: '/recent',
-            templateUrl: '/t/home/recentlyUsed.html',
-            controller: 'HomeController',
-            resolve: {
-                recent: function(RecentFactory) {
-                    return RecentFactory.query();
-                }
-            }
-        })
-        .state('user.project', {
-            url: '/project/:projectId/:active?',
-            templateUrl: '/t/entry/list.html',
-            controller: 'EntryController',
-            resolve: {
-                project: function ($stateParams, projects) {
-                    return projects.$promise.then(function(projects) {
-                        for (var i=0; i<projects.length; i++) {
-                            if (projects[i].id == parseInt($stateParams.projectId)) {
-                                return projects[i];
-                            }
+                    $scope.login = AuthFactory.getUser();
+
+                    $scope.jump = jump;
+
+                    hotkeys.add({
+                        combo: 'ctrl+p',
+                        description: 'Show project jump window',
+                        allowIn: ['input', 'select', 'textarea'],
+                        callback: function(event, hotkey) {
+                            event.preventDefault();
+                            jump();
                         }
-                        console.log('neradau');
+                    });
+
+                    function jump() {
+                        $scope.$broadcast('toggleJump');
+                    }
+
+                    $scope.$on('project:update', function(event, project) {
+                        $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
                     });
                 },
-                entries: function($stateParams, Api) {
-                    return Api.projectKeys.query({id: $stateParams.projectId});
-                },
-                active: function($stateParams, entries) {
-                    if ($stateParams.active) {
-                        return entries.$promise.then(function(entries) {
-                            var key = _.find(
-                                entries,
-                                _.matchesProperty('id', parseInt($stateParams.active))
-                            );
-
-                            if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
-                                key = _.find(
-                                    entries,
-                                    _.matchesProperty('id', $stateParams.active)
-                                );
-                            }
-                            return key;
-                        });
+                resolve: {
+                    projects: function(Api) {
+                        return Api.project.query();
                     }
-                    return {};
                 }
-            }
-        })
-        .state('user.list', {
-            url: '/users',
-            templateUrl: '/t/user/userList.html',
-            controller: 'UserListController',
-            resolve: {
-                users: function(Api) {
-                    return Api.user.query();
+            })
+            .state('user.home', {
+                url: '/recent',
+                templateUrl: '/t/home/recentlyUsed.html',
+                controller: 'HomeController',
+                resolve: {
+                    recent: function(RecentFactory) {
+                        return RecentFactory.query();
+                    }
                 }
-            }
-        })
-        .state('user.projects', {
-            url: '/projects/:active?',
-            templateUrl: '/t/project/list.html',
-            controller: 'ProjectController',
-            resolve: {
-                active: function($stateParams) {
-                    return $stateParams.active;
+            })
+            .state('user.project', {
+                url: '/project/:projectId/:active?',
+                templateUrl: '/t/entry/list.html',
+                controller: 'EntryController',
+                resolve: {
+                    project: function ($stateParams, projects) {
+                        return projects.$promise.then(function(projects) {
+                            for (var i=0; i<projects.length; i++) {
+                                if (projects[i].id == parseInt($stateParams.projectId)) {
+                                    return projects[i];
+                                }
+                            }
+                            console.log('neradau');
+                        });
+                    },
+                    entries: function($stateParams, Api) {
+                        return Api.projectKeys.query({id: $stateParams.projectId});
+                    },
+                    active: function($stateParams, entries) {
+                        if ($stateParams.active) {
+                            return entries.$promise.then(function(entries) {
+                                var key = _.find(
+                                    entries,
+                                    _.matchesProperty('id', parseInt($stateParams.active))
+                                );
+
+                                if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
+                                    key = _.find(
+                                        entries,
+                                        _.matchesProperty('id', $stateParams.active)
+                                    );
+                                }
+                                return key;
+                            });
+                        }
+                        return {};
+                    }
                 }
-            }
-        })
-        .state('user.history', {
-            url: '/history',
-            templateUrl: '/t/history/list.html',
-            controller: 'HistoryController',
-            resolve: {
-                history: function(HistoryFactory) {
-                    return HistoryFactory.query();
+            })
+            .state('user.list', {
+                url: '/users',
+                templateUrl: '/t/user/userList.html',
+                controller: 'UserListController',
+                resolve: {
+                    users: function(Api) {
+                        return Api.user.query();
+                    }
                 }
-            }
-        })
-        .state('user.api', {
-            url: '/api',
-            templateUrl: '/t/api/list.html',
-            controller: 'ApiController',
-            resolve: {
-                apis: function(Api) {
-                    return Api.apis.query();
+            })
+            .state('user.projects', {
+                url: '/projects/:active?',
+                templateUrl: '/t/project/list.html',
+                controller: 'ProjectController',
+                resolve: {
+                    active: function($stateParams) {
+                        return $stateParams.active;
+                    }
                 }
-            }
-        })
-        .state('user.teams', {
-            url: '/teams',
-            templateUrl: '/t/team/teamList.html',
-            controller: 'TeamListController',
-            resolve: {
-                teams: function(Api) {
-                    return Api.team.query();
+            })
+            .state('user.history', {
+                url: '/history',
+                templateUrl: '/t/history/list.html',
+                controller: 'HistoryController',
+                resolve: {
+                    history: function(HistoryFactory) {
+                        return HistoryFactory.query();
+                    }
                 }
+            })
+            .state('user.api', {
+                url: '/api',
+                templateUrl: '/t/api/list.html',
+                controller: 'ApiController',
+                resolve: {
+                    apis: function(Api) {
+                        return Api.apis.query();
+                    }
+                }
+            })
+            .state('user.teams', {
+                url: '/teams',
+                templateUrl: '/t/team/teamList.html',
+                controller: 'TeamListController',
+                resolve: {
+                    teams: function(Api) {
+                        return Api.team.query();
+                    }
+                }
+            })
+            .state('user.404', {
+                url: '/404',
+                templateUrl: '/t/error/404.html'
+            });
+
+        $urlRouterProvider.otherwise('/404');
+
+        jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
+            var idToken = AuthFactory.getToken();
+
+            if (config.url.substr(config.url.length - 5) == '.html') {
+                return null;
             }
-        })
-        .state('user.404', {
-            url: '/404',
-            templateUrl: '/t/error/404.html'
-        });
 
-    $urlRouterProvider.otherwise('/404');
+            if (idToken && AuthFactory.tokenExpired()) {
+                return AuthFactory.refreshToken();
+            }
 
-    jwtInterceptorProvider.tokenGetter = function(config, AuthFactory) {
-        var idToken = AuthFactory.getToken();
+            return idToken;
+        };
 
-        if (config.url.substr(config.url.length - 5) == '.html') {
-            return null;
-        }
-
-        if (idToken && AuthFactory.tokenExpired()) {
-            return AuthFactory.refreshToken();
-        }
-
-        return idToken;
-    };
-
-    $httpProvider.interceptors.push('jwtInterceptor');
-    $httpProvider.interceptors.push('AuthInterceptor');
-}]);
+        $httpProvider.interceptors.push('jwtInterceptor');
+        $httpProvider.interceptors.push('AuthInterceptor');
+    }
+})();
 
 (function() {
     angular
@@ -228,6 +229,7 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
             authStatus: $resource("/internal/auth/status", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
+            entry: $resource("/api/entry", null, enableCustom),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })
@@ -270,6 +272,154 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     }
 })();
 
+(function() {
+    angular
+        .module('xApp')
+        .controller('AuthController', authController);
+
+    function authController($scope, AuthFactory) {
+        $scope.login = login;
+
+        function login() {
+            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthFactory', auth);
+
+    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
+        var localToken = 'auth_token';
+        var refreshingToken = null;
+
+        return {
+            login: login,
+            logout: logout,
+            getUser: getUser,
+            isLoggedIn: isLoggedIn,
+            initLogin: initLogin,
+            getToken: getToken,
+            tokenExpired: tokenExpired,
+            setToken: setToken,
+            refreshToken: refreshToken
+        };
+
+        function getToken() {
+            return localStorage.getItem(localToken);
+        }
+
+        function setToken(token) {
+            localStorage.setItem(localToken, token);
+        }
+
+        function login(token) {
+            setToken(token);
+            $rootScope.$broadcast('auth:login', getUser());
+        }
+
+        function logout() {
+            localStorage.removeItem(localToken);
+
+            $rootScope.$broadcast('auth:login', null);
+        }
+
+        function getUser() {
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function tokenExpired() {
+            return jwtHelper.isTokenExpired(getToken());
+        }
+
+        function isLoggedIn() {
+            return getUser().id > 0;
+        }
+
+        function initLogin(username, password, remember) {
+            Api.auth.save({
+                email: $sanitize(username),
+                password: $sanitize(password),
+                remember: $sanitize(remember)
+            }, function (response) {
+                login(response.token);
+                $location.path('/recent');
+                toaster.pop('info', "", "Welcome back, " + getUser().name);
+            }, function (response) {
+                toaster.pop('error', "Login Failed", response.data[0]);
+            })
+        }
+
+        function refreshToken() {
+            if (refreshingToken == null) {
+                refreshingToken = $http({
+                    url: '/internal/auth/refresh',
+                    skipAuthorization: true,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken()
+                    }
+                }).then(function(response) {
+                    var token = response.data.token;
+                    setToken(token);
+                    refreshingToken = null;
+
+                    return token;
+                });
+            }
+
+            return refreshingToken;
+        }
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .factory('AuthInterceptor', authInterceptor);
+
+    function authInterceptor($q, $injector, $location, toaster) {
+        return {
+            response: response,
+            responseError: error
+        };
+
+        function response(response) {
+            return response || $q.when(response);
+        }
+
+        function error(rejection) {
+            var AuthFactory = $injector.get('AuthFactory');
+
+            if (rejection.status === 400 || rejection.status === 401) {
+                if (AuthFactory.isLoggedIn()) {
+                    toaster.pop('warning', 'Session Expired', 'Please log in.');
+                    AuthFactory.logout();
+                }
+                $location.path('/login');
+            }
+
+            if (rejection.status === 403) {
+                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
+            }
+
+            if (rejection.status === 419) {
+                toaster.pop('warning', "Validation Error", rejection.data);
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+})();
 (function () {
     angular
         .module('xApp')
@@ -891,155 +1041,20 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
 (function() {
     angular
         .module('xApp')
-        .controller('AuthController', authController);
-
-    function authController($scope, AuthFactory) {
-        $scope.login = login;
-
-        function login() {
-            AuthFactory.initLogin($scope.email, $scope.password, $scope.remember);
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthFactory', auth);
-
-    function auth($rootScope, $sanitize, $http, $location, Api, toaster, jwtHelper) {
-        var localToken = 'auth_token';
-        var refreshingToken = null;
-
-        return {
-            login: login,
-            logout: logout,
-            getUser: getUser,
-            isLoggedIn: isLoggedIn,
-            initLogin: initLogin,
-            getToken: getToken,
-            tokenExpired: tokenExpired,
-            setToken: setToken,
-            refreshToken: refreshToken
-        };
-
-        function getToken() {
-            return localStorage.getItem(localToken);
-        }
-
-        function setToken(token) {
-            localStorage.setItem(localToken, token);
-        }
-
-        function login(token) {
-            setToken(token);
-            $rootScope.$broadcast('auth:login', getUser());
-        }
-
-        function logout() {
-            localStorage.removeItem(localToken);
-
-            $rootScope.$broadcast('auth:login', null);
-        }
-
-        function getUser() {
-            var token = getToken();
-            if (token) {
-                try {
-                    return jwtHelper.decodeToken(token).user;
-                } catch(err) {}
-            }
-            return [];
-        }
-
-        function tokenExpired() {
-            return jwtHelper.isTokenExpired(getToken());
-        }
-
-        function isLoggedIn() {
-            return getUser().id > 0;
-        }
-
-        function initLogin(username, password, remember) {
-            Api.auth.save({
-                email: $sanitize(username),
-                password: $sanitize(password),
-                remember: $sanitize(remember)
-            }, function (response) {
-                login(response.token);
-                $location.path('/recent');
-                toaster.pop('info', "", "Welcome back, " + getUser().name);
-            }, function (response) {
-                toaster.pop('error', "Login Failed", response.data[0]);
+        .controller('EntryController', controller)
+        .factory('EntryFactory', function ($resource) {
+            return $resource("/api/entry/:id", {}, {
+                show: { method: 'GET' },
+                update: { method: 'PUT', params: {id: '@id'} },
+                password: { method: 'GET', params: {id: '@id'} },
+                delete: { method: 'DELETE', params: {id: '@id'} }
             })
-        }
-
-        function refreshToken() {
-            if (refreshingToken == null) {
-                refreshingToken = $http({
-                    url: '/internal/auth/refresh',
-                    skipAuthorization: true,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + getToken()
-                    }
-                }).then(function(response) {
-                    var token = response.data.token;
-                    setToken(token);
-                    refreshingToken = null;
-
-                    return token;
-                });
-            }
-
-            return refreshingToken;
-        }
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .factory('AuthInterceptor', authInterceptor);
-
-    function authInterceptor($q, $injector, $location, toaster) {
-        return {
-            response: response,
-            responseError: error
-        };
-
-        function response(response) {
-            return response || $q.when(response);
-        }
-
-        function error(rejection) {
-            var AuthFactory = $injector.get('AuthFactory');
-
-            if (rejection.status === 400 || rejection.status === 401) {
-                if (AuthFactory.isLoggedIn()) {
-                    toaster.pop('warning', 'Session Expired', 'Please log in.');
-                    AuthFactory.logout();
-                }
-                $location.path('/login');
-            }
-
-            if (rejection.status === 403) {
-                toaster.pop('error', "Forbidden", 'You cannot access this resource.');
-            }
-
-            if (rejection.status === 419) {
-                toaster.pop('warning', "Validation Error", rejection.data);
-            }
-
-            return $q.reject(rejection);
-        }
-    }
-
-})();
-(function() {
-    angular
-        .module('xApp')
-        .controller('EntryController', controller);
+        })
+        .factory('EntryAccessFactory', function ($resource) {
+            return $resource("/api/entry/access/:id", {}, {
+                query: { method: 'GET', params: {id: '@id'}, isArray: true }
+            })
+        });
 
     function controller($scope, $filter, hotkeys, entries, project, active) {
 
@@ -1130,43 +1145,28 @@ function($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtI
     }
 })();
 
-xApp
-    .factory('EntriesFactory', function ($resource) {
-        return $resource("/api/entry", {}, {
-            query: { method: 'GET', isArray: true },
-            create: { method: 'POST' }
-        })
-    })
-    .factory('EntryFactory', function ($resource) {
-        return $resource("/api/entry/:id", {}, {
-            show: { method: 'GET' },
-            update: { method: 'PUT', params: {id: '@id'} },
-            password: { method: 'GET', params: {id: '@id'} },
-            delete: { method: 'DELETE', params: {id: '@id'} }
-        })
-    })
-    .factory('EntryAccessFactory', function ($resource) {
-        return $resource("/api/entry/access/:id", {}, {
-            query: { method: 'GET', params: {id: '@id'}, isArray: true }
-        })
-    });
-
-xApp
-    .controller('ModalAccessController', function($scope, $modalInstance, access) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalAccessController', function($scope, $modalInstance, access) {
         $scope.access = access;
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
     });
-xApp
-    .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, project_id) {
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalCreateEntryController', function($scope, $modalInstance, Api, project_id) {
         $scope.entry = {
             project_id: project_id
         };
 
         $scope.ok = function () {
-            EntriesFactory.create($scope.entry,
+            Api.entry.save($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
                 }
@@ -1182,55 +1182,13 @@ xApp
         };
     });
 
-
-var Password = {
-
-    _pattern : /[a-zA-Z0-9_\-\+\.]/,
+})();
 
 
-    _getRandomByte : function()
-    {
-        // http://caniuse.com/#feat=getrandomvalues
-        if(window.crypto && window.crypto.getRandomValues)
-        {
-            var result = new Uint8Array(1);
-            window.crypto.getRandomValues(result);
-            return result[0];
-        }
-        else if(window.msCrypto && window.msCrypto.getRandomValues)
-        {
-            var result = new Uint8Array(1);
-            window.msCrypto.getRandomValues(result);
-            return result[0];
-        }
-        else
-        {
-            return Math.floor(Math.random() * 256);
-        }
-    },
-
-    generate : function(length)
-    {
-        return Array.apply(null, {'length': length})
-            .map(function()
-            {
-                var result;
-                while(true)
-                {
-                    result = String.fromCharCode(this._getRandomByte());
-                    if(this._pattern.test(result))
-                    {
-                        return result;
-                    }
-                }
-            }, this)
-            .join('');
-    }
-
-};
-
-xApp
-    .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalGetPasswordController', function($scope, $modalInstance, password, entry) {
         $scope.password = password;
         $scope.entry = entry;
 
@@ -1242,11 +1200,11 @@ xApp
 
         $scope.show = function() {
             $scope.shown = true;
-        }
+        };
 
         $scope.hide = function() {
             $scope.shown = false;
-        }
+        };
 
         $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
@@ -1262,6 +1220,8 @@ xApp
             a.parentNode.removeChild(a);
         }
     });
+
+})();
 
 (function() {
     angular
@@ -1379,8 +1339,10 @@ xApp
     }
 })();
 
-xApp
-    .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -1402,13 +1364,65 @@ xApp
             $modalInstance.dismiss('cancel');
         };
     });
+})();
 
-xApp.constant('GROUPS', {
-    admin: 'Administrator',
-    dev: 'Developer',
-    tester: 'Tester',
-    pm: 'Project Manager'
-});
+(function() {
+    angular
+        .module('xApp')
+        .constant('GROUPS', {
+            admin: 'Administrator',
+            dev: 'Developer',
+            tester: 'Tester',
+            pm: 'Project Manager'
+        });
+})();
+
+var Password = {
+
+    _pattern : /[a-zA-Z0-9_\-\+\.]/,
+
+
+    _getRandomByte : function()
+    {
+        // http://caniuse.com/#feat=getrandomvalues
+        if(window.crypto && window.crypto.getRandomValues)
+        {
+            var result = new Uint8Array(1);
+            window.crypto.getRandomValues(result);
+            return result[0];
+        }
+        else if(window.msCrypto && window.msCrypto.getRandomValues)
+        {
+            var result = new Uint8Array(1);
+            window.msCrypto.getRandomValues(result);
+            return result[0];
+        }
+        else
+        {
+            return Math.floor(Math.random() * 256);
+        }
+    },
+
+    generate : function(length)
+    {
+        return Array.apply(null, {'length': length})
+            .map(function()
+            {
+                var result;
+                while(true)
+                {
+                    result = String.fromCharCode(this._getRandomByte());
+                    if(this._pattern.test(result))
+                    {
+                        return result;
+                    }
+                }
+            }, this)
+            .join('');
+    }
+
+};
+
 (function() {
     angular
         .module('xApp')
@@ -1537,20 +1551,28 @@ xApp.constant('GROUPS', {
 
 })();
 
-xApp.
-    filter('userGroup', function(GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .filter('userGroup', groupFilter)
+        .filter('nl2br', nl2brFilter);
+
+    function groupFilter(GROUPS) {
         return function(input) {
             return GROUPS[input];
         }
-    })
-    .filter('nl2br', function($sce){
-        return function(msg,is_xhtml) {
-            var is_xhtml = is_xhtml || true;
+    }
+
+    function nl2brFilter($sce) {
+        return function(message, xhtml) {
+            var is_xhtml = xhtml || true;
             var breakTag = (is_xhtml) ? '<br />' : '<br>';
-            var msg = (msg + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+            var msg = (message + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+
             return $sce.trustAsHtml(msg);
         }
-    });
+    }
+})();
 
 (function () {
     angular
@@ -1579,27 +1601,38 @@ xApp.
     }
 })();
 
-xApp
-    .controller('HistoryController', function($scope, history) {
-        $scope.history = history;
-    })
-    .factory('HistoryFactory', function ($resource) {
-        return $resource("/api/history", {}, {
-            query: { method: 'GET', isArray: true }
+(function() {
+    angular
+        .module('xApp')
+        .controller('HistoryController', function($scope, history) {
+            $scope.history = history;
         })
-    });
-xApp
-    .controller('HomeController', function($scope, recent) {
-        $scope.recent = recent;
-    })
-    .factory('RecentFactory', function ($resource) {
-        return $resource("/api/recent", {}, {
-            query: { method: 'GET', isArray: true }
+        .factory('HistoryFactory', function ($resource) {
+            return $resource("/api/history", {}, {
+                query: { method: 'GET', isArray: true }
+            })
         });
-    });
+})();
 
-xApp
-    .controller('ModalChangeProjectOwnerController', function($scope, $modalInstance, toaster, Api, users, project) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('HomeController', function($scope, recent) {
+            $scope.recent = recent;
+        })
+        .factory('RecentFactory', function ($resource) {
+            return $resource("/api/recent", {}, {
+                query: { method: 'GET', isArray: true }
+            });
+        });
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalChangeProjectOwnerController', ctrl);
+
+    function ctrl($scope, $modalInstance, toaster, Api, users, project) {
         $scope.users = users;
         $scope.project = project;
         $scope.form = {owner: 0, assign: 0};
@@ -1622,10 +1655,15 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss();
         };
-    });
+    }
+})();
 
-xApp
-    .controller('ModalCreateProjectController', function($scope, $modalInstance, Api) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalCreateProjectController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api) {
         $scope.project = {};
 
         $scope.ok = function () {
@@ -1639,18 +1677,30 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss();
         };
-    });
+    }
+})();
 
-xApp
-    .controller('ModalProjectOwnerController', function($scope, $modalInstance, owner) {
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalProjectOwnerController', ctrl);
+
+    function ctrl($scope, $modalInstance, owner) {
         $scope.owner = owner;
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
-xApp
-    .controller('ModalUpdateProjectController', function($scope, $modalInstance, Api, project) {
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalUpdateProjectController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, project) {
         $scope.project = project;
 
         $scope.ok = function() {
@@ -1665,7 +1715,9 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
@@ -1963,8 +2015,12 @@ xApp
     }
 })();
 
-xApp
-    .controller('ModalCreateUserController', function($scope, $modalInstance, Api, GROUPS) {
+(function() {
+    angular
+        .module('xApp')
+        .controller('ModalCreateUserController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, GROUPS) {
         $scope.user = {};
         $scope.groups = GROUPS;
 
@@ -1979,7 +2035,9 @@ xApp
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
+})();
+
 
 (function() {
     angular
