@@ -2,7 +2,7 @@
 
 @sidebar-width: 400px;
 @sidebar-show-width: 56px;
-@sidebar-show-bg: #3C3D42;
+@sidebar-show-bg: #5d4157;
 @sidebar-bg: #2E2F34;
 
 html, body {
@@ -89,6 +89,7 @@ body {
   height: 100%;
   top: 0;
   left: 0;
+  right: 0;
   z-index: 500;
 
   background: -webkit-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* Chrome 10+, Saf5.1+ */
@@ -97,10 +98,8 @@ body {
   background:      -o-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* Opera 11.10+ */
   background:         linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* W3C */
 
-  right: 0;
   width: @sidebar-show-width;
   text-align: center;
-  box-shadow: -10px 0 15px 0 rgba(0, 0, 0, .1);
 }
 
 .cursor {
@@ -113,9 +112,15 @@ body {
   width: 100%;
   border-radius: 0;
   color: #fff;
-  &:hover, &:focus {
-    color: #C5CAE9;
+  &:focus {
+    color: #fff;
   }
+  &:hover, &.active {
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    box-shadow: none;
+  }
+
 }
 
 .sidebar-table {
@@ -159,7 +164,6 @@ body {
   background: #F1F1F1;
   padding: 15px 30px;
   height: 55px;
-  border-bottom: 1px solid #E0E0E0;
   h3 {
     margin: 0;
     font-size: 22px;
@@ -180,7 +184,6 @@ body {
 .modal-header {
   height: 56px;
   background: @sidebar-show-bg;
-  border-bottom: darken(@sidebar-show-bg, 10%);
   padding: 1.1em;
   h3 {
     color: #E7EDEA;
@@ -197,7 +200,7 @@ body {
 .modal-footer {
   background: #F1F1F1;
   padding: 10px;
-  border-top: 1px solid #E0E0E0;
+  border-top: none;
 }
 
 .password {
