@@ -7,8 +7,8 @@
         return {
             restrict: 'E',
             template:
-                '<a class="btn btn-side-menu" ng-click="logout()" title="Log Out ({{login.email}})">' +
-                    '<span class="glyphicon glyphicon-off"></span><br>Logout' +
+                '<a class="btn btn-side-menu" ng-click="logout()" tooltip-placement="right" tooltip="Log-out ({{login.email}})">' +
+                    '<i class="fa fa-sign-out fa-2x"></i>' +
                 '</a>',
             controller: function($scope, Api, AuthFactory, $location) {
                 $scope.logout = logout;

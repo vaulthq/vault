@@ -45,6 +45,16 @@
     </div>
 </script>
 
+<script type="text/ng-template" id="template/tooltip/tooltip-popup.html">
+    <div class="tooltip @{{placement}}" ng-class="{ in: isOpen(), fade: animation() }">
+        <div class="tooltip-arrow"></div>
+        <div class="tooltip-inner" ng-bind="content"></div>
+    </div>
+</script>
+
+
+
+
 <clippy></clippy>
 <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
 

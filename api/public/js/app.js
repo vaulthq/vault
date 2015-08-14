@@ -841,8 +841,8 @@
         return {
             restrict: 'E',
             template:
-                '<a class="btn btn-side-menu" ng-click="logout()" title="Log Out ({{login.email}})">' +
-                    '<span class="glyphicon glyphicon-off"></span><br>Logout' +
+                '<a class="btn btn-side-menu" ng-click="logout()" tooltip-placement="right" tooltip="Log-out ({{login.email}})">' +
+                    '<i class="fa fa-sign-out fa-2x"></i>' +
                 '</a>',
             controller: function($scope, Api, AuthFactory, $location) {
                 $scope.logout = logout;
@@ -867,8 +867,8 @@
         return {
             restrict: 'E',
             template:
-                '<a class="btn btn-side-menu" ng-click="profile()" title="Edit Profile">' +
-                    '<span class="glyphicon glyphicon-wrench"></span><br>Profile' +
+                '<a class="btn btn-side-menu" ng-click="profile()" tooltip-placement="right" tooltip="Edit Profile">' +
+                    '<i class="fa fa-wrench fa-2x"></i>' +
                 '</a>',
             controller: function($scope, $modal) {
                 $scope.profile = profile;
