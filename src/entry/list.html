@@ -42,7 +42,7 @@
                     <td colspan="2"></td>
                 </tr>
 
-                <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == active.id}">
+                <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == active.id}" class="cursor">
                     <td ng-click="setActive(entry)">{{ entry.id }}</td>
                     <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.name }}</span></td>
                     <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.username }}</span></td>
