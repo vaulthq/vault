@@ -57,6 +57,7 @@
                     $scope.login = AuthFactory.getUser();
 
                     $scope.jump = jump;
+                    $scope.isEntryActive = $state.is('user.project');
 
                     hotkeys.add({
                         combo: 'ctrl+p',
@@ -71,6 +72,11 @@
                     function jump() {
                         $scope.$broadcast('toggleJump');
                     }
+
+                    $rootScope.$on('$stateChangeStart', function(event, toState) {
+                        console.debug(toState);
+                        $scope.isEntryActive = toState.name == 'user.project' || toState.name == 'user.projects';
+                    });
 
                     $scope.$on('project:update', function(event, project) {
                         $scope.projects[$scope.projects.map(function (i) {return i.id;}).indexOf(project.id)] = project;
