@@ -16,58 +16,49 @@
 <div class="content">
     <loader when="!entries.$resolved"></loader>
 
-    <div class="row">
-        <div class="col-sm-8 nice-flow">
-            <table class="table table-hover" ng-if="entries.length > 0">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Updated</th>
-                    <th style="min-width: 130px"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="filter-row">
-                    <td>
-                        <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
-                            <i class="glyphicon glyphicon-remove"></i>
-                        </button>
-                    </td>
-                    <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus></td>
-                    <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
-                    <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-                    <td colspan="2"></td>
-                </tr>
+    <table class="table table-hover" ng-if="entries.length > 0">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Updated</th>
+            <th style="min-width: 130px"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="filter-row">
+            <td>
+                <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
+                    <i class="glyphicon glyphicon-remove"></i>
+                </button>
+            </td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
+            <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
+            <td colspan="2"></td>
+        </tr>
 
-                <tr ng-repeat="entry in getFiltered()" ng-class="{'list-group-item-warning': entry.id == active.id}" class="cursor">
-                    <td ng-click="setActive(entry)">{{ entry.id }}</td>
-                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.name }}</span></td>
-                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.username }}</span></td>
-                    <td ng-click="setActive(entry)"><span title="{{entry.note}}">{{ entry.url }}</span></td>
-                    <td ng-click="setActive(entry)"><span am-time-ago="entry.updated_at"
-                                                          title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
-                    </td>
-                    <td class="text-right">
-                        <div ng-if="entry.can_edit">
-                            <copy-password entry="entry"></copy-password>
-                            <show-password entry-id="entry.id"></show-password>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <tr ng-if="0" ng-repeat-start="entry in getFiltered()"></tr>
 
-            <div ng-if="entries.$resolved && entries.length == 0">
-                This project has no added keys.
-            </div>
-        </div>
-
-        <div class="col-sm-4 invisible-flow" ng-if="active && active.id">
-            <h4>
-                {{ active.name }}
+        <tr ng-class="{'list-group-item-warning': entry.id == active.id}">
+            <td ng-click="setActive(entry)" class="cursor">{{ entry.id }}</td>
+            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.name }}</span></td>
+            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.username }}</span></td>
+            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.url }}</span></td>
+            <td ng-click="setActive(entry)" class="cursor"><span am-time-ago="entry.updated_at"
+                                                  title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
+            </td>
+            <td class="text-right" style="width: 30px">
+                <div ng-if="entry.can_edit">
+                    <copy-password entry="entry"></copy-password>
+                    <show-password entry-id="entry.id"></show-password>
+                </div>
+            </td>
+        </tr>
+        <tr ng-if="active && active.id == entry.id" style="background-color: rgba(252, 248, 227, 0.17)">
+            <td colspan="6">
                 <div class="pull-right">
                     <entry-access-info entry="active"></entry-access-info>
 
@@ -78,17 +69,26 @@
                         <entry-delete entry="active"></entry-delete>
                     </div>
                 </div>
-            </h4>
-            <br>
-            <ul class="list-inline" style="font-size: 15px">
-                <li ng-repeat="tag in active.tags">
-                    <span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
-                </li>
-            </ul>
-            <br><br>
 
-            <p class="nl2br">{{ active.note }}</p>
-        </div>
+                <ul class="list-inline" style="font-size: 15px">
+                    <li ng-repeat="tag in active.tags">
+                        <span class="label label-default"
+                              style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+                    </li>
+                </ul>
+
+                <br>
+                <p class="nl2br">{{ active.note }}</p>
+            </td>
+        </tr>
+
+        <tr ng-if="0" ng-repeat-end></tr>
+        </tbody>
+    </table>
+
+    <div ng-if="entries.$resolved && entries.length == 0">
+        This project has no added keys.
     </div>
-
 </div>
+
+
