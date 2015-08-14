@@ -12,7 +12,11 @@
   top: 0;
   height: 100%;
   width: 100%;
-  background-color: rgb(60, 67, 92);
+  background: -webkit-linear-gradient(-45deg, #5D4157 10%, #A8CABA 90%); /* Chrome 10+, Saf5.1+ */
+  background:    -moz-linear-gradient(-45deg, #5D4157 10%, #A8CABA 90%); /* FF3.6+ */
+  background:     -ms-linear-gradient(-45deg, #5D4157 10%, #A8CABA 90%); /* IE10 */
+  background:      -o-linear-gradient(-45deg, #5D4157 10%, #A8CABA 90%); /* Opera 11.10+ */
+  background:         linear-gradient(-45deg, #5D4157 10%, #A8CABA 90%); /* W3C */
 }
 
 
@@ -20,14 +24,14 @@
 .signin-card {
   max-width: 350px;
   border-radius: 2px;
-  margin: 150px auto;
+  margin: 200px auto;
   padding: 20px;
-  background-color: #eceff1; // Blue Grey 50
+  background-color: #fff;
   .box-shadow
 }
 
 .box-shadow {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, .19);
 }
 
 .signin-card {
