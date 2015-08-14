@@ -1,13 +1,13 @@
 (function() {
     angular
         .module('xApp')
-        .controller('ModalCreateEntryController', function($scope, $modalInstance, EntriesFactory, project_id) {
+        .controller('ModalCreateEntryController', function($scope, $modalInstance, Api, project_id) {
         $scope.entry = {
             project_id: project_id
         };
 
         $scope.ok = function () {
-            EntriesFactory.create($scope.entry,
+            Api.entry.save($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
                 }
