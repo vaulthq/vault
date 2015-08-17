@@ -1077,7 +1077,7 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-        $scope.$watch("search|json", onFilterChanged);
+        $scope.$watch("search", onFilterChanged, true);
 
         hotkeys.add({
             combo: 'up',
@@ -1751,7 +1751,7 @@ var Password = {
         $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
         $scope.search = {};
-        $scope.$watch("search|json", onFilterChanged);
+        $scope.$watch("search", onFilterChanged, true);
 
         function onFilterChanged() {
             var filtered = getFiltered();

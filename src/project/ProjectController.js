@@ -14,7 +14,7 @@
         $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
         $scope.search = {};
-        $scope.$watch("search|json", onFilterChanged);
+        $scope.$watch("search", onFilterChanged, true);
 
         function onFilterChanged() {
             var filtered = getFiltered();

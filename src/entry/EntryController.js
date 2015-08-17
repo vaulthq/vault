@@ -32,7 +32,7 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-        $scope.$watch("search|json", onFilterChanged);
+        $scope.$watch("search", onFilterChanged, true);
 
         hotkeys.add({
             combo: 'up',
