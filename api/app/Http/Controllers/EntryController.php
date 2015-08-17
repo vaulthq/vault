@@ -43,6 +43,7 @@ class EntryController extends Controller
      */
 	public function show(Entry $model)
 	{
+        $model->load('tags');
 		return $model;
 	}
 
@@ -73,7 +74,7 @@ class EntryController extends Controller
         }
 
         $model->save();
-
+        $model->load('tags');
         return $model;
 	}
 

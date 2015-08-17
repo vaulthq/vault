@@ -74,7 +74,6 @@
                     }
 
                     $rootScope.$on('$stateChangeStart', function(event, toState) {
-                        console.debug(toState);
                         $scope.isEntryActive = toState.name == 'user.project' || toState.name == 'user.projects';
                     });
 
@@ -1078,6 +1077,7 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+        $scope.$watch("search", onFilterChanged, true);
 
         hotkeys.add({
             combo: 'up',
@@ -1112,6 +1112,16 @@
                 }
             }
         });
+
+        function onFilterChanged() {
+            var filtered = getFiltered();
+            var current = _.findIndex(filtered, function(x) {
+                return x.id == $scope.active.id;
+            });
+            if (current == -1 && filtered.length > 0) {
+                $scope.active = filtered[0];
+            }
+        }
 
         function getFiltered() {
             return $filter('filter')($scope.entries, $scope.search);
@@ -1730,15 +1740,28 @@ var Password = {
         .module('xApp')
         .controller('ProjectController', controller);
 
-    function controller($scope, $modal, Api, projects, active) {
+    function controller($scope, $modal, Api, $filter, projects, active, hotkeys, $state) {
 
         $scope.projects = projects;
-        $scope.activeId = active;
+        $scope.active = {id: active};
 
         $scope.create = createProject;
+        $scope.getFiltered = getFiltered;
         $scope.teams = teamsAssigned;
         $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
+        $scope.search = {};
+        $scope.$watch("search", onFilterChanged, true);
+
+        function onFilterChanged() {
+            var filtered = getFiltered();
+            var current = _.findIndex(filtered, function(x) {
+                return x.id == $scope.active.id;
+            });
+            if (current == -1 && filtered.length > 0) {
+                $scope.active = filtered[0];
+            }
+        }
 
         function createProject() {
             $modal.open({
@@ -1782,6 +1805,61 @@ var Password = {
             $scope.projects.splice($scope.projects.map(function (i) {return i.id;}).indexOf(project.id), 1);
         }
 
+        function getFiltered() {
+            return $filter('filter')($scope.projects, $scope.search);
+        }
+
+
+        hotkeys.add({
+            combo: 'up',
+            description: 'Show project jump window',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                event.preventDefault();
+                var current = _.findIndex(getFiltered(), function(x) {
+                    return x.id == $scope.active.id;
+                });
+
+                var previous = getFiltered()[current - 1];
+                if (previous) {
+                    $scope.active = previous;
+                }
+            }
+        });
+
+        hotkeys.add({
+            combo: 'down',
+            description: 'Show project jump window',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                event.preventDefault();
+                var current = _.findIndex(getFiltered(), function(x) {
+                    return x.id == $scope.active.id;
+                });
+
+                var next = getFiltered()[current + 1];
+                if (next) {
+                    $scope.active = next;
+                }
+            }
+        });
+
+
+        hotkeys.add({
+            combo: 'return',
+            description: 'Open project',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                event.preventDefault();
+                $state.go("user.project", {projectId: $scope.active.id});
+            }
+        });
+
+        $scope.$on('$destroy', function(){
+            hotkeys.del('return');
+            hotkeys.del('up');
+            hotkeys.del('down');
+        });
     }
 })();
 

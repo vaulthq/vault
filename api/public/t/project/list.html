@@ -33,7 +33,7 @@
                 <td colspan="2"></td>
             </tr>
 
-            <tr ng-repeat="project in projects | filter:search" ng-class="{'list-group-item-warning': project.id == activeId}">
+            <tr ng-repeat="project in getFiltered()" ng-class="{'list-group-item-warning': project.id == active.id}">
                 <td>{{ project.id }}</td>
                 <td><a ui-sref="user.project({projectId: project.id})" title="Go to project">{{ project.name }}</a></td>
                 <td><span title="{{project.description}}">{{ project.description }}</span></td>
