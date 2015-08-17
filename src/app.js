@@ -74,7 +74,6 @@
                     }
 
                     $rootScope.$on('$stateChangeStart', function(event, toState) {
-                        console.debug(toState);
                         $scope.isEntryActive = toState.name == 'user.project' || toState.name == 'user.projects';
                     });
 

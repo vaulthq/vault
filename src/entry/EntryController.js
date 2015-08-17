@@ -32,6 +32,7 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+        $scope.$watch("search|json", onFilterChanged);
 
         hotkeys.add({
             combo: 'up',
@@ -66,6 +67,16 @@
                 }
             }
         });
+
+        function onFilterChanged() {
+            var filtered = getFiltered();
+            var current = _.findIndex(filtered, function(x) {
+                return x.id == $scope.active.id;
+            });
+            if (current == -1 && filtered.length > 0) {
+                $scope.active = filtered[0];
+            }
+        }
 
         function getFiltered() {
             return $filter('filter')($scope.entries, $scope.search);
