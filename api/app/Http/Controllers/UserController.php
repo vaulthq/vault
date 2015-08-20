@@ -45,6 +45,4 @@ class UserController extends Controller
             'id' => $user->id
         ]);
     }
-
-
 }

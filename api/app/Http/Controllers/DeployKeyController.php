@@ -1,13 +1,14 @@
 <?php namespace App\Http\Controllers;
 
 use App\Http\Requests\DeployKeyRequest;
+use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
 use App\Vault\Models\History;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DeployKeyController extends Controller
 {
-    public function find(DeployKeyRequest $request)
+    public function find(DeployKeyRequest $request, HistoryLogger $logger)
     {
         $host = $request->get('host');
         $username = $request->get('user');
@@ -20,7 +21,7 @@ class DeployKeyController extends Controller
 
         foreach ($availableKeys as $key) {
             if ($key->can_edit) {
-                History::make('entry', 'Accessed entry via API', $key->id);
+                $logger->log('entry', 'Accessed entry via API', $key->id);
                 return $key->toArray() + ['password' => $key->password];
             }
 

@@ -2,7 +2,6 @@
 
 use App\Vault\Models\Entry;
 use App\Vault\Models\EntryTag;
-use App\Vault\Models\History;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -11,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class EntryTagController extends Controller
 {
-
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -27,18 +25,6 @@ class EntryTagController extends Controller
 
 		return $tags;
 	}
-
-
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
 
 	/**
 	 * Store a newly created resource in storage.
@@ -62,9 +48,6 @@ class EntryTagController extends Controller
         }
 
 		$entry = Entry::findOrFail($entryId);
-        if (!$entry->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
 
 		if ($entry->tags->contains('name', $name)) {
 			return Response::make('Tag already present.', 419);
@@ -75,49 +58,13 @@ class EntryTagController extends Controller
         $model->name = $name;
         $model->color = $color;
         $model->entry_id = $entryId;
-        $model->save();
 
-        History::make('share', 'Added tag "'.$model->name.'" to entry ('.$entry->name.').', $model->id);
+		if (!$model->save()) {
+			abort(403);
+		}
 
         return $model;
 	}
-
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-    }
-
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
 
 	/**
 	 * Remove the specified resource from storage.
@@ -129,15 +76,8 @@ class EntryTagController extends Controller
 	{
         $model = EntryTag::findOrFail($id);
 
-        $entry = Entry::findOrFail($model->entry_id);
-        if (!$entry->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+        if (!$model->delete()) {
+            abort(403);
         }
-
-        History::make('entry', 'Removed tag "'.$model->name.'" from entry.', $id);
-
-        $model->delete();
 	}
-
-
 }

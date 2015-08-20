@@ -25,7 +25,7 @@ class ShareObserver
 
     public function created(Share $share)
     {
-        $this->logger->log('entry', 'Shared entry.', $share->entry->id);
+        $this->logger->log('share', 'Shared entry.', $share->entry->id);
     }
 
     public function deleting(Share $share)
@@ -35,6 +35,6 @@ class ShareObserver
 
     public function deleted(Share $share)
     {
-        $this->logger->log('project', 'Deleted share.', $share->id);
+        $this->logger->log('share', 'Deleted share.', $share->id);
     }
 }

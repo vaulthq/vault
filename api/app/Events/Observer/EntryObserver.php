@@ -52,6 +52,6 @@ class EntryObserver
 
     public function deleted(Entry $entry)
     {
-        $this->logger->log('project', 'Deleted  #' . $entry->id . ' ('.$entry->project->name.').', $entry->id);
+        $this->logger->log('entry', 'Deleted  #' . $entry->id . ' ('.$entry->project->name.').', $entry->id);
     }
 }

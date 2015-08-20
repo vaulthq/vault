@@ -58,12 +58,12 @@ class EntryController extends Controller
         $model->url = $request->get('url');
         $model->note = $request->get('note');
 
-        if ( ! is_null($request->get('password', null))) {
+        if (!is_null($request->get('password', null))) {
             $model->password = $request->get('password');
         }
 
         if (!$model->save()) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+            abort(403);
         }
 
         $model->load('tags');
@@ -81,7 +81,7 @@ class EntryController extends Controller
 	public function destroy(Entry $model)
 	{
         if (!$model->delete()) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+            abort(403);
         }
 	}
 
@@ -97,7 +97,7 @@ class EntryController extends Controller
         $model = Entry::findOrFail($id);
 
         if (!$model->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+            abort(403);
         }
 
         $logger->log('password', 'Accessed password #' . $id . ' ('.$model->project->name.').', $id);
