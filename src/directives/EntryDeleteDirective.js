@@ -13,7 +13,7 @@
             scope: {
                 entry: '='
             },
-            controller: function($rootScope, $scope, EntryFactory) {
+            controller: function($rootScope, $scope, Api) {
                 $scope.delete = entryDelete;
 
                 function entryDelete() {
@@ -21,7 +21,7 @@
                         return;
                     }
 
-                    EntryFactory.delete({id: $scope.entry.id});
+                    Api.entry.delete({id: $scope.entry.id});
                     $rootScope.$broadcast('entry:delete', $scope.entry);
                 }
             }

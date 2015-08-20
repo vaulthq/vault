@@ -16,8 +16,8 @@
                     password: function (Api) {
                         return Api.entryPassword.password({id: entryId});
                     },
-                    entry: function (EntryFactory) {
-                        return EntryFactory.show({id: entryId});
+                    entry: function (Api) {
+                        return Api.entry.show({id: entryId});
                     }
                 }
             });

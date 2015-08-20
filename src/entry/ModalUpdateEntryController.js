@@ -1,12 +1,12 @@
 (function() {
     angular
         .module('xApp')
-        .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
+        .controller('ModalUpdateEntryController', function($scope, $modalInstance, Api, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            EntryFactory.update($scope.entry,
+            Api.entry.update($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
                 }

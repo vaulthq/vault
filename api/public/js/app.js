@@ -234,7 +234,10 @@
             authStatus: $resource("/internal/auth/status", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
-            entry: $resource("/api/entry", null, enableCustom),
+            entry: $resource("/api/entry/:id", null, angular.extend(enableCustom, {
+                password: { method: 'GET', params: {id: '@id'} }
+            })),
+            entryAccess: $resource("/api/entry/access/:id", null),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })
@@ -569,8 +572,8 @@
                         templateUrl: '/t/entry/access.html',
                         controller: 'ModalAccessController',
                         resolve: {
-                            access: function(EntryAccessFactory) {
-                                return EntryAccessFactory.query({id: $scope.entry.id});
+                            access: function(Api) {
+                                return Api.entryAccess.query({id: $scope.entry.id});
                             }
                         }
                     });
@@ -628,7 +631,7 @@
             scope: {
                 entry: '='
             },
-            controller: function($rootScope, $scope, EntryFactory) {
+            controller: function($rootScope, $scope, Api) {
                 $scope.delete = entryDelete;
 
                 function entryDelete() {
@@ -636,7 +639,7 @@
                         return;
                     }
 
-                    EntryFactory.delete({id: $scope.entry.id});
+                    Api.entry.delete({id: $scope.entry.id});
                     $rootScope.$broadcast('entry:delete', $scope.entry);
                 }
             }
@@ -754,8 +757,8 @@
                         templateUrl: '/t/entry/form.html',
                         controller: 'ModalUpdateEntryController',
                         resolve: {
-                            entry: function(EntryFactory) {
-                                return EntryFactory.show({id: $scope.entryId});
+                            entry: function(Api) {
+                                return Api.entry.get({id: $scope.entryId});
                             }
                         }
                     }).result.then(function (model) {
@@ -1046,20 +1049,7 @@
 (function() {
     angular
         .module('xApp')
-        .controller('EntryController', controller)
-        .factory('EntryFactory', function ($resource) {
-            return $resource("/api/entry/:id", {}, {
-                show: { method: 'GET' },
-                update: { method: 'PUT', params: {id: '@id'} },
-                password: { method: 'GET', params: {id: '@id'} },
-                delete: { method: 'DELETE', params: {id: '@id'} }
-            })
-        })
-        .factory('EntryAccessFactory', function ($resource) {
-            return $resource("/api/entry/access/:id", {}, {
-                query: { method: 'GET', params: {id: '@id'}, isArray: true }
-            })
-        });
+        .controller('EntryController', controller);
 
     function controller($scope, $filter, hotkeys, entries, project, active) {
 
@@ -1358,12 +1348,12 @@
 (function() {
     angular
         .module('xApp')
-        .controller('ModalUpdateEntryController', function($scope, $modalInstance, EntryFactory, entry, GROUPS) {
+        .controller('ModalUpdateEntryController', function($scope, $modalInstance, Api, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
         $scope.ok = function () {
-            EntryFactory.update($scope.entry,
+            Api.entry.update($scope.entry,
                 function(response) {
                     $modalInstance.close(response);
                 }
@@ -1608,8 +1598,8 @@ var Password = {
                     password: function (Api) {
                         return Api.entryPassword.password({id: entryId});
                     },
-                    entry: function (EntryFactory) {
-                        return EntryFactory.show({id: entryId});
+                    entry: function (Api) {
+                        return Api.entry.show({id: entryId});
                     }
                 }
             });
