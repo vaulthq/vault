@@ -21,8 +21,8 @@
                         templateUrl: '/t/entry/form.html',
                         controller: 'ModalUpdateEntryController',
                         resolve: {
-                            entry: function(EntryFactory) {
-                                return EntryFactory.show({id: $scope.entryId});
+                            entry: function(Api) {
+                                return Api.entry.get({id: $scope.entryId});
                             }
                         }
                     }).result.then(function (model) {

@@ -1,22 +1,9 @@
 (function() {
     angular
         .module('xApp')
-        .controller('EntryController', controller)
-        .factory('EntryFactory', function ($resource) {
-            return $resource("/api/entry/:id", {}, {
-                show: { method: 'GET' },
-                update: { method: 'PUT', params: {id: '@id'} },
-                password: { method: 'GET', params: {id: '@id'} },
-                delete: { method: 'DELETE', params: {id: '@id'} }
-            })
-        })
-        .factory('EntryAccessFactory', function ($resource) {
-            return $resource("/api/entry/access/:id", {}, {
-                query: { method: 'GET', params: {id: '@id'}, isArray: true }
-            })
-        });
+        .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, entries, project, active) {
+    function controller($scope, $filter, hotkeys, entries, project, active, $rootScope) {
 
         $scope.entries = entries;
         $scope.project = project;
@@ -32,7 +19,18 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+        $scope.$on('$destroy', onDestroy);
         $scope.$watch("search", onFilterChanged, true);
+
+        hotkeys.add({
+            combo: 'return',
+            description: 'Download and copy password',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                $rootScope.$broadcast("PasswordRequest", $scope.active);
+            }
+        });
+
 
         hotkeys.add({
             combo: 'up',
@@ -112,6 +110,12 @@
 
         function getEntryIndex(entry) {
             return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
+        }
+
+        function onDestroy() {
+            hotkeys.del('return');
+            hotkeys.del('up');
+            hotkeys.del('down');
         }
     }
 })();

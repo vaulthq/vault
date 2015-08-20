@@ -20,7 +20,10 @@
             authStatus: $resource("/internal/auth/status", null),
             profile: $resource("/api/profile", null, enableCustom),
             share: $resource("/api/share/:id", null, enableCustom),
-            entry: $resource("/api/entry", null, enableCustom),
+            entry: $resource("/api/entry/:id", null, angular.extend(enableCustom, {
+                password: { method: 'GET', params: {id: '@id'} }
+            })),
+            entryAccess: $resource("/api/entry/access/:id", null),
             entryPassword: $resource("/api/entry/password/:id", {}, {
                 password: { method: 'GET', params: {id: '@id'} }
             })

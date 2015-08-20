@@ -21,8 +21,8 @@
                         templateUrl: '/t/entry/access.html',
                         controller: 'ModalAccessController',
                         resolve: {
-                            access: function(EntryAccessFactory) {
-                                return EntryAccessFactory.query({id: $scope.entry.id});
+                            access: function(Api) {
+                                return Api.entryAccess.query({id: $scope.entry.id});
                             }
                         }
                     });

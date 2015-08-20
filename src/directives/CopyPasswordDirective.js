@@ -26,6 +26,30 @@
                 $scope.copy = copy;
                 $scope.password = '';
 
+                $scope.$on("PasswordRequest", function(e, entry){
+                    if (entry.id != $scope.entry.id) {
+                        return;
+                    }
+
+                    if ($scope.state == "download") {
+                        downloadPassword();
+                        return;
+                    }
+
+                    if ($scope.state == "copy") {
+                        var textarea = document.createElement("textarea");
+                        textarea.innerHTML = $scope.password;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            if (document.execCommand("copy")) {
+                                copy();
+                            }
+                        } catch (e) {}
+                        document.body.removeChild(textarea);
+                    }
+                });
+
                 function isState(state) {
                     return $scope.state == state;
                 }
