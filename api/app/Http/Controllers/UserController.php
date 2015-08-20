@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function store(UserCreateRequest $request)
     {
-        return $this->dispatchFrom('App\Commands\UserCreateCommand', $request);
+        return $this->dispatchFrom('App\Jobs\UserCreateCommand', $request);
     }
 
     public function show(User $model)
@@ -36,12 +36,12 @@ class UserController extends Controller
 
     public function update(UserUpdateRequest $request)
     {
-        $this->dispatchFrom('App\Commands\UserUpdateCommand', $request);
+        $this->dispatchFrom('App\Jobs\UserUpdateCommand', $request);
     }
 
     public function destroy(User $user, AdminOnlyRequest $request)
     {
-        $this->dispatchFrom('App\Commands\UserDeleteCommand', $request, [
+        $this->dispatchFrom('App\Jobs\UserDeleteCommand', $request, [
             'id' => $user->id
         ]);
     }

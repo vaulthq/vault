@@ -10,7 +10,7 @@ if [ -f /var/www/api/composer.json ] && [ ! -d /var/www/api/vendor ]; then
    composer install --optimize-autoloader --working-dir=/var/www/api
 fi
 
-chmod 777 -R /var/www/api/storage
+chmod 777 -R /var/www/api/storage /var/www/api/bootstrap/cache
 
 echo "[info] Waiting for mysql"
 sleep 10

@@ -1,8 +1,6 @@
-<?php namespace App\Commands;
+<?php namespace App\Jobs;
 
-use App\Events\User\UserCreated;
 use App\Vault\Logging\HistoryLogger;
-use App\Vault\Models\History;
 use App\Vault\Models\User;
 use App\Vault\Repository\UserRepository;
 use Illuminate\Contracts\Bus\SelfHandling;

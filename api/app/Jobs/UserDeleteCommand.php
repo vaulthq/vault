@@ -1,10 +1,8 @@
-<?php namespace App\Commands;
+<?php namespace App\Jobs;
 
-use App\Events\User\UserCreated;
 use App\Events\User\UserDeleted;
 use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
-use App\Vault\Models\History;
 use App\Vault\Models\Team;
 use App\Vault\Models\User;
 use App\Vault\Repository\UserRepository;
@@ -12,7 +10,6 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserDeleteCommand extends Command implements SelfHandling
 {
