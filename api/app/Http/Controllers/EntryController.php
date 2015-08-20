@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
-use App\Vault\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -27,9 +27,6 @@ class EntryController extends Controller
         $model->user_id = Auth::user()->id;
 
         $model->save();
-
-        History::make('entry', 'Created new entry.', $model->id);
-
         $model->load('tags');
 
         return $model;
@@ -56,25 +53,21 @@ class EntryController extends Controller
      */
 	public function update(Entry $model, Request $request)
 	{
-        if (!$model->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
-
         $model->name = $request->get('name');
         $model->username = $request->get('username');
         $model->url = $request->get('url');
         $model->note = $request->get('note');
 
-        History::make('entry', 'Updated entry details.', $model->id);
-
         if ( ! is_null($request->get('password', null))) {
-            History::make('entry_p', 'Updated entry password.', $model->id);
-
             $model->password = $request->get('password');
         }
 
-        $model->save();
+        if (!$model->save()) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
+
         $model->load('tags');
+
         return $model;
 	}
 
@@ -87,22 +80,19 @@ class EntryController extends Controller
      */
 	public function destroy(Entry $model)
 	{
-        if (!$model->can_edit) {
+        if (!$model->delete()) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
-
-        History::make('entry', 'Deleted entry #' . $model->id . ' ('.$model->project->name.').', $model->id);
-
-        $model->delete();
 	}
 
     /**
      * Get password for Entry
      *
      * @param $id
+     * @param HistoryLogger $logger
      * @return mixed
      */
-    public function getPassword($id)
+    public function getPassword($id, HistoryLogger $logger)
     {
         $model = Entry::findOrFail($id);
 
@@ -110,7 +100,7 @@ class EntryController extends Controller
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        History::make('password', 'Accessed password #' . $id . ' ('.$model->project->name.').', $id);
+        $logger->log('password', 'Accessed password #' . $id . ' ('.$model->project->name.').', $id);
 
         return Response::json(['password' => strlen($model->password) > 0 ? $model->password : ''], 200);
     }
