@@ -1,7 +1,9 @@
 (function() {
     angular
         .module('xApp')
-        .controller('ModalUpdateEntryController', function($scope, $modalInstance, Api, entry, GROUPS) {
+        .controller('ModalUpdateEntryController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -22,5 +24,5 @@
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
 })();
