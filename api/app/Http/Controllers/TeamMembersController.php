@@ -10,29 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class TeamMembersController extends Controller
 {
-
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		//
-	}
-
-
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
-
 	/**
 	 * Store a newly created resource in storage.
 	 *
@@ -42,29 +19,26 @@ class TeamMembersController extends Controller
 	{
         $validator = Validator::make([
             'user_id' => Input::get('user_id'),
-            'id' => Input::get('id')
+            'team_id' => Input::get('id')
         ], UserTeam::$rules);
 
         if ($validator->fails()) {
             return Response::make($validator->messages()->first(), 419);
         }
 
-        $entry = Team::findOrFail(Input::get('id'));
-        if (!$entry->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
-
         $model = new UserTeam();
         $model->user_by_id = Auth::user()->id;
         $model->user_id = Input::get('user_id');
         $model->team_id = Input::get('id');
-        $model->save();
 
-        History::make('share', 'Added member to team ('.$entry->name.').', $model->id);
+        if (!$model->save()) {
+            abort(403);
+        }
+
+
 
         return $model;
 	}
-
 
 	/**
 	 * Display the specified resource.
@@ -77,31 +51,6 @@ class TeamMembersController extends Controller
 		return UserTeam::where('team_id', $id)->get();
 	}
 
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
-
 	/**
 	 * Remove the specified resource from storage.
 	 *
@@ -112,15 +61,8 @@ class TeamMembersController extends Controller
 	{
         $model = UserTeam::findOrFail($id);
 
-        $entry = Team::findOrFail($model->team_id);
-        if (!$entry->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
+        if (!$model->delete()) {
+            abort(403);
         }
-
-        History::make('entry', 'Deleted team user.', $id);
-
-        $model->delete();
 	}
-
-
 }

@@ -16,4 +16,9 @@ class EntryTeam extends Model
     {
         return $this->belongsTo('App\Vault\Models\Team', 'team_id');
     }
+
+    public function entry()
+    {
+        return $this->belongsTo('App\Vault\Models\Entry', 'entry_id');
+    }
 }

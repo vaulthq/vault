@@ -2,7 +2,6 @@
 
 use App\Http\Requests\ProjectRequest;
 use App\Vault\Models\Entry;
-use App\Vault\Models\History;
 use App\Vault\Models\Project;
 use App\Vault\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -35,8 +34,6 @@ class ProjectController extends Controller
         $model->user_id = Auth::user()->id;
 
         $model->save();
-
-        History::make('project', 'Created new project.', $model->id);
 
         return $model;
 	}
@@ -77,16 +74,12 @@ class ProjectController extends Controller
      */
 	public function update(Project $model, ProjectRequest $request)
 	{
-        if (!$model->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
-
         $model->name = $request->get('name');
         $model->description = $request->get('description', '');
 
-        History::make('project', 'Updated project details.', $model->id);
-
-        $model->save();
+        if (!$model->save()) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
 	}
 
     /**
@@ -97,13 +90,9 @@ class ProjectController extends Controller
      */
 	public function destroy(Project $model)
 	{
-        if (!$model->can_edit) {
+        if (!$model->delete()) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
-
-        History::make('project', 'Deleted project #' . $model->id . ' ('.$model->name.').', $model->id);
-
-        $model->delete();
 	}
 
     public function changeOwner(Project $project)
@@ -115,25 +104,19 @@ class ProjectController extends Controller
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        History::make(
-            'project-owner',
-            'Changed owner from "'. $project->user_id .'" to "'. $newOwner->id .'"' . ($recursive ? ' (recursive)' : ''),
-            $project->id
-        );
-
         if ($recursive) {
             foreach ($project->keys as $key) {
                 if ($key->user_id == $project->user_id) {
-                    History::make('entry-owner', 'Changed entry owner from "'. $key->user_id .'" to "'. $newOwner->id .'"', $key->id);
-
                     $key->user_id = $newOwner->id;
-
                     $key->save();
                 }
             }
         }
 
         $project->user_id = $newOwner->id;
-        $project->save();
+
+        if (!$project->save()) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
     }
 }

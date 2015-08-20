@@ -1,7 +1,6 @@
 <?php namespace App\Http\Controllers;
 
 use App\Vault\Models\Entry;
-use App\Vault\Models\History;
 use App\Vault\Models\Share;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -10,27 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ShareController extends Controller
 {
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -54,18 +32,16 @@ class ShareController extends Controller
             return Response::make('This entry is already shared for this user.', 419);
         }
 
-        $entry = Entry::findOrFail($entryId);
-        if (!$entry->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
+        Entry::findOrFail($entryId);
 
         $model = new Share();
         $model->user_by_id = Auth::user()->id;
         $model->user_id = $userId;
         $model->entry_id = $entryId;
-        $model->save();
 
-        History::make('share', 'Shared entry.', $model->id);
+        if (!$model->save()) {
+            return Response::json(['flash' => 'Unauthorized.'], 403);
+        }
 
         return Share::with('user')->where('id', $model->id)->first();
     }
@@ -93,14 +69,8 @@ class ShareController extends Controller
     {
         $model = Share::findOrFail($id);
 
-        $entry = Entry::findOrFail($model->entry_id);
-        if (!$entry->can_edit) {
+        if (!$model->delete()) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
-
-        History::make('entry', 'Deleted share.', $id);
-
-        $model->delete();
     }
-
 }
