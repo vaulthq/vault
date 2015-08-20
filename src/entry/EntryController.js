@@ -45,6 +45,8 @@
                 var previous = getFiltered()[current - 1];
                 if (previous) {
                     $scope.active = previous;
+                } else {
+                    $rootScope.$broadcast("AppFocus");
                 }
             }
         });
@@ -77,7 +79,7 @@
         }
 
         function getFiltered() {
-            return $filter('filter')($scope.entries, $scope.search);
+            return $filter('filter')($scope.entries, { $: $scope.search.query });
         }
 
         function setActive(entry) {

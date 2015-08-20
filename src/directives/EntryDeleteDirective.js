@@ -5,18 +5,20 @@
 
     function entryDeleteDirective() {
         return {
-            restrict: 'E',
-            template:
-                '<a ng-click="delete()" class="btn btn-danger btn-xs" title="Remove">' +
-                    '<i class="glyphicon glyphicon-trash"></i>' +
-                '</a>',
+            restrict: 'A',
             scope: {
-                entry: '='
+                entry: '=entryDelete'
+            },
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.delete();
+                });
             },
             controller: function($rootScope, $scope, Api) {
                 $scope.delete = entryDelete;
 
                 function entryDelete() {
+                    console.log($scope.entry);
                     if (!confirm('Are you sure?')) {
                         return;
                     }

@@ -17,7 +17,7 @@
             <th></th>
         </tr>
         </thead>
-        <tr ng-repeat="entry in recent" ng-class="{'list-group-item-warning': entry.id == active.id}">
+        <tr ng-repeat="entry in recent">
             <td>{{ entry.id }}</td>
             <td><a ui-sref="user.projects({active: entry.project_id})" title="Go to projects">{{ entry.project_name }}</a></td>
             <td><a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to entry">{{ entry.name }}</a></td>
@@ -26,7 +26,7 @@
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
                 <copy-password entry="entry"></copy-password>
-                <show-password entry-id="entry.id"></show-password>
+                <a href show-password="entry" class="btn btn-xs btn-info" ng-if="entry.id > 0"><i class="fa fa-fw fa-lock"></i></a>
             </td>
         </tr>
     </table>

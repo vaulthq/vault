@@ -1,88 +1,120 @@
 <div class="page-header">
-    <h3>
-        <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
-            <i class="glyphicon glyphicon-chevron-left"></i>
-        </a>
-
-        {{ project.name }}
-        <small>{{ project.description }}</small>
-
-        <div class="pull-right">
-            <entry-create project-id="project.id"></entry-create>
+    <div class="row">
+        <div class="col-md-5">
+            <h3>
+                <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
+                    <i class="glyphicon glyphicon-chevron-left"></i>
+                </a>
+                {{ project.name }}
+                <small>{{ project.description }}</small>
+            </h3>
         </div>
-    </h3>
+        <div class="col-md-2">
+            <input  type="text" class="form-control input-sm" style="margin-top:-2px" placeholder="Search password" ng-model="search.query" app-focus>
+        </div>
+        <div class="col-md-5">
+            <div class="pull-right">
+                <entry-create project-id="project.id"></entry-create>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="content">
     <loader when="!entries.$resolved"></loader>
 
-    <table class="table table-hover" ng-if="entries.length > 0">
+    <table class="table table-entries" ng-if="entries.length > 0">
         <thead>
-        <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Updated</th>
-            <th style="min-width: 130px"></th>
-        </tr>
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Username / Address</th>
+                <th>Tags</th>
+                <th style="min-width: 130px"></th>
+            </tr>
         </thead>
         <tbody>
-        <tr class="filter-row">
-            <td>
-                <button ng-click="search={}" class="btn btn-default btn-sm" title="Reset Search">
-                    <i class="glyphicon glyphicon-remove"></i>
-                </button>
-            </td>
-            <td><input type="text" class="form-control input-sm" ng-model="search.name" app-focus></td>
-            <td><input type="text" class="form-control input-sm" ng-model="search.username"></td>
-            <td><input type="text" class="form-control input-sm" ng-model="search.url"></td>
-            <td colspan="2"></td>
-        </tr>
-
         <tr ng-if="0" ng-repeat-start="entry in getFiltered()"></tr>
+        <tr ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)">
+            <td ng-click="setActive(entry)" class="cursor col-min col-id">#{{ entry.id }}</td>
+            <td ng-click="setActive(entry)" class="cursor col-title">
+                <span title="{{entry.note}}" class="title">
+                    {{ entry.name }}
+                    <span class="note">{{ entry.note }}</span>
+                </span>
 
-        <tr ng-class="{'list-group-item-warning': entry.id == active.id}">
-            <td ng-click="setActive(entry)" class="cursor">{{ entry.id }}</td>
-            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.name }}</span></td>
-            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.username }}</span></td>
-            <td ng-click="setActive(entry)" class="cursor"><span title="{{entry.note}}">{{ entry.url }}</span></td>
-            <td ng-click="setActive(entry)" class="cursor"><span am-time-ago="entry.updated_at"
-                                                  title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
-            </td>
-            <td class="text-right" style="width: 30px">
-                <div ng-if="entry.can_edit">
-                    <copy-password entry="entry"></copy-password>
-                    <show-password entry-id="entry.id"></show-password>
+                <div class="text-small">
+                    <span class="time" am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
                 </div>
             </td>
-        </tr>
-        <tr ng-if="active && active.id == entry.id" style="background-color: rgba(252, 248, 227, 0.17)">
-            <td></td>
-            <td colspan="5">
-                <div class="pull-right">
-                    <entry-access-info entry="active"></entry-access-info>
+            <td ng-click="setActive(entry)" class="cursor">
+                <div class="text-large">
+                    <span title="{{entry.note}}">{{ entry.username }}</span>
+                    <span class="text-muted" ng-if="entry.username && entry.url">@</span>
+                    <span title="{{entry.note}}">{{ entry.url }}</span>
+                    &nbsp;
+                </div>
+            </td>
 
-                    <div ng-if="active.can_edit">
-                        <entry-tag entry="active"></entry-tag>
-                        <entry-share entry="active"></entry-share>
-                        <entry-update entry-id="active.id"></entry-update>
-                        <entry-delete entry="active"></entry-delete>
+            <td ng-click="setActive(entry)" class="cursor">
+                <div class="tags">
+                    <span ng-repeat="tag in entry.tags" class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+                    <entry-tag ng-if="entry.can_edit" entry="active"></entry-tag>
+                </div>
+            </td>
+            <td class="text-right">
+                <entry-access-info entry="entry"></entry-access-info>
+
+                <div ng-if="entry.can_edit">
+
+                    <copy-password entry="entry"></copy-password>
+                    <entry-share entry="entry"></entry-share>
+
+                    <!-- Single button -->
+                    <div class="btn-group" dropdown is-open="status.isopen">
+
+                        <a href class="btn btn-link" dropdown-toggle>
+                            <i class="fa fa-cogs"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li>
+                                <a entry-update="entry" href>Edit</a>
+                            </li>
+                            <li>
+                                <a entry-delete="entry" href>Delete</a>
+                            </li>
+                            <li>
+                                <a show-password="entry" href>Show password</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-
-                <ul class="list-inline" style="font-size: 15px">
-                    <li ng-repeat="tag in active.tags">
-                        <span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
-                    </li>
-                </ul>
-
-                <div ng-if="active.note.length">
-                    <br>
-                    <p class="nl2br">{{ active.note }}</p>
-                </div>
             </td>
         </tr>
+        <!--<tr ng-if="active && active.id == entry.id" style="background-color: rgba(252, 248, 227, 0.17)">-->
+            <!--<td></td>-->
+            <!--<td colspan="5">-->
+                <!--<div class="pull-right">-->
+
+
+                    <!--<div ng-if="active.can_edit">-->
+
+
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<ul class="list-inline" style="font-size: 15px">-->
+                    <!--<li ng-repeat="tag in active.tags">-->
+                        <!--<span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>-->
+                    <!--</li>-->
+                <!--</ul>-->
+
+                <!--<div ng-if="active.note.length">-->
+                    <!--<br>-->
+                    <!--<p class="nl2br">{{ active.note }}</p>-->
+                <!--</div>-->
+            <!--</td>-->
+        <!--</tr>-->
 
         <tr ng-if="0" ng-repeat-end></tr>
         </tbody>

@@ -5,13 +5,14 @@
 
     function entryUpdateDirective() {
         return {
-            restrict: 'E',
-            template:
-                '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
-                    '<i class="glyphicon glyphicon-edit"></i> Edit' +
-                '</a>',
+            restrict: 'A',
             scope: {
-                entryId: '='
+                entry: '=entryUpdate'
+            },
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.update();
+                });
             },
             controller: function($rootScope, $scope, $modal) {
                 $scope.update = updateEntry;
@@ -22,7 +23,7 @@
                         controller: 'ModalUpdateEntryController',
                         resolve: {
                             entry: function(Api) {
-                                return Api.entry.get({id: $scope.entryId});
+                                return Api.entry.get({id: $scope.entry.id});
                             }
                         }
                     }).result.then(function (model) {

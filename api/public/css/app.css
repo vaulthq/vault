@@ -148,6 +148,57 @@
     transform: scale3d(1, 1, 1);
   }
 }
+.table .col-min {
+  width: 1%;
+  white-space: nowrap;
+}
+.table-entries > tbody > tr > td {
+  vertical-align: middle;
+}
+.table-entries tr.current {
+  background: #EFF5F2;
+}
+.table-entries .col-id {
+  font-weight: bold;
+  color: #ccc;
+  font-size: 20px;
+  vertical-align: middle;
+  text-align: center;
+}
+.table-entries .col-title {
+  font-size: 17px;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+}
+.table-entries .col-title .title {
+  text-transform: capitalize;
+}
+.table-entries .col-title .note {
+  color: #ccc;
+}
+.table-entries .col-title .time {
+  color: #999;
+  line-height: 100%;
+}
+.table-entries .text-large {
+  font-size: 17px;
+}
+.table-entries .text-small {
+  font-size: 11px;
+}
+.table-entries tr:hover .tags a,
+.table-entries tr.current .tags a {
+  visibility: visible;
+}
+.table-entries .tags a {
+  visibility: hidden;
+}
+.table-entries .tags .label {
+  margin-right: 3px;
+}
 html,
 body {
   margin: 0;
@@ -501,4 +552,56 @@ body {
     -ms-transform: scale3d(1, 1, 1);
     transform: scale3d(1, 1, 1);
   }
+}
+
+.table .col-min {
+  width: 1%;
+  white-space: nowrap;
+}
+.table-entries > tbody > tr > td {
+  vertical-align: middle;
+}
+.table-entries tr.current {
+  background: #EFF5F2;
+}
+.table-entries .col-id {
+  font-weight: bold;
+  color: #ccc;
+  font-size: 20px;
+  vertical-align: middle;
+  text-align: center;
+}
+.table-entries .col-title {
+  font-size: 17px;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+}
+.table-entries .col-title .title {
+  text-transform: capitalize;
+}
+.table-entries .col-title .note {
+  color: #ccc;
+}
+.table-entries .col-title .time {
+  color: #999;
+  line-height: 100%;
+}
+.table-entries .text-large {
+  font-size: 17px;
+}
+.table-entries .text-small {
+  font-size: 11px;
+}
+.table-entries tr:hover .tags a,
+.table-entries tr.current .tags a {
+  visibility: visible;
+}
+.table-entries .tags a {
+  visibility: hidden;
+}
+.table-entries .tags .label {
+  margin-right: 3px;
 }

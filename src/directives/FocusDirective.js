@@ -41,6 +41,10 @@
                     elem[0].select();
                 }
             }
+
+            scope.$on("AppFocus", function() {
+                selectInput();
+            });
         };
     }
 })();

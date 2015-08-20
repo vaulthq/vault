@@ -7,8 +7,8 @@
         return {
             restrict: 'E',
             template:
-                '<a ng-click="tag()" class="btn btn-default btn-xs" title="Manage Tags">' +
-                    '<i class="glyphicon glyphicon-tag"></i> Tag' +
+                '<a ng-click="tag()" class="btn btn-link btn-xs" title="Manage Tags">' +
+                    '<i class="fa fa-pencil"></i> Tags' +
                 '</a>',
             scope: {
                 entry: '='

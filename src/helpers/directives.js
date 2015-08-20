@@ -49,20 +49,20 @@
     function showPasswordDirective() {
         return {
             scope: {
-                entryId: '=',
-                'elementClass': '=?'
+                entry: '=showPassword'
             },
-            restrict: 'EA',
-            template:
-                '<a ng-click="showPassword()" ng-class="elementClass" title="Display Password">' +
-                '    <i class="glyphicon glyphicon-lock"></i>' +
-                '</a>',
+            restrict: 'A',
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.showPassword();
+                });
+            },
             controller: function($scope, $modal, modal) {
                 $scope.elementClass = $scope.elementClass || 'btn btn-info btn-xs';
                 $scope.showPassword = showPasswordModal;
 
                 function showPasswordModal() {
-                    modal.showPassword($scope.entryId);
+                    modal.showPassword($scope.entry.id);
                 }
             }
         };

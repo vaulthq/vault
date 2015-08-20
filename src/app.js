@@ -109,7 +109,7 @@
                                     return projects[i];
                                 }
                             }
-                            console.log('neradau');
+                            throw "Project not found!";
                         });
                     },
                     entries: function($stateParams, Api) {

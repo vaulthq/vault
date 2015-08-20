@@ -1,0 +1,66 @@
+.table {
+  .col-min {
+    width: 1%;
+    white-space: nowrap;
+  }
+}
+
+
+.table-entries {
+  > tbody > tr > td {
+    vertical-align: middle;
+  }
+
+  tr.current {
+    background: #EFF5F2;
+  }
+
+  .col-id {
+    font-weight: bold;
+    color: #ccc;
+    font-size: 20px;
+    vertical-align: middle;
+    text-align: center;
+  }
+  .col-title {
+    font-size: 17px;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 300px;
+    .title {
+      text-transform: capitalize;
+    }
+    .note {
+      color: #ccc;
+    }
+    .time {
+      color: #999;
+      line-height: 100%;
+    }
+
+
+  }
+  .text-large {
+    font-size: 17px;
+  }
+  .text-small {
+    font-size: 11px;
+  }
+
+  tr:hover, tr.current {
+    .tags a {
+      visibility: visible;
+    }
+  }
+
+  .tags {
+    a {
+      visibility: hidden;
+    }
+    .label {
+      margin-right: 3px;
+    }
+  }
+}

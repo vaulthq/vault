@@ -109,7 +109,7 @@
                                     return projects[i];
                                 }
                             }
-                            console.log('neradau');
+                            throw "Project not found!";
                         });
                     },
                     entries: function($stateParams, Api) {
@@ -428,6 +428,655 @@
     }
 
 })();
+(function () {
+    angular
+        .module('xApp')
+        .directive('clippy', dir);
+
+    function dir() {
+        return {
+            restrict: 'E',
+            controller: function() {
+                var enabled = localStorage.getItem('clippy') || false;
+
+                if (String(enabled).toLowerCase() == 'true') {
+                    runClippy();
+                }
+            }
+        };
+    }
+
+    function runClippy() {
+        clippy.load('Clippy', function(agent){
+            agent.show();
+            agent.reposition = function () {
+                if (!this._el.is(':visible')) return;
+                var o = this._el.offset();
+                var bH = this._el.outerHeight();
+                var bW = this._el.outerWidth();
+
+                var wW = $(window).width();
+                var wH = $(window).height();
+                var sT = $(window).scrollTop();
+                var sL = $(window).scrollLeft();
+                var top = o.top - sT;
+                var left = o.left - sL;
+                var m = 5;
+                if (top - m < 0) {
+                    top = m;
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                } else if ((top + bH + m) > wH) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    top = wH - bH - m;
+                }
+
+                if (left - m < 0) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    left = m;
+                } else if (left + bW + m > wW) {
+                    this.hide();
+                    clearInterval(loop);
+                    this._balloon.hide(true);
+                    left = wW - bW - m;
+                }
+
+                this._el.css({left:left, top:top});
+                // reposition balloon
+                this._balloon.reposition();
+            };
+            agent._balloon.WORD_SPEAK_TIME = 200;
+            agent._balloon.CLOSE_BALLOON_DELAY = 15000;
+            var loop = setInterval(function () {
+                agent.speak(fortunes[Math.floor(Math.random()*fortunes.length)]);
+            }, 30000);
+        });
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('copyPassword', copyPasswordDirective);
+
+    function copyPasswordDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="download()" class="btn btn-default btn-xs" title="Copy password" ng-if="isState(\'download\')">' +
+                    '<i class="glyphicon glyphicon-open"></i>' +
+                '</a>' +
+                '<a class="btn btn-default btn-xs" title="Please wait..." ng-if="isState(\'waiting\')">' +
+                    '<i class="fa fa-spinner fa-spin"></i>' +
+                '</a>' +
+                '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
+                    '<i class="glyphicon glyphicon-save"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($scope, Api, toaster) {
+                $scope.state = 'download';
+                $scope.isState = isState;
+                $scope.download = downloadPassword;
+                $scope.copy = copy;
+                $scope.password = '';
+
+                $scope.$on("PasswordRequest", function(e, entry){
+                    if (entry.id != $scope.entry.id) {
+                        return;
+                    }
+
+                    if ($scope.state == "download") {
+                        downloadPassword();
+                        return;
+                    }
+
+                    if ($scope.state == "copy") {
+                        var textarea = document.createElement("textarea");
+                        textarea.innerHTML = $scope.password;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            if (document.execCommand("copy")) {
+                                copy();
+                            }
+                        } catch (e) {}
+                        document.body.removeChild(textarea);
+                    }
+                });
+
+                function isState(state) {
+                    return $scope.state == state;
+                }
+
+                function copy() {
+                    toaster.pop('success', "", 'Password copied to clipboard.');
+                }
+
+                function downloadPassword() {
+                    $scope.state = 'waiting';
+                    Api.entryPassword.password({id: $scope.entry.id}, function(response) {
+                        $scope.password = response.password;
+                        response.$promise.then(function() {
+                            $scope.state = 'copy';
+                        });
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryAccessInfo', entryAccessInfoDirective);
+
+    function entryAccessInfoDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-primary btn-xs" title="Access Information" ng-click="info()" ng-if="!entry.can_edit">' +
+                    '<i class="glyphicon glyphicon-info-sign"></i>' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.info = entryInfo;
+
+                function entryInfo() {
+                    $modal.open({
+                        templateUrl: '/t/entry/access.html',
+                        controller: 'ModalAccessController',
+                        resolve: {
+                            access: function(Api) {
+                                return Api.entryAccess.query({id: $scope.entry.id});
+                            }
+                        }
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryCreate', entryCreateDirective);
+
+    function entryCreateDirective() {
+        return {
+            restrict: 'E',
+            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            scope: {
+                projectId: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.create = createEntry;
+
+                function createEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/form.html',
+                        controller: 'ModalCreateEntryController',
+                        resolve: {
+                            project_id: function() {
+                                return $scope.projectId;
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:create', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryDelete', entryDeleteDirective);
+
+    function entryDeleteDirective() {
+        return {
+            restrict: 'A',
+            scope: {
+                entry: '=entryDelete'
+            },
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.delete();
+                });
+            },
+            controller: function($rootScope, $scope, Api) {
+                $scope.delete = entryDelete;
+
+                function entryDelete() {
+                    console.log($scope.entry);
+                    if (!confirm('Are you sure?')) {
+                        return;
+                    }
+
+                    Api.entry.delete({id: $scope.entry.id});
+                    $rootScope.$broadcast('entry:delete', $scope.entry);
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryShare', entryShareDirective);
+
+    function entryShareDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
+                    '<i class="glyphicon glyphicon-link"></i> Share' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.share = shareEntry;
+
+                function shareEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/share.html',
+                        controller: 'ModalShareController',
+                        resolve: {
+                            users: function(Api) {
+                                return Api.user.query();
+                            },
+                            access: function(Api) {
+                                return Api.share.query({id: $scope.entry.id});
+                            },
+                            entry: function() {
+                                return $scope.entry;
+                            },
+                            teams: function(Api) {
+                                return Api.team.query();
+                            },
+                            entryTeams: function(Api) {
+                                return Api.entryTeams.query({id: $scope.entry.id});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:share', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryTag', entryTagDirective);
+
+    function entryTagDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a ng-click="tag()" class="btn btn-link btn-xs" title="Manage Tags">' +
+                    '<i class="fa fa-pencil"></i> Tags' +
+                '</a>',
+            scope: {
+                entry: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.tag = tagEntry;
+
+                function tagEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/tag.html',
+                        controller: 'ModalTagController',
+                        resolve: {
+                            entry: function() {
+                                return $scope.entry;
+                            },
+                            tags: function(Api) {
+                                return Api.entryTags.query();
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:tag', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('entryUpdate', entryUpdateDirective);
+
+    function entryUpdateDirective() {
+        return {
+            restrict: 'A',
+            scope: {
+                entry: '=entryUpdate'
+            },
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.update();
+                });
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.update = updateEntry;
+
+                function updateEntry() {
+                    $modal.open({
+                        templateUrl: '/t/entry/form.html',
+                        controller: 'ModalUpdateEntryController',
+                        resolve: {
+                            entry: function(Api) {
+                                return Api.entry.get({id: $scope.entry.id});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('entry:update', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+/*global angular */
+/**
+ * Directive that places focus on the element it is applied to when the expression it binds to evaluates to true
+ */
+(function () {
+    angular
+        .module('xApp')
+        .directive('appFocus', appFocusDirective);
+
+    function appFocusDirective($parse) {
+        return function (scope, elem, attrs) {
+            var select = attrs.hasOwnProperty('appFocusSelect');
+            var optionsFn = angular.noop;
+            if (select) {
+                optionsFn = $parse(attrs.appFocusSelect) || optionsFn;
+            }
+            if (!attrs.appFocus) {
+                focus();
+            } else {
+                scope.$watch(attrs.appFocus, function (newVal) {
+                    if (newVal) {
+                        focus();
+                    }
+                });
+            }
+            function focus() {
+                setTimeout(function () {
+                    elem[0].focus();
+                    select && selectInput();
+                }, 200);
+            }
+
+            function selectInput() {
+                var options = optionsFn(scope);
+                if (options) {
+                    elem[0].setSelectionRange(
+                        options.start || 0,
+                        options.end || 0
+                    );
+                } else {
+                    elem[0].select();
+                }
+            }
+
+            scope.$on("AppFocus", function() {
+                selectInput();
+            });
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('keyCreate', dir);
+
+    function dir() {
+        return {
+            restrict: 'E',
+            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            controller: function($rootScope, $scope, Api, toaster) {
+                $scope.create = createKey;
+
+                function createKey() {
+                    Api.apis.save({}).$promise.then(function(key) {
+                        toaster.pop('success', "Key successfully created.");
+                        $rootScope.$broadcast('key:create', key);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('logout', logoutDirective);
+
+    function logoutDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-side-menu" ng-click="logout()" tooltip-placement="right" tooltip="Log-out ({{login.email}})">' +
+                    '<i class="fa fa-sign-out fa-2x"></i>' +
+                '</a>',
+            controller: function($scope, Api, AuthFactory, $location) {
+                $scope.logout = logout;
+
+                function logout() {
+                    Api.auth.get({}, function() {
+                        AuthFactory.logout(true);
+                        $location.path('/login');
+                    })
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('profile', profileDirective);
+
+    function profileDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-side-menu" ng-click="profile()" tooltip-placement="right" tooltip="Edit Profile">' +
+                    '<i class="fa fa-wrench fa-2x"></i>' +
+                '</a>',
+            controller: function($scope, $modal) {
+                $scope.profile = profile;
+
+                function profile() {
+                    $modal.open({
+                        templateUrl: '/t/user/profile.html',
+                        controller: 'ProfileController'
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectJump', projectJumpDirective);
+
+    function projectJumpDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<div class="project-jump" ng-class="{in: isActive}"><ui-select ng-model="project" on-select="openProject($item)" focus-on="openJump">' +
+                    '<ui-select-match placeholder="Quick project jump">{{ $select.selected.name }}</ui-select-match>' +
+                    '<ui-select-choices repeat="project.id as pro in projects | filter: {name: $select.search}">' +
+                        '<div ng-bind-html="pro.name | highlight: $select.search"></div>' +
+                        '<div class="muted small">{{ pro.description }}</div>' +
+                    '</ui-select-choices>' +
+                '</ui-select></div>',
+            scope: {
+                projects: '='
+            },
+            controller: function($scope, $state, hotkeys) {
+                $scope.openProject = openProject;
+                $scope.isActive = false;
+
+                $scope.$on('toggleJump', function () {
+                    $scope.isActive = !$scope.isActive;
+                    $scope.$broadcast('openJump');
+
+                    if ($scope.isActive) {
+                        hotkeys.add({
+                            combo: 'esc',
+                            description: 'Close project jump',
+                            allowIn: ['input', 'select'],
+                            callback: function() {
+                                close();
+                            }
+                        });
+                    } else {
+                        close();
+                    }
+                });
+
+                function close() {
+                    $scope.isActive = false;
+                    hotkeys.del('esc');
+                }
+
+                function openProject(project) {
+                    $state.go('user.project', {projectId: project.id});
+                    close();
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectTeam', directive);
+
+    function directive() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-success btn-xs" title="Assign Team" ng-click="teams()" ng-if="project.can_edit">' +
+                    '<i class="glyphicon glyphicon-link"></i>' +
+                '</a>',
+            scope: {
+                project: '='
+            },
+            controller: function($scope, $modal) {
+                $scope.teams = teams;
+
+                function teams() {
+                  $modal.open({
+                      templateUrl: '/t/project-team/teams.html',
+                      controller: 'ProjectTeamController',
+                      resolve: {
+                          teams: function(Api) {
+                              return Api.team.query();
+                          },
+                          access: function(Api) {
+                              return Api.projectTeams.query({id: $scope.project.id});
+                          },
+                          project: function() {
+                              return $scope.project;
+                          }
+                      }
+                  });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('projectUpdate', projectUpdateDirective);
+
+    function projectUpdateDirective() {
+        return {
+            restrict: 'E',
+            template:
+                '<a class="btn btn-warning btn-xs" title="Edit project" ng-click="update()" ng-if="project.can_edit">' +
+                    '<i class="glyphicon glyphicon-edit"></i>' +
+                '</a>',
+            scope: {
+                project: '='
+            },
+            controller: function($rootScope, $scope, $modal) {
+                $scope.update = updateProject;
+
+                function updateProject() {
+                    $modal.open({
+                        templateUrl: '/t/project/form.html',
+                        controller: 'ModalUpdateProjectController',
+                        resolve: {
+                            project: function(Api) {
+                                return Api.project.get({id: $scope.project.id});
+                            }
+                        }
+                    }).result.then(function (model) {
+                        $rootScope.$broadcast('project:update', model);
+                    });
+                }
+            }
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .directive('triggerChange', triggerChangeDirective);
+
+    function triggerChangeDirective() {
+        return {
+            restrict: 'A',
+            priority: -10,
+            link: function (scope, element) {
+                element.on('submit', function(){
+                    angular.forEach(element.find('input'), function(field) {
+                        angular.element(field).triggerHandler('change');
+                    });
+                });
+            }
+        };
+    }
+})();
+
 (function() {
     angular
         .module('xApp')
@@ -475,6 +1124,8 @@
                 var previous = getFiltered()[current - 1];
                 if (previous) {
                     $scope.active = previous;
+                } else {
+                    $rootScope.$broadcast("AppFocus");
                 }
             }
         });
@@ -507,7 +1158,7 @@
         }
 
         function getFiltered() {
-            return $filter('filter')($scope.entries, $scope.search);
+            return $filter('filter')($scope.entries, { $: $scope.search.query });
         }
 
         function setActive(entry) {
@@ -773,648 +1424,6 @@
     }
 })();
 
-(function () {
-    angular
-        .module('xApp')
-        .directive('clippy', dir);
-
-    function dir() {
-        return {
-            restrict: 'E',
-            controller: function() {
-                var enabled = localStorage.getItem('clippy') || false;
-
-                if (String(enabled).toLowerCase() == 'true') {
-                    runClippy();
-                }
-            }
-        };
-    }
-
-    function runClippy() {
-        clippy.load('Clippy', function(agent){
-            agent.show();
-            agent.reposition = function () {
-                if (!this._el.is(':visible')) return;
-                var o = this._el.offset();
-                var bH = this._el.outerHeight();
-                var bW = this._el.outerWidth();
-
-                var wW = $(window).width();
-                var wH = $(window).height();
-                var sT = $(window).scrollTop();
-                var sL = $(window).scrollLeft();
-                var top = o.top - sT;
-                var left = o.left - sL;
-                var m = 5;
-                if (top - m < 0) {
-                    top = m;
-                    this.hide();
-                    clearInterval(loop);
-                    this._balloon.hide(true);
-                } else if ((top + bH + m) > wH) {
-                    this.hide();
-                    clearInterval(loop);
-                    this._balloon.hide(true);
-                    top = wH - bH - m;
-                }
-
-                if (left - m < 0) {
-                    this.hide();
-                    clearInterval(loop);
-                    this._balloon.hide(true);
-                    left = m;
-                } else if (left + bW + m > wW) {
-                    this.hide();
-                    clearInterval(loop);
-                    this._balloon.hide(true);
-                    left = wW - bW - m;
-                }
-
-                this._el.css({left:left, top:top});
-                // reposition balloon
-                this._balloon.reposition();
-            };
-            agent._balloon.WORD_SPEAK_TIME = 200;
-            agent._balloon.CLOSE_BALLOON_DELAY = 15000;
-            var loop = setInterval(function () {
-                agent.speak(fortunes[Math.floor(Math.random()*fortunes.length)]);
-            }, 30000);
-        });
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('copyPassword', copyPasswordDirective);
-
-    function copyPasswordDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a ng-click="download()" class="btn btn-default btn-xs" title="Copy password" ng-if="isState(\'download\')">' +
-                    '<i class="glyphicon glyphicon-open"></i>' +
-                '</a>' +
-                '<a class="btn btn-default btn-xs" title="Please wait..." ng-if="isState(\'waiting\')">' +
-                    '<i class="fa fa-spinner fa-spin"></i>' +
-                '</a>' +
-                '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
-                    '<i class="glyphicon glyphicon-save"></i>' +
-                '</a>',
-            scope: {
-                entry: '='
-            },
-            controller: function($scope, Api, toaster) {
-                $scope.state = 'download';
-                $scope.isState = isState;
-                $scope.download = downloadPassword;
-                $scope.copy = copy;
-                $scope.password = '';
-
-                $scope.$on("PasswordRequest", function(e, entry){
-                    if (entry.id != $scope.entry.id) {
-                        return;
-                    }
-
-                    if ($scope.state == "download") {
-                        downloadPassword();
-                        return;
-                    }
-
-                    if ($scope.state == "copy") {
-                        var textarea = document.createElement("textarea");
-                        textarea.innerHTML = $scope.password;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        try {
-                            if (document.execCommand("copy")) {
-                                copy();
-                            }
-                        } catch (e) {}
-                        document.body.removeChild(textarea);
-                    }
-                });
-
-                function isState(state) {
-                    return $scope.state == state;
-                }
-
-                function copy() {
-                    toaster.pop('success', "", 'Password copied to clipboard.');
-                }
-
-                function downloadPassword() {
-                    $scope.state = 'waiting';
-                    Api.entryPassword.password({id: $scope.entry.id}, function(response) {
-                        $scope.password = response.password;
-                        response.$promise.then(function() {
-                            $scope.state = 'copy';
-                        });
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryAccessInfo', entryAccessInfoDirective);
-
-    function entryAccessInfoDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-primary btn-xs" title="Access Information" ng-click="info()" ng-if="!entry.can_edit">' +
-                    '<i class="glyphicon glyphicon-info-sign"></i>' +
-                '</a>',
-            scope: {
-                entry: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.info = entryInfo;
-
-                function entryInfo() {
-                    $modal.open({
-                        templateUrl: '/t/entry/access.html',
-                        controller: 'ModalAccessController',
-                        resolve: {
-                            access: function(Api) {
-                                return Api.entryAccess.query({id: $scope.entry.id});
-                            }
-                        }
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryCreate', entryCreateDirective);
-
-    function entryCreateDirective() {
-        return {
-            restrict: 'E',
-            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
-            scope: {
-                projectId: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.create = createEntry;
-
-                function createEntry() {
-                    $modal.open({
-                        templateUrl: '/t/entry/form.html',
-                        controller: 'ModalCreateEntryController',
-                        resolve: {
-                            project_id: function() {
-                                return $scope.projectId;
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('entry:create', model);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryDelete', entryDeleteDirective);
-
-    function entryDeleteDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a ng-click="delete()" class="btn btn-danger btn-xs" title="Remove">' +
-                    '<i class="glyphicon glyphicon-trash"></i>' +
-                '</a>',
-            scope: {
-                entry: '='
-            },
-            controller: function($rootScope, $scope, Api) {
-                $scope.delete = entryDelete;
-
-                function entryDelete() {
-                    if (!confirm('Are you sure?')) {
-                        return;
-                    }
-
-                    Api.entry.delete({id: $scope.entry.id});
-                    $rootScope.$broadcast('entry:delete', $scope.entry);
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryShare', entryShareDirective);
-
-    function entryShareDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a ng-click="share()" class="btn btn-success btn-xs" title="Share to User">' +
-                    '<i class="glyphicon glyphicon-link"></i> Share' +
-                '</a>',
-            scope: {
-                entry: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.share = shareEntry;
-
-                function shareEntry() {
-                    $modal.open({
-                        templateUrl: '/t/entry/share.html',
-                        controller: 'ModalShareController',
-                        resolve: {
-                            users: function(Api) {
-                                return Api.user.query();
-                            },
-                            access: function(Api) {
-                                return Api.share.query({id: $scope.entry.id});
-                            },
-                            entry: function() {
-                                return $scope.entry;
-                            },
-                            teams: function(Api) {
-                                return Api.team.query();
-                            },
-                            entryTeams: function(Api) {
-                                return Api.entryTeams.query({id: $scope.entry.id});
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('entry:share', model);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryTag', entryTagDirective);
-
-    function entryTagDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a ng-click="tag()" class="btn btn-default btn-xs" title="Manage Tags">' +
-                    '<i class="glyphicon glyphicon-tag"></i> Tag' +
-                '</a>',
-            scope: {
-                entry: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.tag = tagEntry;
-
-                function tagEntry() {
-                    $modal.open({
-                        templateUrl: '/t/entry/tag.html',
-                        controller: 'ModalTagController',
-                        resolve: {
-                            entry: function() {
-                                return $scope.entry;
-                            },
-                            tags: function(Api) {
-                                return Api.entryTags.query();
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('entry:tag', model);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('entryUpdate', entryUpdateDirective);
-
-    function entryUpdateDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a ng-click="update()" class="btn btn-warning btn-xs" title="Update">' +
-                    '<i class="glyphicon glyphicon-edit"></i> Edit' +
-                '</a>',
-            scope: {
-                entryId: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.update = updateEntry;
-
-                function updateEntry() {
-                    $modal.open({
-                        templateUrl: '/t/entry/form.html',
-                        controller: 'ModalUpdateEntryController',
-                        resolve: {
-                            entry: function(Api) {
-                                return Api.entry.get({id: $scope.entryId});
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('entry:update', model);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-/*global angular */
-/**
- * Directive that places focus on the element it is applied to when the expression it binds to evaluates to true
- */
-(function () {
-    angular
-        .module('xApp')
-        .directive('appFocus', appFocusDirective);
-
-    function appFocusDirective($parse) {
-        return function (scope, elem, attrs) {
-            var select = attrs.hasOwnProperty('appFocusSelect');
-            var optionsFn = angular.noop;
-            if (select) {
-                optionsFn = $parse(attrs.appFocusSelect) || optionsFn;
-            }
-            if (!attrs.appFocus) {
-                focus();
-            } else {
-                scope.$watch(attrs.appFocus, function (newVal) {
-                    if (newVal) {
-                        focus();
-                    }
-                });
-            }
-            function focus() {
-                setTimeout(function () {
-                    elem[0].focus();
-                    select && selectInput();
-                }, 200);
-            }
-
-            function selectInput() {
-                var options = optionsFn(scope);
-                if (options) {
-                    elem[0].setSelectionRange(
-                        options.start || 0,
-                        options.end || 0
-                    );
-                } else {
-                    elem[0].select();
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('keyCreate', dir);
-
-    function dir() {
-        return {
-            restrict: 'E',
-            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
-            controller: function($rootScope, $scope, Api, toaster) {
-                $scope.create = createKey;
-
-                function createKey() {
-                    Api.apis.save({}).$promise.then(function(key) {
-                        toaster.pop('success', "Key successfully created.");
-                        $rootScope.$broadcast('key:create', key);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('logout', logoutDirective);
-
-    function logoutDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-side-menu" ng-click="logout()" tooltip-placement="right" tooltip="Log-out ({{login.email}})">' +
-                    '<i class="fa fa-sign-out fa-2x"></i>' +
-                '</a>',
-            controller: function($scope, Api, AuthFactory, $location) {
-                $scope.logout = logout;
-
-                function logout() {
-                    Api.auth.get({}, function() {
-                        AuthFactory.logout(true);
-                        $location.path('/login');
-                    })
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('profile', profileDirective);
-
-    function profileDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-side-menu" ng-click="profile()" tooltip-placement="right" tooltip="Edit Profile">' +
-                    '<i class="fa fa-wrench fa-2x"></i>' +
-                '</a>',
-            controller: function($scope, $modal) {
-                $scope.profile = profile;
-
-                function profile() {
-                    $modal.open({
-                        templateUrl: '/t/user/profile.html',
-                        controller: 'ProfileController'
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('projectJump', projectJumpDirective);
-
-    function projectJumpDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<div class="project-jump" ng-class="{in: isActive}"><ui-select ng-model="project" on-select="openProject($item)" focus-on="openJump">' +
-                    '<ui-select-match placeholder="Quick project jump">{{ $select.selected.name }}</ui-select-match>' +
-                    '<ui-select-choices repeat="project.id as pro in projects | filter: {name: $select.search}">' +
-                        '<div ng-bind-html="pro.name | highlight: $select.search"></div>' +
-                        '<div class="muted small">{{ pro.description }}</div>' +
-                    '</ui-select-choices>' +
-                '</ui-select></div>',
-            scope: {
-                projects: '='
-            },
-            controller: function($scope, $state, hotkeys) {
-                $scope.openProject = openProject;
-                $scope.isActive = false;
-
-                $scope.$on('toggleJump', function () {
-                    $scope.isActive = !$scope.isActive;
-                    $scope.$broadcast('openJump');
-
-                    if ($scope.isActive) {
-                        hotkeys.add({
-                            combo: 'esc',
-                            description: 'Close project jump',
-                            allowIn: ['input', 'select'],
-                            callback: function() {
-                                close();
-                            }
-                        });
-                    } else {
-                        close();
-                    }
-                });
-
-                function close() {
-                    $scope.isActive = false;
-                    hotkeys.del('esc');
-                }
-
-                function openProject(project) {
-                    $state.go('user.project', {projectId: project.id});
-                    close();
-                    if (document.activeElement) {
-                        document.activeElement.blur();
-                    }
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('projectTeam', directive);
-
-    function directive() {
-        return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-success btn-xs" title="Assign Team" ng-click="teams()" ng-if="project.can_edit">' +
-                    '<i class="glyphicon glyphicon-link"></i>' +
-                '</a>',
-            scope: {
-                project: '='
-            },
-            controller: function($scope, $modal) {
-                $scope.teams = teams;
-
-                function teams() {
-                  $modal.open({
-                      templateUrl: '/t/project-team/teams.html',
-                      controller: 'ProjectTeamController',
-                      resolve: {
-                          teams: function(Api) {
-                              return Api.team.query();
-                          },
-                          access: function(Api) {
-                              return Api.projectTeams.query({id: $scope.project.id});
-                          },
-                          project: function() {
-                              return $scope.project;
-                          }
-                      }
-                  });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('projectUpdate', projectUpdateDirective);
-
-    function projectUpdateDirective() {
-        return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-warning btn-xs" title="Edit project" ng-click="update()" ng-if="project.can_edit">' +
-                    '<i class="glyphicon glyphicon-edit"></i>' +
-                '</a>',
-            scope: {
-                project: '='
-            },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.update = updateProject;
-
-                function updateProject() {
-                    $modal.open({
-                        templateUrl: '/t/project/form.html',
-                        controller: 'ModalUpdateProjectController',
-                        resolve: {
-                            project: function(Api) {
-                                return Api.project.get({id: $scope.project.id});
-                            }
-                        }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('project:update', model);
-                    });
-                }
-            }
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .directive('triggerChange', triggerChangeDirective);
-
-    function triggerChangeDirective() {
-        return {
-            restrict: 'A',
-            priority: -10,
-            link: function (scope, element) {
-                element.on('submit', function(){
-                    angular.forEach(element.find('input'), function(field) {
-                        angular.element(field).triggerHandler('change');
-                    });
-                });
-            }
-        };
-    }
-})();
-
 (function() {
     angular
         .module('xApp')
@@ -1523,20 +1532,20 @@ var Password = {
     function showPasswordDirective() {
         return {
             scope: {
-                entryId: '=',
-                'elementClass': '=?'
+                entry: '=showPassword'
             },
-            restrict: 'EA',
-            template:
-                '<a ng-click="showPassword()" ng-class="elementClass" title="Display Password">' +
-                '    <i class="glyphicon glyphicon-lock"></i>' +
-                '</a>',
+            restrict: 'A',
+            link: function($scope, element) {
+                element.on('click', function(e){
+                    $scope.showPassword();
+                });
+            },
             controller: function($scope, $modal, modal) {
                 $scope.elementClass = $scope.elementClass || 'btn btn-info btn-xs';
                 $scope.showPassword = showPasswordModal;
 
                 function showPasswordModal() {
-                    modal.showPassword($scope.entryId);
+                    modal.showPassword($scope.entry.id);
                 }
             }
         };
@@ -1666,122 +1675,8 @@ var Password = {
 (function() {
     angular
         .module('xApp')
-        .controller('AssignedTeamController', teamController);
-
-    function teamController($scope, $modalInstance, teams) {
-        $scope.teams = teams;
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .controller('ProjectTeamController', teamController);
-
-    function teamController($scope, $modalInstance, Api, teams, project, access) {
-        $scope.teams = teams;
-        $scope.access = access;
-        $scope.project = project;
-
-        $scope.canAccess = function(team) {
-            return getAccessIndexForUserId(team.id) != -1;
-        };
-
-        $scope.grant = function(team) {
-            Api.projectTeams.save({
-                team_id: team.id,
-                project_id: $scope.project.id
-            }, function (response) {
-                $scope.access.push(response);
-            });
-        };
-
-        $scope.revoke = function(team) {
-            var accessIndex = getAccessIndexForUserId(team.id);
-
-            Api.projectTeams.delete({
-                id: $scope.access[accessIndex].id
-            }, function() {
-                $scope.access.splice(accessIndex, 1);
-            });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-
-        function getAccessIndexForUserId(teamId) {
-            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
-        };
-    }
-})();
-
-(function() {
-    angular
-        .module('xApp')
-        .controller('HomeController', function($scope, recent, hotkeys, $rootScope) {
+        .controller('HomeController', function($scope, recent) {
             $scope.recent = recent;
-            $scope.active = null;
-            $scope.$on('$destroy', onDestroy);
-            recent.$promise.then(function(){
-                if (recent.length > 0) {
-                    $scope.active = recent[0];
-                }
-            });
-
-            hotkeys.add({
-                combo: 'return',
-                description: 'Download and copy password',
-                allowIn: ['input', 'select', 'textarea'],
-                callback: function(event, hotkey) {
-                    $rootScope.$broadcast("PasswordRequest", $scope.active);
-                }
-            });
-
-
-            hotkeys.add({
-                combo: 'up',
-                description: 'Navigate up',
-                allowIn: ['input', 'select', 'textarea'],
-                callback: function(event, hotkey) {
-                    event.preventDefault();
-                    var current = _.findIndex(recent, function(x) {
-                        return x.id == $scope.active.id;
-                    });
-
-                    var previous = recent[current - 1];
-                    if (previous) {
-                        $scope.active = previous;
-                    }
-                }
-            });
-
-            hotkeys.add({
-                combo: 'down',
-                description: 'Navigate down',
-                allowIn: ['input', 'select', 'textarea'],
-                callback: function(event, hotkey) {
-                    event.preventDefault();
-                    var current = _.findIndex(recent, function(x) {
-                        return x.id == $scope.active.id;
-                    });
-
-                    var next = recent[current + 1];
-                    if (next) {
-                        $scope.active = next;
-                    }
-                }
-            });
-
-            function onDestroy() {
-                hotkeys.del('return');
-                hotkeys.del('up');
-                hotkeys.del('down');
-            }
 
         })
         .factory('RecentFactory', function ($resource) {
@@ -2007,6 +1902,63 @@ var Password = {
             hotkeys.del('up');
             hotkeys.del('down');
         });
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('AssignedTeamController', teamController);
+
+    function teamController($scope, $modalInstance, teams) {
+        $scope.teams = teams;
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+    }
+})();
+
+(function() {
+    angular
+        .module('xApp')
+        .controller('ProjectTeamController', teamController);
+
+    function teamController($scope, $modalInstance, Api, teams, project, access) {
+        $scope.teams = teams;
+        $scope.access = access;
+        $scope.project = project;
+
+        $scope.canAccess = function(team) {
+            return getAccessIndexForUserId(team.id) != -1;
+        };
+
+        $scope.grant = function(team) {
+            Api.projectTeams.save({
+                team_id: team.id,
+                project_id: $scope.project.id
+            }, function (response) {
+                $scope.access.push(response);
+            });
+        };
+
+        $scope.revoke = function(team) {
+            var accessIndex = getAccessIndexForUserId(team.id);
+
+            Api.projectTeams.delete({
+                id: $scope.access[accessIndex].id
+            }, function() {
+                $scope.access.splice(accessIndex, 1);
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss();
+        };
+
+        function getAccessIndexForUserId(teamId) {
+            return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
+        };
     }
 })();
 
