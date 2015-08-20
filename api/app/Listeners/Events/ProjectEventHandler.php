@@ -1,4 +1,4 @@
-<?php namespace App\Handlers\Events;
+<?php namespace App\Listeners\Events;
 
 use App\Events\User\ProjectReassigned;
 use App\Events\User\UserDeleted;
@@ -19,7 +19,7 @@ class ProjectEventHandler
 
 	public function subscribe($events)
 	{
-		$events->listen('App\Events\User\UserDeleted', 'App\Handlers\Events\ProjectEventHandler@onUserDeleted');
+		$events->listen('App\Events\User\UserDeleted', 'App\Listeners\Events\ProjectEventHandler@onUserDeleted');
 	}
 
 }

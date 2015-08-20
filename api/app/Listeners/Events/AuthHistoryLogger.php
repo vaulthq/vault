@@ -1,4 +1,4 @@
-<?php namespace App\Handlers\Events;
+<?php namespace App\Listeners\Events;
 
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\UserLoggedOut;
@@ -32,8 +32,8 @@ class AuthHistoryLogger
 
 	public function subscribe($events)
 	{
-		$events->listen('App\Events\Auth\UserLoggedIn', 'App\Handlers\Events\AuthHistoryLogger@onUserLogin');
-		$events->listen('App\Events\Auth\UserLoggedOut', 'App\Handlers\Events\AuthHistoryLogger@onUserLogout');
+		$events->listen('App\Events\Auth\UserLoggedIn', 'App\Listeners\Events\AuthHistoryLogger@onUserLogin');
+		$events->listen('App\Events\Auth\UserLoggedOut', 'App\Listeners\Events\AuthHistoryLogger@onUserLogout');
 	}
 
 }

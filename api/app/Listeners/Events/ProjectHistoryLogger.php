@@ -1,8 +1,6 @@
-<?php namespace App\Handlers\Events;
+<?php namespace App\Listeners\Events;
 
 use App\Events\Auth\UserChangedUser;
-use App\Events\Auth\UserLoggedIn;
-use App\Events\Auth\UserLoggedOut;
 
 use App\Events\User\ProjectReassigned;
 use App\Vault\Logging\HistoryLogger;
@@ -30,6 +28,6 @@ class ProjectHistoryLogger
 
 	public function subscribe($events)
 	{
-		$events->listen('App\Events\Project\ProjectReassigned', 'App\Handlers\Events\ProjectHistoryLogger@onReassign');
+		$events->listen('App\Events\Project\ProjectReassigned', 'App\Listeners\Events\ProjectHistoryLogger@onReassign');
 	}
 }

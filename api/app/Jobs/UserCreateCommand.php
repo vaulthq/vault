@@ -1,4 +1,4 @@
-<?php namespace App\Commands;
+<?php namespace App\Jobs;
 
 use App\Events\User\UserCreated;
 use App\Vault\Models\User;

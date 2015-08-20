@@ -1,4 +1,4 @@
-<?php namespace App\Handlers\Events;
+<?php namespace App\Listeners\Events;
 
 use App\Events\User\UserCreated;
 use App\Events\User\UserDeleted;
@@ -33,8 +33,8 @@ class UserHistoryLogger
 
 	public function subscribe($events)
 	{
-		$events->listen('App\Events\User\UserCreated', 'App\Handlers\Events\UserHistoryLogger@onUserCreated');
-		$events->listen('App\Events\User\UserDeleted', 'App\Handlers\Events\UserHistoryLogger@onUserDeleted');
+		$events->listen('App\Events\User\UserCreated', 'App\Listeners\Events\UserHistoryLogger@onUserCreated');
+		$events->listen('App\Events\User\UserDeleted', 'App\Listeners\Events\UserHistoryLogger@onUserDeleted');
 	}
 
 }
