@@ -1,6 +1,7 @@
 <?php namespace App\Commands;
 
 use App\Events\User\UserCreated;
+use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\History;
 use App\Vault\Models\User;
 use App\Vault\Repository\UserRepository;
@@ -54,7 +55,7 @@ class UserUpdateCommand extends Command implements SelfHandling
         $this->surname = $surname;
     }
 
-    public function handle(UserRepository $userRepo)
+    public function handle(UserRepository $userRepo, HistoryLogger $logger)
     {
         $model = User::findOrFail($this->id);
 
@@ -70,10 +71,10 @@ class UserUpdateCommand extends Command implements SelfHandling
             $model->group = $this->group;
         }
 
-        History::make('user', 'Updated user details.', $model->id);
+        $logger->log('user', 'Updated user details.', $model->id);
 
         if ( ! is_null($this->password)) {
-            History::make('user', 'Changed user password.', $model->id);
+            $logger->log('user', 'Changed user password.', $model->id);
             $model->password = Hash::make($this->password);
         }
 

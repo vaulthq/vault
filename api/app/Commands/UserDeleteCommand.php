@@ -2,6 +2,7 @@
 
 use App\Events\User\UserCreated;
 use App\Events\User\UserDeleted;
+use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
 use App\Vault\Models\History;
 use App\Vault\Models\Team;
@@ -28,7 +29,7 @@ class UserDeleteCommand extends Command implements SelfHandling
         $this->id = $id;
     }
 
-    public function handle(UserRepository $userRepo)
+    public function handle(UserRepository $userRepo, HistoryLogger $logger)
     {
         $model = User::findOrFail($this->id);
 
@@ -43,13 +44,13 @@ class UserDeleteCommand extends Command implements SelfHandling
         foreach (Entry::where('user_id', $model->id)->get() as $item) {
             $item->user_id = Auth::user()->id;
             $item->save();
-            History::make('reassign', 'Assigning entry #'.$item->id.'.', $item->id);
+            $logger->log('reassign', 'Assigning entry #'.$item->id.'.', $item->id);
         }
 
         foreach (Team::where('user_id', $model->id)->get() as $item) {
             $item->user_id = Auth::user()->id;
             $item->save();
-            History::make('reassign', 'Assigning team #'.$item->id.'.', $item->id);
+            $logger->log('reassign', 'Assigning team #'.$item->id.'.', $item->id);
         }
 
         $model->delete();
