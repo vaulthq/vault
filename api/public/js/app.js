@@ -527,6 +527,30 @@
                 $scope.copy = copy;
                 $scope.password = '';
 
+                $scope.$on("PasswordRequest", function(e, entry){
+                    if (entry.id != $scope.entry.id) {
+                        return;
+                    }
+
+                    if ($scope.state == "download") {
+                        downloadPassword();
+                        return;
+                    }
+
+                    if ($scope.state == "copy") {
+                        var textarea = document.createElement("textarea");
+                        textarea.innerHTML = $scope.password;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            if (document.execCommand("copy")) {
+                                copy();
+                            }
+                        } catch (e) {}
+                        document.body.removeChild(textarea);
+                    }
+                });
+
                 function isState(state) {
                     return $scope.state == state;
                 }
@@ -1051,7 +1075,7 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, entries, project, active) {
+    function controller($scope, $filter, hotkeys, entries, project, active, $rootScope) {
 
         $scope.entries = entries;
         $scope.project = project;
@@ -1067,7 +1091,18 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+        $scope.$on('$destroy', onDestroy);
         $scope.$watch("search", onFilterChanged, true);
+
+        hotkeys.add({
+            combo: 'return',
+            description: 'Download and copy password',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                $rootScope.$broadcast("PasswordRequest", $scope.active);
+            }
+        });
+
 
         hotkeys.add({
             combo: 'up',
@@ -1147,6 +1182,12 @@
 
         function getEntryIndex(entry) {
             return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
+        }
+
+        function onDestroy() {
+            hotkeys.del('return');
+            hotkeys.del('up');
+            hotkeys.del('down');
         }
     }
 })();
@@ -1348,7 +1389,9 @@
 (function() {
     angular
         .module('xApp')
-        .controller('ModalUpdateEntryController', function($scope, $modalInstance, Api, entry, GROUPS) {
+        .controller('ModalUpdateEntryController', ctrl);
+
+    function ctrl($scope, $modalInstance, Api, entry, GROUPS) {
         $scope.entry = entry;
         $scope.groups = GROUPS;
 
@@ -1369,7 +1412,7 @@
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
-    });
+    }
 })();
 
 (function() {

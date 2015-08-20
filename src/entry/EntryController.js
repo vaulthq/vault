@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('EntryController', controller);
 
-    function controller($scope, $filter, hotkeys, entries, project, active) {
+    function controller($scope, $filter, hotkeys, entries, project, active, $rootScope) {
 
         $scope.entries = entries;
         $scope.project = project;
@@ -19,7 +19,18 @@
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
+        $scope.$on('$destroy', onDestroy);
         $scope.$watch("search", onFilterChanged, true);
+
+        hotkeys.add({
+            combo: 'return',
+            description: 'Download and copy password',
+            allowIn: ['input', 'select', 'textarea'],
+            callback: function(event, hotkey) {
+                $rootScope.$broadcast("PasswordRequest", $scope.active);
+            }
+        });
+
 
         hotkeys.add({
             combo: 'up',
@@ -99,6 +110,12 @@
 
         function getEntryIndex(entry) {
             return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
+        }
+
+        function onDestroy() {
+            hotkeys.del('return');
+            hotkeys.del('up');
+            hotkeys.del('down');
         }
     }
 })();
