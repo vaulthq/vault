@@ -17,7 +17,7 @@
             <th></th>
         </tr>
         </thead>
-        <tr ng-repeat="entry in recent">
+        <tr ng-repeat="entry in recent" ng-class="{'list-group-item-warning': entry.id == active.id}">
             <td>{{ entry.id }}</td>
             <td><a ui-sref="user.projects({active: entry.project_id})" title="Go to projects">{{ entry.project_name }}</a></td>
             <td><a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to entry">{{ entry.name }}</a></td>
