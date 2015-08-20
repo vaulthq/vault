@@ -36,8 +36,6 @@ class ProjectController extends Controller
 
         $model->save();
 
-        History::make('project', 'Created new project.', $model->id);
-
         return $model;
 	}
 

@@ -1,5 +1,6 @@
 <?php namespace App\Providers;
 
+use App\Vault\Models\Project;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -32,6 +33,8 @@ class EventServiceProvider extends ServiceProvider {
 		Event::subscribe('App\Handlers\Events\ProjectHistoryLogger');
 
 		Event::subscribe('App\Handlers\Events\ProjectEventHandler');
+
+		Project::observe($this->app->make('App\Events\Observer\ProjectObserver'));
 	}
 
 }
