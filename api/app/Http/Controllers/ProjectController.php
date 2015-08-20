@@ -2,7 +2,6 @@
 
 use App\Http\Requests\ProjectRequest;
 use App\Vault\Models\Entry;
-use App\Vault\Models\History;
 use App\Vault\Models\Project;
 use App\Vault\Models\User;
 use Illuminate\Support\Facades\Auth;

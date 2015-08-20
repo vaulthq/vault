@@ -2,6 +2,7 @@
 
 use App\Vault\Models\Entry;
 use App\Vault\Models\Project;
+use App\Vault\Models\Share;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -37,6 +38,7 @@ class EventServiceProvider extends ServiceProvider {
 
 		Project::observe($this->app->make('App\Events\Observer\ProjectObserver'));
 		Entry::observe($this->app->make('App\Events\Observer\EntryObserver'));
+		Share::observe($this->app->make('App\Events\Observer\ShareObserver'));
 	}
 
 }
