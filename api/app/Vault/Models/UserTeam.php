@@ -9,7 +9,16 @@ class UserTeam extends Model
 
     public static $rules = [
         'user_id' => 'required',
-        'id' => 'required'
+        'team_id' => 'required',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo('App\Vault\Models\User', 'user_id');
+    }
+
+    public function team()
+    {
+        return $this->belongsTo('App\Vault\Models\Team', 'team_id');
+    }
 }

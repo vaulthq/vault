@@ -11,4 +11,14 @@ class ProjectTeam extends Model
         'team_id' => 'required',
         'project_id' => 'required',
     ];
+
+    public function team()
+    {
+        return $this->belongsTo('App\Vault\Models\Team', 'team_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo('App\Vault\Models\Project', 'project_id');
+    }
 }
