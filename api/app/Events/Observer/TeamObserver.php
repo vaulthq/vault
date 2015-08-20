@@ -1,26 +1,12 @@
 <?php namespace App\Events\Observer;
 
-use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Team;
 
-class TeamObserver
+class TeamObserver extends BaseObserver
 {
-    /**
-     * @var HistoryLogger
-     */
-    private $logger;
-
-    /**
-     * @param HistoryLogger $logger
-     */
-    public function __construct(HistoryLogger $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function created(Team $team)
     {
-        $this->logger->log('team', 'Created new team. (' . $team->name. ').', $team->id);
+        $this->log('Created new team. "' . $team->name. '".', $team);
     }
 
     public function updating(Team $team)
@@ -30,7 +16,7 @@ class TeamObserver
 
     public function updated(Team $team)
     {
-        $this->logger->log('team', 'Updated team details.', $team->id);
+        $this->log('Updated team details.', $team);
     }
 
     public function deleting(Team $team)
@@ -40,6 +26,6 @@ class TeamObserver
 
     public function deleted(Team $team)
     {
-        $this->logger->log('team', 'Deleted team #' . $team->id . ' ('.$team->name.').', $team->id);
+        $this->log('Deleted team "'.$team->name.'".', $team);
     }
 }

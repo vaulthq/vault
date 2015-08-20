@@ -1,27 +1,13 @@
 <?php namespace App\Events\Observer;
 
-use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
-class ProjectObserver
+class ProjectObserver extends BaseObserver
 {
-    /**
-     * @var HistoryLogger
-     */
-    private $logger;
-
-    /**
-     * @param HistoryLogger $logger
-     */
-    public function __construct(HistoryLogger $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function created(Project $project)
     {
-        $this->logger->log('project', 'Created new project.', $project->id);
+        $this->log('Created new project.', $project);
     }
 
     public function updating(Project $project)
@@ -32,14 +18,13 @@ class ProjectObserver
     public function updated(Project $project)
     {
         if ($project->isDirty('user_id')) {
-            $this->logger->log(
-                'project-owner',
+            $this->log(
                 sprintf('Changed owner from "%s" to "%s".', $project->getOriginal('user_id'), $project->user_id),
-                $project->id
+                $project
             );
         }
 
-        $this->logger->log('project', 'Updated project details.', $project->id);
+        $this->log('Updated project details.', $project);
     }
 
     public function deleting(Project $project)
@@ -49,6 +34,6 @@ class ProjectObserver
 
     public function deleted(Project $project)
     {
-        $this->logger->log('project', 'Deleted project #' . $project->id . ' ('.$project->name.').', $project->id);
+        $this->log('Deleted project "'.$project->name.'".', $project);
     }
 }

@@ -1,23 +1,9 @@
 <?php namespace App\Events\Observer;
 
-use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\UserTeam;
 
-class UserTeamObserver
+class UserTeamObserver extends BaseObserver
 {
-    /**
-     * @var HistoryLogger
-     */
-    private $logger;
-
-    /**
-     * @param HistoryLogger $logger
-     */
-    public function __construct(HistoryLogger $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function creating(UserTeam $team)
     {
         return $team->team->can_edit;
@@ -25,7 +11,7 @@ class UserTeamObserver
 
     public function created(UserTeam $team)
     {
-        $this->logger->log('user_team', 'Added "'.$team->user->email.'" to team "'.$team->team->name.'".', $team->id);
+        $this->log('Added "'.$team->user->email.'" to team "'.$team->team->name.'".', $team);
     }
 
     public function deleting(UserTeam $team)
@@ -35,6 +21,6 @@ class UserTeamObserver
 
     public function deleted(UserTeam $team)
     {
-        $this->logger->log('user_team', 'Deleted "'.$team->user->email.'" from team "'.$team->team->name.'".', $team->id);
+        $this->log('Deleted "'.$team->user->email.'" from team "'.$team->team->name.'".', $team);
     }
 }
