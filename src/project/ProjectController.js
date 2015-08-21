@@ -7,14 +7,20 @@
 
         $scope.projects = projects;
         $scope.active = {id: active};
-
         $scope.create = createProject;
         $scope.getFiltered = getFiltered;
         $scope.teams = teamsAssigned;
         $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
-        $scope.search = {};
+        $scope.setActive = setActive;
+        $scope.goTo = goTo;
+        $scope.search = {query: ''};
         $scope.$watch("search", onFilterChanged, true);
+        $scope.projects.$promise.then(function(){
+            if (!$scope.active.id && $scope.projects.length > 0) {
+                $scope.active = $scope.projects[0];
+            }
+        });
 
         function onFilterChanged() {
             var filtered = getFiltered();
@@ -69,9 +75,12 @@
         }
 
         function getFiltered() {
-            return $filter('filter')($scope.projects, $scope.search);
+            return $filter('filter')($scope.projects, { $: $scope.search.query });
         }
 
+        function setActive(entry) {
+            $scope.active = entry;
+        }
 
         hotkeys.add({
             combo: 'up',
@@ -106,6 +115,10 @@
                 }
             }
         });
+
+        function goTo(project){
+            $state.go('user.project', {projectId: project.id});
+        }
 
 
         hotkeys.add({

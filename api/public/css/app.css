@@ -171,7 +171,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 300px;
+  max-width: 1000px;
 }
 .table-entries .col-title .title {
   text-transform: capitalize;
@@ -350,6 +350,10 @@ body {
   margin: 0;
   font-size: 22px;
   color: #1A1B1F;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
 }
 .content {
   margin: 30px;
@@ -577,7 +581,7 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 300px;
+  max-width: 1000px;
 }
 .table-entries .col-title .title {
   text-transform: capitalize;

@@ -7,14 +7,17 @@
 
         $scope.entries = entries;
         $scope.project = project;
-
         $scope.active = active;
-
         $scope.search = {};
         $scope.tags = [];
-
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
+
+        $scope.entries.$promise.then(function(){
+            if (!$scope.active.id && $scope.entries.length > 0) {
+                $scope.active = $scope.entries[0];
+            }
+        });
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);

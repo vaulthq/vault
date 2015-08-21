@@ -14,7 +14,7 @@
         </div>
         <div class="col-md-5">
             <div class="pull-right">
-                <entry-create project-id="project.id"></entry-create>
+                <a class="btn btn-default btn-xs" title="Add new key" entry-create="project">Add new key</a>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
         <tr ng-if="0" ng-repeat-start="entry in getFiltered()"></tr>
         <tr ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)">
             <td ng-click="setActive(entry)" class="cursor col-min col-id">#{{ entry.id }}</td>
-            <td ng-click="setActive(entry)" class="cursor col-title">
+            <td ng-click="setActive(entry)" class="cursor col-title" show-password="entry">
                 <span title="{{entry.note}}" class="title">
                     {{ entry.name }}
                     <span class="note">{{ entry.note }}</span>
@@ -83,38 +83,11 @@
                             <li>
                                 <a entry-delete="entry" href>Delete</a>
                             </li>
-                            <li>
-                                <a show-password="entry" href>Show password</a>
-                            </li>
                         </ul>
                     </div>
                 </div>
             </td>
         </tr>
-        <!--<tr ng-if="active && active.id == entry.id" style="background-color: rgba(252, 248, 227, 0.17)">-->
-            <!--<td></td>-->
-            <!--<td colspan="5">-->
-                <!--<div class="pull-right">-->
-
-
-                    <!--<div ng-if="active.can_edit">-->
-
-
-                    <!--</div>-->
-                <!--</div>-->
-
-                <!--<ul class="list-inline" style="font-size: 15px">-->
-                    <!--<li ng-repeat="tag in active.tags">-->
-                        <!--<span class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>-->
-                    <!--</li>-->
-                <!--</ul>-->
-
-                <!--<div ng-if="active.note.length">-->
-                    <!--<br>-->
-                    <!--<p class="nl2br">{{ active.note }}</p>-->
-                <!--</div>-->
-            <!--</td>-->
-        <!--</tr>-->
 
         <tr ng-if="0" ng-repeat-end></tr>
         </tbody>

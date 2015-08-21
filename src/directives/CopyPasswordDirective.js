@@ -19,7 +19,7 @@
             scope: {
                 entry: '='
             },
-            controller: function($scope, Api, toaster) {
+            controller: function($scope, Api, toaster, $rootScope) {
                 $scope.state = 'download';
                 $scope.isState = isState;
                 $scope.download = downloadPassword;
@@ -47,6 +47,7 @@
                             }
                         } catch (e) {}
                         document.body.removeChild(textarea);
+                        $rootScope.$broadcast("AppFocus");
                     }
                 });
 

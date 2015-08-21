@@ -7,9 +7,14 @@
         return {
             restrict: 'A',
             scope: {
-                entry: '=entryUpdate'
+                entry: '=entryUpdate',
+                on: '='
             },
             link: function($scope, element) {
+                if (!$scope.entry.can_edit) {
+                    return;
+                }
+
                 element.on('click', function(e){
                     $scope.update();
                 });

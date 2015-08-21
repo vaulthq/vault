@@ -33,6 +33,7 @@
             function selectInput() {
                 var options = optionsFn(scope);
                 if (options) {
+
                     elem[0].setSelectionRange(
                         options.start || 0,
                         options.end || 0
@@ -40,6 +41,7 @@
                 } else {
                     elem[0].select();
                 }
+                return elem[0];
             }
 
             scope.$on("AppFocus", function() {

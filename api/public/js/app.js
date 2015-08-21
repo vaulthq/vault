@@ -520,7 +520,7 @@
             scope: {
                 entry: '='
             },
-            controller: function($scope, Api, toaster) {
+            controller: function($scope, Api, toaster, $rootScope) {
                 $scope.state = 'download';
                 $scope.isState = isState;
                 $scope.download = downloadPassword;
@@ -548,6 +548,7 @@
                             }
                         } catch (e) {}
                         document.body.removeChild(textarea);
+                        $rootScope.$broadcast("AppFocus");
                     }
                 });
 
@@ -612,29 +613,51 @@
         .module('xApp')
         .directive('entryCreate', entryCreateDirective);
 
-    function entryCreateDirective() {
+    function entryCreateDirective($modal, $rootScope, hotkeys) {
         return {
-            restrict: 'E',
-            template: '<a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add new key</a>',
+            restrict: 'A',
             scope: {
-                projectId: '='
+                project: '=entryCreate'
             },
-            controller: function($rootScope, $scope, $modal) {
-                $scope.create = createEntry;
 
-                function createEntry() {
+            link: function($scope, element) {
+                hotkeys.add({
+                    combo: 'ctrl+i',
+                    description: 'Add new entry',
+                    allowIn: ['input', 'select', 'textarea'],
+                    callback: function(event, hotkey) {
+                        openEntryModal();
+                    }
+                });
+
+                element.on('click', function() {
+                    openEntryModal();
+                });
+
+                function openEntryModal() {
                     $modal.open({
                         templateUrl: '/t/entry/form.html',
                         controller: 'ModalCreateEntryController',
                         resolve: {
-                            project_id: function() {
-                                return $scope.projectId;
+                            project_id: function () {
+                                return $scope.project.id;
                             }
                         }
-                    }).result.then(function (model) {
-                        $rootScope.$broadcast('entry:create', model);
-                    });
+                    }).result.then(onModalSuccess, onModalDismiss);
                 }
+
+                function onModalSuccess(model) {
+                    $rootScope.$broadcast('entry:create', model);
+                    $rootScope.$broadcast('AppFocus');
+                }
+
+                function onModalDismiss() {
+                    setTimeout(function(){ $rootScope.$broadcast("AppFocus"); }, 400);
+                }
+
+                $scope.$on('$destroy', function(){
+                    hotkeys.del('ctrl+i');
+                });
             }
         };
     }
@@ -660,7 +683,6 @@
                 $scope.delete = entryDelete;
 
                 function entryDelete() {
-                    console.log($scope.entry);
                     if (!confirm('Are you sure?')) {
                         return;
                     }
@@ -769,9 +791,14 @@
         return {
             restrict: 'A',
             scope: {
-                entry: '=entryUpdate'
+                entry: '=entryUpdate',
+                on: '='
             },
             link: function($scope, element) {
+                if (!$scope.entry.can_edit) {
+                    return;
+                }
+
                 element.on('click', function(e){
                     $scope.update();
                 });
@@ -832,6 +859,7 @@
             function selectInput() {
                 var options = optionsFn(scope);
                 if (options) {
+
                     elem[0].setSelectionRange(
                         options.start || 0,
                         options.end || 0
@@ -839,6 +867,7 @@
                 } else {
                     elem[0].select();
                 }
+                return elem[0];
             }
 
             scope.$on("AppFocus", function() {
@@ -1086,14 +1115,17 @@
 
         $scope.entries = entries;
         $scope.project = project;
-
         $scope.active = active;
-
         $scope.search = {};
         $scope.tags = [];
-
         $scope.setActive = setActive;
         $scope.getFiltered = getFiltered;
+
+        $scope.entries.$promise.then(function(){
+            if (!$scope.active.id && $scope.entries.length > 0) {
+                $scope.active = $scope.entries[0];
+            }
+        });
 
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
@@ -1536,6 +1568,10 @@ var Password = {
             },
             restrict: 'A',
             link: function($scope, element) {
+                if (!$scope.entry.can_edit) {
+                    return;
+                }
+
                 element.on('click', function(e){
                     $scope.showPassword();
                 });
@@ -1675,9 +1711,64 @@ var Password = {
 (function() {
     angular
         .module('xApp')
-        .controller('HomeController', function($scope, recent) {
+        .controller('HomeController', function($scope, recent, hotkeys, $rootScope) {
             $scope.recent = recent;
+            $scope.active = {};
+            $scope.setActive = setActive;
+            $scope.$on('$destroy', onDestroy);
 
+            hotkeys.add({
+                combo: 'return',
+                description: 'Download and copy password',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function(event, hotkey) {
+                    $rootScope.$broadcast("PasswordRequest", $scope.active);
+                }
+            });
+
+            hotkeys.add({
+                combo: 'up',
+                description: 'Show project jump window',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function(event, hotkey) {
+                    event.preventDefault();
+                    var current = _.findIndex($scope.recent, function(x) {
+                        return x.id == $scope.active.id;
+                    });
+
+                    var previous = $scope.recent[current - 1];
+                    if (previous) {
+                        $scope.active = previous;
+                    }
+                }
+            });
+
+            hotkeys.add({
+                combo: 'down',
+                description: 'Show project jump window',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function(event, hotkey) {
+                    event.preventDefault();
+                    var current = _.findIndex($scope.recent, function(x) {
+                        return x.id == $scope.active.id;
+                    });
+
+                    var next = $scope.recent[current + 1];
+                    if (next) {
+                        $scope.active = next;
+                    }
+                }
+            });
+
+            function setActive(entry) {
+                $scope.active = entry;
+            }
+
+            function onDestroy() {
+                hotkeys.del('return');
+                hotkeys.del('up');
+                hotkeys.del('down');
+            }
         })
         .factory('RecentFactory', function ($resource) {
             return $resource("/api/recent", {}, {
@@ -1786,14 +1877,20 @@ var Password = {
 
         $scope.projects = projects;
         $scope.active = {id: active};
-
         $scope.create = createProject;
         $scope.getFiltered = getFiltered;
         $scope.teams = teamsAssigned;
         $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
-        $scope.search = {};
+        $scope.setActive = setActive;
+        $scope.goTo = goTo;
+        $scope.search = {query: ''};
         $scope.$watch("search", onFilterChanged, true);
+        $scope.projects.$promise.then(function(){
+            if (!$scope.active.id && $scope.projects.length > 0) {
+                $scope.active = $scope.projects[0];
+            }
+        });
 
         function onFilterChanged() {
             var filtered = getFiltered();
@@ -1848,9 +1945,12 @@ var Password = {
         }
 
         function getFiltered() {
-            return $filter('filter')($scope.projects, $scope.search);
+            return $filter('filter')($scope.projects, { $: $scope.search.query });
         }
 
+        function setActive(entry) {
+            $scope.active = entry;
+        }
 
         hotkeys.add({
             combo: 'up',
@@ -1885,6 +1985,10 @@ var Password = {
                 }
             }
         });
+
+        function goTo(project){
+            $state.go('user.project', {projectId: project.id});
+        }
 
 
         hotkeys.add({

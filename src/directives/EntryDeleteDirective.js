@@ -18,7 +18,6 @@
                 $scope.delete = entryDelete;
 
                 function entryDelete() {
-                    console.log($scope.entry);
                     if (!confirm('Are you sure?')) {
                         return;
                     }
