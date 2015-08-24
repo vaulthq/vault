@@ -1,7 +1,10 @@
+/.idea
 /api/vendor
 /node_modules
-/.idea
 /bower_components
-/bin
 /api/.env
 /docker-compose.yml
+/api/public/css
+/api/public/fonts
+/api/public/js
+/api/public/t
