@@ -5,8 +5,9 @@ app:
     - ".:/var/www"
 
 web:
-  build: docker/nginx
+  image: datadoglt/nginx-laravel
   volumes_from: [app]
+  volumes: ["docker/nginx/default.conf:/etc/nginx/sites-enabled/laravel.conf"]
   links:
    - php
   ports:
