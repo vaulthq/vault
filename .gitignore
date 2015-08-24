@@ -6,5 +6,7 @@
 /docker-compose.yml
 /api/public/css
 /api/public/fonts
-/api/public/js
+/api/public/js/app.js
+/api/public/js/vendor.js
 /api/public/t
+
