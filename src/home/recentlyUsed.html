@@ -18,10 +18,10 @@
         </thead>
         <tr ng-repeat="entry in recent" ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)">
             <td class="col-min col-id">#{{ entry.id }}</td>
-            <td class="col-title">
+            <td>
                 <a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to projects">{{ entry.project_name }}</a>
             </td>
-            <td class="col-title">
+            <td>
                 <a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to entry">{{ entry.name }}</a>
             </td>
             <td>
@@ -32,7 +32,7 @@
                     &nbsp;
                 </div>
             </td>
-            <td class="col-title"><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
+            <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
                 <copy-password entry="entry"></copy-password>
                 <a href show-password="entry" class="btn btn-xs btn-info" ng-if="entry.id > 0"><i class="fa fa-fw fa-lock"></i></a>
