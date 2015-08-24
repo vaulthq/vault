@@ -1,18 +1,18 @@
 <div class="page-header">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-5 col-xs-4">
             <h3>
                 <a ui-sref="user.projects({active: project.id})" class="btn btn-info btn-xs" title="Go to projects">
                     <i class="glyphicon glyphicon-chevron-left"></i>
                 </a>
                 {{ project.name }}
-                <small>{{ project.description }}</small>
+                <small class="hidden-md">{{ project.description }}</small>
             </h3>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 col-xs-4">
             <input  type="text" class="form-control input-sm" style="margin-top:-2px" placeholder="Search password" ng-model="search.query" app-focus>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-5 col-xs-4">
             <div class="pull-right">
                 <a class="btn btn-default btn-xs" title="Add new key" entry-create="project">Add new key</a>
             </div>
