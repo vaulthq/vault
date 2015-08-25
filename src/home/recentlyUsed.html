@@ -35,7 +35,7 @@
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
             <td class="text-right">
                 <copy-password entry="entry"></copy-password>
-                <a href show-password="entry" class="btn btn-xs btn-info" ng-if="entry.id > 0"><i class="fa fa-fw fa-lock"></i></a>
+                <span show-password="entry" class="btn btn-xs btn-info"><i class="fa fa-fw fa-lock"></i></span>
             </td>
         </tr>
     </table>

@@ -53,10 +53,6 @@
             },
             restrict: 'A',
             link: function($scope, element) {
-                if (!$scope.entry.can_edit) {
-                    return;
-                }
-
                 element.on('click', function(e){
                     $scope.showPassword();
                 });
