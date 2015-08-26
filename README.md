@@ -10,17 +10,6 @@ The key features of this system:
 * **API**: Vault also includes an API for accessing secrets automatically, enabling you to create integrations with other software.
 * **Audit logs**: Every action in system is logged, so you can see who accessed which secrets.
 
-## Production requirements
-
-Vault uses AngularJS and Laravel 5.1 framework, so the requirements are:
-
-* PHP > 5.5.9
-* OpenSSL PHP Extension
-* PDO PHP Extension
-* Mbstring PHP Extension
-* Tokenizer PHP Extension
-* Web server (nginx)
-
 ## Production setup guide
 
 Instructions how to setup project for production can be found here: [Installation instructions](https://github.com/private-vault/vault/wiki/Installation-instructions).
