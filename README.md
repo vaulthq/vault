@@ -21,23 +21,29 @@ Vault uses AngularJS and Laravel 5.1 framework, so the requirements are:
 * Tokenizer PHP Extension
 * Web server (nginx)
 
+## Production setup guide
+
+Instructions how to setup project for production can be found here: [Installation instructions](https://github.com/private-vault/vault/wiki/Installation-instructions).
+
 ## Development: via docker-compose
 
-Make sure that you have `docker >1.5` installed:
+1. Make sure that you have [`docker >1.5`](http://docs.docker.com/) installed:
 
-    docker -v
+        $ docker -v
 
-Make sure that you have `docker-compose >1.2` installed:
+2. Make sure that you have [`docker-compose >1.2`](http://docs.docker.com/compose/install/) installed:
 
-    docker-compose --version
+        $ docker-compose --version
 
-Start containers and configure:
+3. Copy `docker-compose.yml.dist` to `docker-compose.yml` and make any changes as needed 
 
-    docker-compose pull && docker-compose up
+4. Start containers:
 
-## Login details
+        $ docker-compose up
 
-How to login:
+5. Wait until composer, npm, bower, gulp runs and then you can access frontend at [http://localhost](http://localhost).
+
+After initial setup, one account will be created which can be used to login. Login details are:
 
     Username: admin
     Password: admin
