@@ -41,11 +41,9 @@ Instructions how to setup project for production can be found here: [Installatio
 
         $ docker-compose up
 
-5. Wait until composer, npm, bower, gulp runs and then you can access frontend at [http://localhost](http://localhost).
-
-After initial setup, one account will be created which can be used to login. Login details are:
-
-    Username: admin
-    Password: admin
+5. Wait until composer, npm, bower, gulp runs and then you can access frontend at [http://localhost](http://localhost). After initial setup, one account will be created which can be used to login. Login details are:
+    
+        Username: admin
+        Password: admin
 
 
