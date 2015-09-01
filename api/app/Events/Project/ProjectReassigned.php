@@ -1,4 +1,4 @@
-<?php namespace App\Events\User;
+<?php namespace App\Events\Project;
 
 use App\Events\Event;
 use App\Vault\Models\Project;

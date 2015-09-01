@@ -1,8 +1,6 @@
 <?php namespace App\Listeners\Events;
 
-use App\Events\Auth\UserChangedUser;
-
-use App\Events\User\ProjectReassigned;
+use App\Events\Project\ProjectReassigned;
 use App\Vault\Logging\HistoryLogger;
 
 class ProjectHistoryLogger
