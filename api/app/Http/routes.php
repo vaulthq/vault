@@ -22,9 +22,16 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::resource('user', 'UserController');
 	Route::resource('recent', 'RecentController');
 	Route::resource('share', 'ShareController');
-	Route::resource('team', 'TeamController');
 	Route::resource('teamMembers', 'TeamMembersController');
 	Route::resource('projectTeams', 'ProjectTeamsController');
+
+	Route::group(['prefix' => 'team'], function() {
+		Route::get('/', 'TeamController@index');
+		Route::get('/{team}', 'TeamController@show');
+		Route::post('/', 'TeamController@create');
+		Route::put('/{team}', 'TeamController@update');
+		Route::delete('/{team}', 'TeamController@delete');
+	});
 
 	Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
 	Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);

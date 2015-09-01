@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Vault\Models\Team;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
@@ -8,21 +9,11 @@ use Illuminate\Support\Facades\Validator;
 
 class TeamController extends Controller
 {
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
 	public function index()
 	{
 		return Team::with('owner', 'users')->get();
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
 	public function store()
 	{
         $validator = Validator::make(Input::all(), Team::$rules);
@@ -39,50 +30,30 @@ class TeamController extends Controller
         return Team::with('owner', 'users')->where('id', $model->id)->get()->first();
 	}
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
+	public function show(Team $team)
 	{
-		return Team::with('owner', 'users')->where('id', $id)->get()->first();
+		$team->load('owner', 'users');
+
+		return $team;
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 */
-	public function update($id)
+	public function update(Team $model, Request $request)
 	{
-        $data = json_decode(file_get_contents("php://input", "r"));
-
-        $validator = Validator::make(['name' => isset($data->name) ? $data->name : ''], Team::$rules);
+        $validator = Validator::make(['name' => $request->get('name')], Team::$rules);
 
         if ($validator->fails()) {
             return Response::make($validator->messages()->first(), 419);
         }
 
-        $model = Team::findOrFail($data->id);
-
-        $model->name = $data->name;
+        $model->name = $request->get('name');
 
 		if (!$model->save()) {
 			abort(403);
 		}
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 */
-	public function destroy($id)
+	public function destroy(Team $model)
 	{
-        $model = Team::findOrFail($id);
-
         if (!$model->delete()) {
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
