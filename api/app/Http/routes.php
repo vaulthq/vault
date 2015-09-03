@@ -28,9 +28,9 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::group(['prefix' => 'team'], function() {
 		Route::get('/', 'TeamController@index');
 		Route::get('/{team}', 'TeamController@show');
-		Route::post('/', 'TeamController@create');
+		Route::post('/', 'TeamController@store');
 		Route::put('/{team}', 'TeamController@update');
-		Route::delete('/{team}', 'TeamController@delete');
+		Route::delete('/{team}', 'TeamController@destroy');
 	});
 
 	Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
