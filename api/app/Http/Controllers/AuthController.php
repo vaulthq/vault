@@ -2,6 +2,8 @@
 
 use App\Events\Auth\UserLoggedIn;
 use App\Events\Auth\UserLoggedOut;
+use App\Vault\Exception\UserDisabledException;
+use App\Vault\Models\User;
 use App\Vault\Response\JsonResponse;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -25,6 +27,9 @@ class AuthController extends Controller
 
         try {
             if ($auth->byCredentials($credentials)) {
+                if ($auth->user()->group == User::GROUP_DISABLED) {
+                    throw new UserDisabledException('Account has been disabled.');
+                }
                 if ($token = $jwt->fromUser($auth->user(), ['user' => $auth->user()])) {
                     event(new UserLoggedIn($auth->user()));
                     return $this->jsonResponse(['token' => $token]);
@@ -32,6 +37,8 @@ class AuthController extends Controller
             }
         } catch (JWTException $e) {
             return $this->jsonResponse(['Error creating JWT token'], 401);
+        } catch (UserDisabledException $e) {
+            return $this->jsonResponse([$e->getMessage()], 401);
         }
 
         return $this->jsonResponse(['Invalid username or password'], 401);

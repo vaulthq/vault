@@ -17,15 +17,13 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     use SoftDeletes, Authenticatable, CanResetPassword;
 
     const GROUP_ADMIN = 'admin';
-    const GROUP_DEV = 'dev';
-    const GROUP_TESTER = 'tester';
-    const GROUP_PM = 'pm';
+    const GROUP_MEMBER = 'member';
+    const GROUP_DISABLED = 'disabled';
 
     public static $groups = [
         self::GROUP_ADMIN => 'Administrator',
-        self::GROUP_DEV => 'Developer',
-        self::GROUP_TESTER => 'Tester',
-        self::GROUP_PM => 'Project Manager'
+        self::GROUP_MEMBER => 'Member',
+        self::GROUP_DISABLED => 'Disabled',
     ];
 
     protected $guarded = ['id', 'updated_at', 'created_at', 'deleted_at'];

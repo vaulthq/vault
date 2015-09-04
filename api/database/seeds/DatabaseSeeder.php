@@ -25,13 +25,12 @@ class DatabaseSeeder extends Seeder
                 'group' => User::GROUP_ADMIN
             ]);
 
-            for ($i=0; $i<5; $i++) {
-                Project::create([
-                    'name' => 'Project' . ($i + 1),
-                    'description' => 'some description about what dis is',
-                    'user_id' => 1
-                ]);
-            }
+            Project::create([
+                'name' => 'Project 1',
+                'description' => 'Default starter project',
+                'user_id' => 1
+            ]);
+
             echo "DB Seeded...\n";
         } else {
             echo "DB Already Seeded...\n";
