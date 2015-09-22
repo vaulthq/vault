@@ -10,6 +10,7 @@ Route::group(['prefix' => 'internal'], function() {
 
 Route::group(['prefix' => 'api', 'middleware' => 'api.key'], function() {
 	Route::get('deployKey', 'DeployKeyController@find');
+	Route::get('keyByTag', 'DeployKeyController@findByTag');
 });
 
 Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {

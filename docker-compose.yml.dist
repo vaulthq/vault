@@ -7,7 +7,7 @@ app:
 web:
   image: datadoglt/nginx-laravel
   volumes_from: [app]
-  volumes: ["docker/nginx/default.conf:/etc/nginx/sites-enabled/laravel.conf"]
+  volumes: ["./docker/nginx/default.conf:/etc/nginx/sites-enabled/laravel.conf"]
   links:
    - php
   ports:
