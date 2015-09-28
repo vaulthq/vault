@@ -49,10 +49,7 @@
             </td>
             <td ng-click="setActive(entry)" class="cursor">
                 <div class="text-large">
-                    <span title="{{entry.note}}">{{ entry.username }}</span>
-                    <span class="text-muted" ng-if="entry.username && entry.url">@</span>
-                    <span title="{{entry.note}}">{{ entry.url }}</span>
-                    &nbsp;
+                    <span title="{{entry.note}}">{{ entry.username }}</span><span class="text-muted" ng-if="entry.username && entry.url">@</span><span title="{{entry.note}}">{{ entry.url }}</span>
                 </div>
             </td>
 

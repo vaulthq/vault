@@ -11,7 +11,6 @@ var paths = {
         'bower_components/bootstrap/dist/css/bootstrap.min.css',
         'bower_components/AngularJS-Toaster/toaster.css',
         'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/clippy/build/clippy.css',
         'bower_components/angular-hotkeys/build/hotkeys.min.css',
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/angular-bootstrap-colorpicker/css/colorpicker.min.css'

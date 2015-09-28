@@ -10,8 +10,6 @@
             repeat: ''
         };
 
-        $scope.clippy = String(localStorage.getItem('clippy')) == 'false';
-
         $scope.ok = function() {
             Api.profile.save($scope.profile,
                 function() {
@@ -19,10 +17,6 @@
                     $modalInstance.close();
                 }
             );
-        };
-
-        $scope.toggleClippy = function() {
-            localStorage.setItem('clippy', $scope.clippy);
         };
 
         $scope.cancel = function () {
