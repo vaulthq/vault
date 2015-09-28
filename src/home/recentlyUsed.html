@@ -21,15 +21,12 @@
             <td>
                 <a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to projects">{{ entry.project_name }}</a>
             </td>
-            <td>
+            <td class="col-title">
                 <a ui-sref="user.project({projectId: entry.project_id, active: entry.id})" title="Go to entry">{{ entry.name }}</a>
             </td>
             <td>
                 <div class="text-large">
-                    <span title="{{entry.note}}">{{ entry.username }}</span>
-                    <span class="text-muted" ng-if="entry.username && entry.url">@</span>
-                    <span title="{{entry.note}}">{{ entry.url }}</span>
-                    &nbsp;
+                    <span title="{{entry.note}}">{{ entry.username }}</span><span class="text-muted" ng-if="entry.username && entry.url">@</span><span title="{{entry.note}}">{{ entry.url }}</span>
                 </div>
             </td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
