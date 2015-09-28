@@ -29,11 +29,26 @@
             <td><input type="text" class="form-control input-sm" ng-model="search.surname"></td>
             <td colspan="2"></td>
         </tr>
-        <tr ng-repeat="user in users | filter:search">
+        <tr ng-repeat="user in users | filter:search | filter:{group: '!disabled'}">
             <td>{{ user.email }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.surname }} </td>
             <td>{{ user.group | userGroup }} </td>
+            <td class="text-right" ng-show="login.group == 'admin'">
+                <a ng-click="updateUser(user.id)" class="btn btn-warning btn-xs" title="Update">
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a ng-click="deleteUser(user.id)" class="btn btn-danger btn-xs" title="Remove">
+                    <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </td>
+        </tr>
+
+        <tr ng-repeat="user in users | filter:search | filter:{group: 'disabled'}">
+            <td class="text-muted">{{ user.email }}</td>
+            <td class="text-muted">{{ user.name }}</td>
+            <td class="text-muted">{{ user.surname }} </td>
+            <td class="text-muted">{{ user.group | userGroup }} </td>
             <td class="text-right" ng-show="login.group == 'admin'">
                 <a ng-click="updateUser(user.id)" class="btn btn-warning btn-xs" title="Update">
                     <i class="glyphicon glyphicon-edit"></i>

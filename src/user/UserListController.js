@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('UserListController', controller);
 
-    function controller($scope, $modal, $timeout, toaster, Api, AuthFactory, users) {
+    function controller($scope, $modal, Api, users) {
         $scope.users = users;
 
         $scope.createUser = function() {
