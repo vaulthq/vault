@@ -38,7 +38,7 @@ class DeployKeyController extends Controller
 
         foreach ($request->get('tags') as $i => $tag) {
             $q->join("entry_tag as tag_$i", "tag_$i.entry_id", "=", "entry.id");
-            $q->where("tag_$i.name", $tag);
+            $q->where("tag_$i.name", strtoupper($tag));
         }
 
         $key = $q->get();
