@@ -20,8 +20,10 @@ class GroupToVarcharMigration extends Migration
         $users = User::all();
 
         foreach ($users as $user) {
+          if (isset($user->group)) {
             $user->type = $user->group == 'admin' ? 'admin' : 'member';
             $user->save();
+          }
         }
 
         Schema::table('user', function($table) {

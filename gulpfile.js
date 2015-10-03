@@ -32,10 +32,9 @@ var paths = {
         'bower_components/jquery/jquery.min.js',
         'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'bower_components/lodash/lodash.min.js',
-        'bower_components/clippy/build/clippy.js',
         'bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js',
-        'js_vendor/moment.min.js',
-        'js_vendor/angular-moment.min.js',
+        'bower_components/moment/min/moment.min.js',
+        'bower_components/angular-moment/angular-moment.min.js',
         'js_vendor/ZeroClipboard.min.js'
     ],
     scripts: [

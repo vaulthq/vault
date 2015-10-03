@@ -20,9 +20,9 @@
         ];
     }
 
-    function config($stateProvider, $urlRouterProvider, $httpProvider, uiSelectConfig, jwtInterceptorProvider) {
+    function config($stateProvider, $urlRouterProvider, $httpProvider, hotkeysProvider, uiSelectConfig, jwtInterceptorProvider) {
         uiSelectConfig.theme = 'bootstrap';
-
+        hotkeysProvider.includeCheatSheet = false;
         $stateProvider
             .state('anon', {
                 abstract: true,
@@ -44,7 +44,10 @@
             .state('anon.login', {
                 url: '/login',
                 templateUrl: '/t/auth/login.html',
-                controller: 'AuthController'
+                controller: 'AuthController',
+                data: {
+                  bodyClass: 'login-page'
+                }
             });
 
         $stateProvider
