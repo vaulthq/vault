@@ -33,21 +33,6 @@ body {
   white-space: pre-line;
 }
 
-.nice-flow {
-  -webkit-transition: width 0.3s ease, margin 0.3s ease;
-  -moz-transition: width 0.3s ease, margin 0.3s ease;
-  -o-transition: width 0.3s ease, margin 0.3s ease;
-  transition: width 0.3s ease, margin 0.3s ease;
-}
-
-.invisible {
-  opacity: 0;
-}
-
-.invisible-flow {
-  transition: opacity 0.1s 0.3s ease;
-}
-
 #toast-container > div {
   .box-shadow;
   border-radius: 2px;
@@ -93,12 +78,9 @@ body {
   right: 0;
   z-index: 500;
 
-  background: -webkit-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* Chrome 10+, Saf5.1+ */
-  background:    -moz-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* FF3.6+ */
-  background:     -ms-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* IE10 */
-  background:      -o-linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* Opera 11.10+ */
-  background:         linear-gradient(180deg, #5D4157 10%, #A8CABA 90%); /* W3C */
-
+  background: url('/img/bg.png');
+  background-repeat: repeat-y;
+  
   width: @sidebar-show-width;
   text-align: center;
 }

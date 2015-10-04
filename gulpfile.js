@@ -29,7 +29,6 @@ var paths = {
         'bower_components/AngularJS-Toaster/toaster.js',
         'bower_components/angular-ui-router/release/angular-ui-router.min.js',
         'bower_components/angular-jwt/dist/angular-jwt.min.js',
-        'bower_components/jquery/jquery.min.js',
         'bower_components/angular-hotkeys/build/hotkeys.min.js',
         'bower_components/lodash/lodash.min.js',
         'bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js',

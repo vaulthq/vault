@@ -1,4 +1,4 @@
-(function($) {
+(function() {
   angular
     .module('xApp')
     .controller('VaultController', ctrl);

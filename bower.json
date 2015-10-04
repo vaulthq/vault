@@ -31,7 +31,6 @@
     "angular-jwt": "~0.0.7",
     "angular-moment": "~0.10.3",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
-    "jquery": "~1.9.0",
     "lodash": "~3.9.3",
     "font-awesome": "~4.4"
   }
