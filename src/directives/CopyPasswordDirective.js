@@ -13,20 +13,23 @@
                 '<a class="btn btn-default btn-xs" title="Please wait..." ng-if="isState(\'waiting\')">' +
                     '<i class="fa fa-spinner fa-spin"></i>' +
                 '</a>' +
-                '<a clip-copy="password" clip-click="copy()" class="btn btn-info btn-xs" title="Copy password" ng-if="isState(\'copy\')">' +
+                '<a class="btn btn-info btn-xs" ng-click="copy()" title="Copy password" ng-if="isState(\'copy\')">' +
                     '<i class="glyphicon glyphicon-save"></i>' +
                 '</a>',
             scope: {
                 entry: '='
             },
-            controller: function($scope, Api, toaster, $rootScope) {
+            controller: function($scope, Api, toaster, $rootScope, CopyService) {
                 $scope.state = 'download';
                 $scope.isState = isState;
                 $scope.download = downloadPassword;
-                $scope.copy = copy;
+                $scope.copy = copyPassword;
                 $scope.password = '';
 
-                $scope.$on("PasswordRequest", function(e, entry){
+                $scope.$on('$destroy', cleanup);
+                $scope.$on("PasswordRequest", onPasswordRequest);
+
+                function onPasswordRequest(e, entry) {
                     if (entry.id != $scope.entry.id) {
                         return;
                     }
@@ -37,26 +40,18 @@
                     }
 
                     if ($scope.state == "copy") {
-                        var textarea = document.createElement("textarea");
-                        textarea.innerHTML = $scope.password;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        try {
-                            if (document.execCommand("copy")) {
-                                copy();
-                            }
-                        } catch (e) {}
-                        document.body.removeChild(textarea);
+                      CopyService.copy($scope.password).then(function() {
                         $rootScope.$broadcast("AppFocus");
+                      });
                     }
-                });
+                }
 
                 function isState(state) {
                     return $scope.state == state;
                 }
 
-                function copy() {
-                    toaster.pop('success', "", 'Password copied to clipboard.');
+                function copyPassword() {
+                  CopyService.copy($scope.password);
                 }
 
                 function downloadPassword() {
@@ -67,6 +62,10 @@
                             $scope.state = 'copy';
                         });
                     });
+                }
+
+                function cleanup() {
+                  CopyService.cleanup();
                 }
             }
         };

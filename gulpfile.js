@@ -33,8 +33,7 @@ var paths = {
         'bower_components/lodash/lodash.min.js',
         'bower_components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js',
         'bower_components/moment/min/moment.min.js',
-        'bower_components/angular-moment/angular-moment.min.js',
-        'js_vendor/ZeroClipboard.min.js'
+        'bower_components/angular-moment/angular-moment.min.js'
     ],
     scripts: [
         'src/**/*.js'
