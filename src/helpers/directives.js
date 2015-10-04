@@ -12,7 +12,7 @@
             scope: {
                 when: '='
             },
-            template: '<img src="/img/loader.gif" ng-show="when" class="loader">'
+            template: '<ul class="loading" ng-if="when"><li></li><li></li><li></li></ul>'
         };
     }
 
