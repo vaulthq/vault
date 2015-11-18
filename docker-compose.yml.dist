@@ -17,13 +17,13 @@ php:
   image: datadoglt/php56
   volumes_from: [app]
   working_dir: /var/www
-  volumes: ["docker/init.sh:/init.sh"]
+  volumes: ["./docker/init.sh:/init.sh"]
   links:
    - mysql
 
 mysql:
   image: mysql:5.6
-  volumes: ["api/storage/mysql:/var/lib/mysql"]
+  volumes: ["./api/storage/mysql:/var/lib/mysql"]
   environment:
     MYSQL_ROOT_PASSWORD: secret
     MYSQL_DATABASE: vault
