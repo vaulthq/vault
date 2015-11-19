@@ -17,6 +17,8 @@ body {
   overflow-x: hidden;
 }
 
+.modal-sm { width: 400px }
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -43,23 +45,6 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23);
 }
 
-.project-jump {
-  position: absolute;
-  top: -350px;
-  left: 50%;
-  margin-left: -175px;
-  width: 350px;
-  background: #3c3d42;
-  padding: 15px;
-  -webkit-transition: 0.2s ease-in-out;
-  -moz-transition: 0.2s ease-in-out;
-  -o-transition: 0.2s ease-in-out;
-  &.in {
-    top: 15px;
-  }
-  .box-shadow;
-}
-
 .content-background {
   background-color: white;
 }
@@ -67,6 +52,24 @@ body {
 .project-scrollbar {
   flex: 1;
   overflow-y: scroll;
+}
+
+.project-jump {
+  > .scroller {
+    max-height: 400px;
+    overflow-y: scroll;
+    margin-right: -10px;
+  }
+  > .input-lg {
+    margin-bottom: 30px;
+  }
+
+  .table>tbody>tr:first-child>td {
+    border-top: none;
+  }
+  .table>tbody>tr>td:hover {
+    cursor: pointer;
+  }
 }
 
 .side-menu {

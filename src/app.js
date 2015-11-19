@@ -56,25 +56,27 @@
                 templateUrl: '/t/home/home.html',
                 controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
                     $scope.projects = projects;
-
                     $scope.login = AuthFactory.getUser();
-
-                    $scope.jump = jump;
                     $scope.isEntryActive = $state.is('user.project');
 
                     hotkeys.add({
-                        combo: 'ctrl+p',
+                        combo: 'ctrl+k',
                         description: 'Show project jump window',
                         allowIn: ['input', 'select', 'textarea'],
-                        callback: function(event, hotkey) {
+                        callback: function(event) {
                             event.preventDefault();
-                            jump();
+                            $modal.open({
+                                templateUrl: '/t/project/projectJumper.html',
+                                controller: 'ModalProjectJumperController',
+                                size: 'sm',
+                                resolve: {
+                                    projects: function() {
+                                        return $scope.projects;
+                                    }
+                                }
+                            });
                         }
                     });
-
-                    function jump() {
-                        $scope.$broadcast('toggleJump');
-                    }
 
                     $rootScope.$on('$stateChangeStart', function(event, toState) {
                         $scope.isEntryActive = toState.name == 'user.project' || toState.name == 'user.projects';
@@ -121,18 +123,10 @@
                     active: function($stateParams, entries) {
                         if ($stateParams.active) {
                             return entries.$promise.then(function(entries) {
-                                var key = _.find(
+                                return _.find(
                                     entries,
                                     _.matchesProperty('id', parseInt($stateParams.active))
                                 );
-
-                                if (key == undefined) { // for some odd reason PHP 5.4 returns IDS as strings
-                                    key = _.find(
-                                        entries,
-                                        _.matchesProperty('id', $stateParams.active)
-                                    );
-                                }
-                                return key;
                             });
                         }
                         return {};

@@ -1,0 +1,17 @@
+<div class="modal-body project-jump">
+    <input type="text" class="form-control input-lg" placeholder="Filter projects..." ng-model="search.query" app-focus>
+
+    <div class="scroller">
+        <table class="table table-entries" ng-if="projects.length > 0">
+            <tbody>
+            <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)">
+                <td class="col-title" ng-click="goTo(project)" >
+                    <a title="Go to project">{{ project.name }}</a>
+                    <br>
+                    <span class="note">{{ project.description }}</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

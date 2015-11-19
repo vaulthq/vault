@@ -19,57 +19,21 @@
             }
         });
 
+        $scope.$watch("search", onFilterChanged, true);
+
         $scope.$on('entry:create', onEntryCreate);
         $scope.$on('entry:update', onEntryUpdate);
         $scope.$on('entry:delete', onEntryDelete);
-        $scope.$on('$destroy', onDestroy);
-        $scope.$watch("search", onFilterChanged, true);
 
-        hotkeys.add({
-            combo: 'return',
-            description: 'Download and copy password',
-            allowIn: ['input', 'select', 'textarea'],
-            callback: function(event, hotkey) {
-                $rootScope.$broadcast("PasswordRequest", $scope.active);
-            }
+        $scope.$on('$destroy', unbindShortcuts);
+        $scope.$on('modal:open', unbindShortcuts);
+        $scope.$on('modal:close', bindShortcuts);
+
+        $scope.$on('project:update', function(event, project) {
+            $scope.project = project;
         });
 
-
-        hotkeys.add({
-            combo: 'up',
-            description: 'Show project jump window',
-            allowIn: ['input', 'select', 'textarea'],
-            callback: function(event, hotkey) {
-                event.preventDefault();
-                var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.active.id;
-                });
-
-                var previous = getFiltered()[current - 1];
-                if (previous) {
-                    $scope.active = previous;
-                } else {
-                    $rootScope.$broadcast("AppFocus");
-                }
-            }
-        });
-
-        hotkeys.add({
-            combo: 'down',
-            description: 'Show project jump window',
-            allowIn: ['input', 'select', 'textarea'],
-            callback: function(event, hotkey) {
-                event.preventDefault();
-                var current = _.findIndex(getFiltered(), function(x) {
-                    return x.id == $scope.active.id;
-                });
-
-                var next = getFiltered()[current + 1];
-                if (next) {
-                    $scope.active = next;
-                }
-            }
-        });
+        bindShortcuts();
 
         function onFilterChanged() {
             var filtered = getFiltered();
@@ -117,7 +81,54 @@
             return $scope.entries.map(function(e) {return parseInt(e.id)}).indexOf(parseInt(entry.id));
         }
 
-        function onDestroy() {
+        function bindShortcuts() {
+            hotkeys.add({
+                combo: 'return',
+                description: 'Download and copy password',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function() {
+                    $rootScope.$broadcast("PasswordRequest", $scope.active);
+                }
+            });
+
+            hotkeys.add({
+                combo: 'up',
+                description: 'Show project jump window',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function(event) {
+                    event.preventDefault();
+                    var current = _.findIndex(getFiltered(), function(x) {
+                        return x.id == $scope.active.id;
+                    });
+
+                    var previous = getFiltered()[current - 1];
+                    if (previous) {
+                        $scope.active = previous;
+                    } else {
+                        $rootScope.$broadcast("AppFocus");
+                    }
+                }
+            });
+
+            hotkeys.add({
+                combo: 'down',
+                description: 'Show project jump window',
+                allowIn: ['input', 'select', 'textarea'],
+                callback: function(event) {
+                    event.preventDefault();
+                    var current = _.findIndex(getFiltered(), function(x) {
+                        return x.id == $scope.active.id;
+                    });
+
+                    var next = getFiltered()[current + 1];
+                    if (next) {
+                        $scope.active = next;
+                    }
+                }
+            });
+        }
+
+        function unbindShortcuts() {
             hotkeys.del('return');
             hotkeys.del('up');
             hotkeys.del('down');

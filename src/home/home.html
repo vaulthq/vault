@@ -3,9 +3,6 @@
             <a class="btn btn-side-menu" ui-sref="user.home" tooltip-placement="right" tooltip="Recently Used" ui-sref-active="active">
                 <i class="fa fa-home fa-2x"></i>
             </a>
-            <a class="btn btn-side-menu" ng-click="jump()" tooltip-placement="right" tooltip="Project Jumper">
-                <i class="fa fa-random fa-2x"></i>
-            </a>
             <a class="btn btn-side-menu" ui-sref="user.projects" tooltip-placement="right" tooltip="Project List" ng-class="{'active': isEntryActive}">
                 <i class="fa fa-th-list fa-2x"></i>
             </a>
@@ -32,5 +29,3 @@
     </div>
 
 <div id="container" class="content-background"><ui-view/></div>
-
-<project-jump projects="projects"></project-jump>
