@@ -10,10 +10,8 @@
         $scope.search = {query: ''};
 
         $scope.create = createProject;
-        $scope.getFiltered = getFiltered;
-        $scope.teams = teamsAssigned;
-        $scope.info = projectOwnerInfo;
         $scope.delete = deleteProject;
+        $scope.getFiltered = getFiltered;
         $scope.setActive = setActive;
         $scope.goTo = goTo;
 
@@ -47,30 +45,6 @@
                 controller: 'ModalCreateProjectController'
             }).result.then(function (model) {
                 $scope.projects.push(model);
-            });
-        }
-
-        function teamsAssigned(project) {
-            $modal.open({
-                templateUrl: '/t/project-team/assigned.html',
-                controller: 'AssignedTeamController',
-                resolve: {
-                    teams: function(Api) {
-                        return Api.assignedTeams.query({id: project.id});
-                    }
-                }
-            });
-        }
-
-        function projectOwnerInfo(project) {
-            $modal.open({
-                templateUrl: '/t/project/owner.html',
-                controller: 'ModalProjectOwnerController',
-                resolve: {
-                    owner: function(Api) {
-                        return Api.user.get({id: project.user_id});
-                    }
-                }
             });
         }
 

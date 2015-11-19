@@ -14,7 +14,17 @@
         </div>
         <div class="col-md-5 col-xs-4">
             <div class="pull-right">
-                <project-team project="project"></project-team>
+                <a class="btn btn-success btn-xs" title="Assign Team" project-teams="project" ng-if="project.can_edit">
+                    <i class="glyphicon glyphicon-link"></i>
+                </a>
+                <a class="btn btn-success btn-xs" title="Show Assigned Teams" project-show-teams="project" ng-if="!project.can_edit">
+                    <i class="glyphicon glyphicon-question-sign"></i>
+                </a>
+
+                <a class="btn btn-primary btn-xs" title="Project Access Information" project-show-owner="project" ng-if="!project.can_edit">
+                    <i class="glyphicon glyphicon-info-sign"></i>
+                </a>
+
                 <project-update project="project"></project-update>
 
                 <a class="btn btn-default btn-xs" title="Add new key" entry-create="project">Add new key</a>

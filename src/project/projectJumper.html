@@ -6,9 +6,9 @@
             <tbody>
             <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)">
                 <td class="col-title" ng-click="goTo(project)" >
-                    <a title="Go to project">{{ project.name }}</a>
+                    <a title="Go to project" ng-bind-html="project.name|highlight:search.query"></a>
                     <br>
-                    <span class="note">{{ project.description }}</span>
+                    <span class="note" ng-bind-html="project.description|highlight:search.query"></span>
                 </td>
             </tr>
             </tbody>
