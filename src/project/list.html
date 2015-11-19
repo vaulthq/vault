@@ -25,7 +25,7 @@
         </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)">
+            <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)" id="p-{{ project.id }}">
                 <td class="col-min col-id">#{{ project.id }}</td>
                 <td class="col-title cursor" ng-click="goTo(project)" >
                     <a ui-sref="user.project({projectId: project.id})" title="Go to project">{{ project.name }}</a>

@@ -83,6 +83,7 @@
                     var previous = getFiltered()[current - 1];
                     if (previous) {
                         $scope.active = previous;
+                        scrollTo();
                     }
                 }
             });
@@ -100,6 +101,7 @@
                     var next = getFiltered()[current + 1];
                     if (next) {
                         $scope.active = next;
+                        scrollTo();
                     }
                 }
             });
@@ -119,6 +121,10 @@
             hotkeys.del('return');
             hotkeys.del('up');
             hotkeys.del('down');
+        }
+
+        function scrollTo() {
+            document.getElementById('p-'+$scope.active.id).scrollIntoViewIfNeeded();
         }
     }
 })();

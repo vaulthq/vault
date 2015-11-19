@@ -48,7 +48,7 @@
         </thead>
         <tbody>
         <tr ng-if="0" ng-repeat-start="entry in getFiltered()"></tr>
-        <tr ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)">
+        <tr ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)" id="e-{{ entry.id }}">
             <td ng-click="setActive(entry)" class="cursor col-min col-id">#{{ entry.id }}</td>
             <td ng-click="setActive(entry)" class="cursor col-title" show-password="entry">
                 <span title="{{entry.note}}" class="title">

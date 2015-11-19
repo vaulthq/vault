@@ -57,6 +57,7 @@
                 var previous = getFiltered()[current - 1];
                 if (previous) {
                     $scope.active = previous;
+                    scrollTo();
                 }
             }
         });
@@ -73,6 +74,7 @@
                 var next = getFiltered()[current + 1];
                 if (next) {
                     $scope.active = next;
+                    scrollTo();
                 }
             }
         });
@@ -95,6 +97,10 @@
 
             $rootScope.$broadcast('modal:close');
         });
+
+        function scrollTo() {
+            document.getElementById('pj-'+$scope.active.id).scrollIntoViewIfNeeded();
+        }
     }
 })();
 

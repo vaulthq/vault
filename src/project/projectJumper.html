@@ -4,7 +4,7 @@
     <div class="scroller">
         <table class="table table-entries" ng-if="projects.length > 0">
             <tbody>
-            <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)">
+            <tr ng-repeat="project in getFiltered()" ng-class="{'current': project.id == active.id}" ng-mouseover="setActive(project)" id="pj-{{ project.id }}">
                 <td class="col-title" ng-click="goTo(project)" >
                     <a title="Go to project" ng-bind-html="project.name|highlight:search.query"></a>
                     <br>
