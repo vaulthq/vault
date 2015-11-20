@@ -11,7 +11,8 @@ class Kernel extends ConsoleKernel {
 	 * @var array
 	 */
 	protected $commands = [
-		'App\Console\Commands\Inspire',
+		'App\Console\Commands\KeyGenerateMaster',
+		'App\Console\Commands\TestE',
 	];
 
 	/**
@@ -22,8 +23,7 @@ class Kernel extends ConsoleKernel {
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		$schedule->command('inspire')
-				 ->hourly();
+
 	}
 
 }
