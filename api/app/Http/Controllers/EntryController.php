@@ -1,7 +1,11 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Encryption\AccessDecider;
+use App\Vault\Encryption\EntryCrypt;
+use App\Vault\Encryption\PrivateKey;
 use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
+use App\Vault\Models\KeyShare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -14,7 +18,7 @@ class EntryController extends Controller
      *
      * @return Entry
      */
-    public function store()
+    public function store(EntryCrypt $entryCrypt)
     {
         $model = new Entry();
 
@@ -26,7 +30,18 @@ class EntryController extends Controller
         $model->project_id = Input::get('project_id');
         $model->user_id = Auth::user()->id;
 
+        $sealed = $entryCrypt->encrypt(Input::get('password'), $model);
+
+        $model->data = $sealed['sealed'];
         $model->save();
+
+        foreach ($sealed['users'] as $id => $user) {
+            $share = new KeyShare();
+            $share->user_id = $user->id;
+            $share->public = $sealed['keys'][$id];
+
+            $model->shares()->save($share);
+        }
         $model->load('tags');
 
         return $model;
@@ -88,70 +103,29 @@ class EntryController extends Controller
     /**
      * Get password for Entry
      *
-     * @param $id
+     * @param Entry $model
      * @param HistoryLogger $logger
      * @return mixed
      */
-    public function getPassword($id, HistoryLogger $logger)
+    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt)
     {
-        $model = Entry::findOrFail($id);
-
         if (!$model->can_edit) {
             abort(403);
         }
 
-        $logger->log('password', 'Accessed password #' . $id . ' ('.$model->project->name.').', $id);
+        $share = KeyShare::where(['user_id' => Auth::user()->id, 'entry_id' => $model->id])->first();
 
-        return Response::json(['password' => strlen($model->password) > 0 ? $model->password : ''], 200);
+        $key = new PrivateKey(Auth::user()->rsaKey->private);
+        $key->unlock('b');
+        $data = $entryCrypt->decrypt($model, $share->public, $key);
+
+        $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
+
+        return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
     }
 
-    public function getAccess($id)
+    public function getAccess(Entry $entry, AccessDecider $decider)
     {
-        $model = Entry::findOrFail($id);
-        $users = [];
-        $added = [];
-
-        foreach ($model->shares()->get() as $share) {
-            if (!in_array($share->user_id, $added)) {
-                $users[] = $share->user->toArray();
-                $added[] = $share->user_id;
-            }
-        }
-
-        foreach ($model->teamShares()->with('team', 'team.users')->get() as $share) {
-            $team = $share->team;
-            if (!in_array($team->user_id, $added)) {
-                $users[] = $team->owner->toArray();
-                $added[] = $team->user_id;
-            }
-
-            foreach ($team->users as $user) {
-                if (!in_array($user->id, $added)) {
-                    $users[] = $user->toArray();
-                    $added[] = $user->id;
-                }
-            }
-        }
-
-        if (!in_array($model->owner->id, $added)) {
-            $users[] = $model->owner->toArray();
-            $added[] = $model->owner->id;
-        }
-
-        foreach ($model->project->teams()->with('users')->get() as $team) {
-            if (!in_array($team->user_id, $added)) {
-                $users[] = $team->owner->toArray();
-                $added[] = $team->user_id;
-            }
-
-            foreach ($team->users as $user) {
-                if (!in_array($user->id, $added)) {
-                    $users[] = $user->toArray();
-                    $added[] = $user->id;
-                }
-            }
-        }
-
-        return $users;
+        return $decider->getUserListForEntry($entry);
     }
 }

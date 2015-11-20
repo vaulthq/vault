@@ -12,7 +12,7 @@ class Entry extends Model
     protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	protected $table = 'entry';
     protected $hidden = [
-        'deleted_at', 'password'
+        'deleted_at', 'password', 'data'
     ];
     protected $appends = ['can_edit'];
 
