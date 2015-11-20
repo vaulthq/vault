@@ -10,7 +10,7 @@ class PrivateKey
     /**
      * @var resource
      */
-    private $resource = null;
+    private $resource = false;
 
     public function __construct($key)
     {
@@ -23,7 +23,11 @@ class PrivateKey
             throw new \RuntimeException('This key already been unlocked!');
         }
 
-        $this->resource = openssl_pkey_get_private($this->key, $passphrase);
+        $this->resource = openssl_pkey_get_private($this->key, md5($passphrase));
+
+        if ($this->resource === false) {
+            throw new \RuntimeException("Loading private key failed: " . openssl_error_string());
+        }
 
         return $this;
     }
@@ -33,8 +37,19 @@ class PrivateKey
         return $this->resource;
     }
 
-    public function getWrapped()
+    public function getKey()
     {
         return $this->key;
+    }
+
+    public function lock($passphrase)
+    {
+        if ($this->resource === false) {
+            throw new \RuntimeException("Key is still locked.");
+        }
+
+        openssl_pkey_export($this->resource, $this->key, md5($passphrase));
+
+        return $this;
     }
 }

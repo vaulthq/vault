@@ -107,6 +107,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $this->belongsToMany('App\Vault\Models\Team', 'user_team', 'team_id', 'user_id');
     }
 
+    public function rsaKey()
+    {
+        return $this->hasOne('App\Vault\Models\RsaKey', 'user_id');
+    }
+
     public function isAdmin()
     {
         return $this->group == self::GROUP_ADMIN;
