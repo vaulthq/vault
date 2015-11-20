@@ -33,10 +33,10 @@ class ProfileController extends Controller
             $model = User::findOrFail(Auth::user()->id);
             $model->password = Hash::make($newPassword);
 
-
             $rsa = $model->rsaKey;
             $rsa->private = (new PrivateKey($rsa->private))->unlock($oldPassword)->lock($newPassword)->getKey();
             $rsa->save();
+
             $model->save();
 
             $logger->log('auth', 'User changed password.', Auth::user()->id);
