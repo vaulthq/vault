@@ -4,6 +4,8 @@ use App\Vault\Models\Entry;
 use App\Vault\Models\KeyShare;
 use Illuminate\Support\Collection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Crypt;
+use Tymon\JWTAuth\JWTAuth;
 
 class EntryCrypt
 {
@@ -21,12 +23,17 @@ class EntryCrypt
      * @var DatabaseManager
      */
     private $db;
+    /**
+     * @var JWTAuth
+     */
+    private $auth;
 
-    public function __construct(AccessDecider $accessDecider, Sealer $sealer, DatabaseManager $db)
+    public function __construct(AccessDecider $accessDecider, Sealer $sealer, DatabaseManager $db, JWTAuth $auth)
     {
         $this->accessDecider = $accessDecider;
         $this->sealer = $sealer;
         $this->db = $db;
+        $this->auth = $auth;
     }
 
     public function encrypt($data, Entry $entry)
@@ -34,27 +41,26 @@ class EntryCrypt
         //@todo check if user can actually do this
         $users = $this->accessDecider->getUserListForEntry($entry);
         $keys = $this->getUserPublicKeys($users);
+
         $encrypt = $this->sealer->seal($data, $keys);
 
         $entry->data = $encrypt['sealed'];
 
-        $shares = [];
-        foreach ($users as $id => $user) {
-            $share = new KeyShare();
-            $share->user_id = $user->id;
-            $share->public = $encrypt['keys'][$id];
-            $shares[] = $share;
-        }
-
         $this->db->connection()->beginTransaction();
         try {
             if ($entry->exists) {
-                $this->db->table('key_share')->where('entry_id', $entry->id)->delete();
+                $entry->keyShares()->delete();
             } else {
                 $entry->save();
             }
 
-            $entry->shares()->saveMany($shares);
+            foreach ($users->values() as $id => $user) {
+                $share = new KeyShare();
+                $share->user_id = $user->id;
+                $share->public = $encrypt['keys'][$id];
+                $entry->keyShares()->save($share);
+            }
+
             $entry->save();
 
             $this->db->connection()->commit();
@@ -64,9 +70,21 @@ class EntryCrypt
         }
     }
 
-    public function decrypt(Entry $entry, $share, PrivateKey $key)
+    public function decrypt(Entry $entry)
     {
-        return $this->sealer->unseal($entry->data, $share, $key);
+        $user = $this->auth->toUser();
+        $share = $entry->keyShares()->where('user_id', $user->id)->firstOrFail();
+        $code = Crypt::decrypt($this->auth->getPayload()->get('code'));
+
+        $key = new PrivateKey($user->rsaKey->private);
+        $key->unlock($code);
+
+        return $this->sealer->unseal($entry->data, $share->public, $key);
+    }
+
+    public function reencrypt(Entry $entry)
+    {
+        $this->encrypt($this->decrypt($entry), $entry);
     }
 
     /**

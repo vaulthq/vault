@@ -1,8 +1,7 @@
 <?php namespace App\Vault\Security;
 
 use App\Vault\Models\Entry;
-use App\Vault\Models\Share;
-use App\Vault\Models\Team;
+use App\Vault\Models\Project;
 use App\Vault\Models\User;
 
 class Access
@@ -17,76 +16,26 @@ class Access
         $this->user = $user;
     }
 
+    /**
+     * Estimates if user should be able to access entry.
+     * It's possible, that found key share cannot unlock key
+     *
+     * @param Entry $entry
+     * @return bool
+     */
     public function userCanAccessEntry(Entry $entry)
     {
-        if ($this->isEntryOwner($entry)) {
+        return $entry->keyShares()->where('user_id', $this->user->id)->count() > 0;
+    }
+
+    public function userCanAccessProject(Project $project)
+    {
+        if ($project->user_id == $this->user->id) {
             return true;
         }
 
-        if ($this->belongsToAssignedTeams($entry) || $this->belongsToSharedTeams($entry)) {
-            return true;
-        }
-
-        if ($this->isEntrySharedForUser($entry)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function isEntrySharedForUser(Entry $entry)
-    {
-        return Share::where('user_id', $this->user->id)->where('entry_id', $entry->id)->count() > 0;
-    }
-
-    private function isEntryOwner(Entry $entry)
-    {
-        return $this->user->id == $entry->user_id;
-    }
-
-    private function isTeamOwner(Team $team)
-    {
-        return $this->user->id == $team->user_id;
-    }
-
-    private function belongsToAssignedTeams(Entry $entry)
-    {
-        $teams = $entry->project->teams()->with('users')->get();
-
-        foreach ($teams as $team) {
-            if ($this->isTeamOwner($team)) {
-                return true;
-            }
-
-            if ($this->isTeamMember($team)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function belongsToSharedTeams(Entry $entry)
-    {
-        $shares = $entry->teamShares()->with('team', 'team.users')->get();
-
-        foreach ($shares as $share) {
-            if ($this->isTeamOwner($share->team)) {
-                return true;
-            }
-
-            if ($this->isTeamMember($share->team)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function isTeamMember(Team $team)
-    {
-        foreach ($team->users as $user) {
-            if ($user->id == $this->user->id) {
+        foreach ($project->teams()->with('users')->get() as $team) {
+            if ($team->can_edit) {
                 return true;
             }
         }

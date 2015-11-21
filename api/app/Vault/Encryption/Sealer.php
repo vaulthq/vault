@@ -16,7 +16,7 @@ class Sealer
             return $unsealed;
         }
 
-        throw new \RuntimeException('Cannot unseal. Is private key unlocked?');
+        throw new \RuntimeException('Cannot unseal: '. openssl_error_string());
     }
 
     public function seal($data, array $pubKeys)

@@ -61,6 +61,11 @@ class Entry extends Model
         return $this->hasMany('App\Vault\Models\EntryTeam', 'entry_id');
     }
 
+    public function keyShares()
+    {
+        return $this->hasMany('App\Vault\Models\KeyShare', 'entry_id');
+    }
+
     private function fixNewLines($str)
     {
         return preg_replace('~\r\n?~', "\r\n", $str);

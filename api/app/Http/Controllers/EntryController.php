@@ -105,11 +105,7 @@ class EntryController extends Controller
             abort(403);
         }
 
-        $share = KeyShare::where(['user_id' => Auth::user()->id, 'entry_id' => $model->id])->first();
-
-        $key = new PrivateKey(Auth::user()->rsaKey->private);
-        $key->unlock(Crypt::decrypt($jwt->getPayload()->get('code')));
-        $data = $entryCrypt->decrypt($model, $share->public, $key);
+        $data = $entryCrypt->decrypt($model);
 
         $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
 

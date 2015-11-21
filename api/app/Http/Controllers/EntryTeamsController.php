@@ -1,5 +1,7 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Encryption\EntryCrypt;
+use App\Vault\Models\Entry;
 use App\Vault\Models\EntryTeam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -13,7 +15,7 @@ class EntryTeamsController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(EntryCrypt $entryCrypt)
 	{
 		$teamId = Input::get('team_id');
 		$entryId = Input::get('id');
@@ -27,7 +29,9 @@ class EntryTeamsController extends Controller
             return Response::make($validator->messages()->first(), 419);
         }
 
-		if (EntryTeam::where('team_id', $teamId)->where('entry_id', $entryId)->count() > 0) {
+		$entry = Entry::findOrFail($entryId);
+
+		if ($entry->teamShares()->where('team_id', $teamId)->count() > 0) {
 			return Response::make('This entry is already shared for this team.', 419);
 		}
 
@@ -39,6 +43,8 @@ class EntryTeamsController extends Controller
 		if (!$model->save()) {
 			abort(403);
 		}
+
+		$entryCrypt->reencrypt($entry);
 
         return EntryTeam::with('team', 'team.users', 'team.owner')->where('id', $model->id)->first();
 	}
@@ -59,12 +65,15 @@ class EntryTeamsController extends Controller
 	 *
 	 * @param  int  $id
 	 */
-	public function destroy($id)
+	public function destroy($id, EntryCrypt $entryCrypt)
 	{
         $model = EntryTeam::findOrFail($id);
+		$entry = $model->entry;
 
         if (!$model->delete()) {
             abort(403);
         }
+
+		$entryCrypt->reencrypt($entry);
 	}
 }
