@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use App\Vault\Models\History;
+use App\Vault\Encryption\EntryCrypt;
 use App\Vault\Models\Project;
 use App\Vault\Models\ProjectTeam;
 use Illuminate\Support\Facades\Auth;
@@ -10,12 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ProjectTeamsController extends Controller
 {
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
+	public function store(EntryCrypt $entryCrypt)
 	{
         $validator = Validator::make([
             'team_id' => Input::get('team_id'),
@@ -26,6 +21,8 @@ class ProjectTeamsController extends Controller
             return Response::make($validator->messages()->first(), 419);
         }
 
+        $project = Project::findOrFail(Input::get('project_id'));
+
         $model = new ProjectTeam();
         $model->user_by_id = Auth::user()->id;
         $model->project_id = Input::get('project_id');
@@ -33,6 +30,10 @@ class ProjectTeamsController extends Controller
 
         if (!$model->save()) {
             abort(403);
+        }
+
+		foreach ($project->keys as $key) {
+            $entryCrypt->reencrypt($key);
         }
 
         return $model;
@@ -55,12 +56,17 @@ class ProjectTeamsController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($id, EntryCrypt $entryCrypt)
 	{
         $model = ProjectTeam::findOrFail($id);
+        $project = $model->project;
 
         if (!$model->delete()) {
             abort(403);
+        }
+
+        foreach ($project->keys as $key) {
+            $entryCrypt->reencrypt($key);
         }
 	}
 }

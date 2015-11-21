@@ -1,7 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use App\Vault\Models\History;
-use App\Vault\Models\Team;
+use App\Vault\Encryption\EntryCrypt;
 use App\Vault\Models\UserTeam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -15,7 +14,7 @@ class TeamMembersController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(EntryCrypt $entryCrypt)
 	{
         $validator = Validator::make([
             'user_id' => Input::get('user_id'),
@@ -34,8 +33,12 @@ class TeamMembersController extends Controller
         if (!$model->save()) {
             abort(403);
         }
-
-
+//@todo figure out this does not work
+		foreach ($model->team->projects as $project) {
+            foreach ($project->keys as $key) {
+                $entryCrypt->reencrypt($key);
+            }
+		}
 
         return $model;
 	}
@@ -57,12 +60,18 @@ class TeamMembersController extends Controller
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($id, EntryCrypt $entryCrypt)
 	{
         $model = UserTeam::findOrFail($id);
 
         if (!$model->delete()) {
             abort(403);
         }
-	}
+
+        foreach ($model->team->projects as $project) {
+            foreach ($project->keys as $key) {
+                $entryCrypt->reencrypt($key);
+            }
+        }
+    }
 }
