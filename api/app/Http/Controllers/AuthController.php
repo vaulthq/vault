@@ -6,6 +6,7 @@ use App\Vault\Exception\UserDisabledException;
 use App\Vault\Models\User;
 use App\Vault\Response\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Providers\Auth\AuthInterface;
@@ -30,7 +31,13 @@ class AuthController extends Controller
                 if ($auth->user()->group == User::GROUP_DISABLED) {
                     throw new UserDisabledException('Account has been disabled.');
                 }
-                if ($token = $jwt->fromUser($auth->user(), ['user' => $auth->user()])) {
+
+                $extraInfo = [
+                    'user' => $auth->user(),
+                    'code' => Crypt::encrypt(md5($credentials['password'])),
+                ];
+
+                if ($token = $jwt->fromUser($auth->user(), $extraInfo)) {
                     event(new UserLoggedIn($auth->user()));
                     return $this->jsonResponse(['token' => $token]);
                 }

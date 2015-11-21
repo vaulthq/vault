@@ -17,13 +17,17 @@ class PrivateKey
         $this->key = $key;
     }
 
+    /**
+     * @param string $passphrase md5 of user passphrase
+     * @return $this
+     */
     public function unlock($passphrase)
     {
         if ($this->resource) {
             throw new \RuntimeException('This key already been unlocked!');
         }
 
-        $this->resource = openssl_pkey_get_private($this->key, md5($passphrase));
+        $this->resource = openssl_pkey_get_private($this->key, $passphrase);
 
         if ($this->resource === false) {
             throw new \RuntimeException("Loading private key failed: " . openssl_error_string());

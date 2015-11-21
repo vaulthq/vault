@@ -8,14 +8,17 @@ use App\Vault\Models\Entry;
 use App\Vault\Models\KeyShare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
+use Tymon\JWTAuth\JWTAuth;
 
 class EntryController extends Controller
 {
     /**
      * Create new Entry in database
      *
+     * @param EntryCrypt $entryCrypt
      * @return Entry
      */
     public function store(EntryCrypt $entryCrypt)
@@ -24,24 +27,14 @@ class EntryController extends Controller
 
         $model->name = Input::get('name');
         $model->url = Input::get('url');
-        $model->password = Input::get('password');
+        $model->password = 'gone...';
         $model->note = Input::get('note');
         $model->username = Input::get('username');
         $model->project_id = Input::get('project_id');
         $model->user_id = Auth::user()->id;
 
-        $sealed = $entryCrypt->encrypt(Input::get('password'), $model);
+        $entryCrypt->encrypt(Input::get('password'), $model);
 
-        $model->data = $sealed['sealed'];
-        $model->save();
-
-        foreach ($sealed['users'] as $id => $user) {
-            $share = new KeyShare();
-            $share->user_id = $user->id;
-            $share->public = $sealed['keys'][$id];
-
-            $model->shares()->save($share);
-        }
         $model->load('tags');
 
         return $model;
@@ -64,21 +57,20 @@ class EntryController extends Controller
      *
      * @param Entry $model
      * @param Request $request
+     * @param EntryCrypt $entryCrypt
      * @return Response
      */
-	public function update(Entry $model, Request $request)
+	public function update(Entry $model, Request $request, EntryCrypt $entryCrypt)
 	{
         $model->name = $request->get('name');
         $model->username = $request->get('username');
         $model->url = $request->get('url');
         $model->note = $request->get('note');
 
-        if (!is_null($request->get('password', null))) {
-            $model->password = $request->get('password');
-        }
-
-        if (!$model->save()) {
-            abort(403);
+        if (is_null($request->get('password', null))) {
+            $model->save();
+        } else {
+            $entryCrypt->encrypt($request->get('password'), $model);
         }
 
         $model->load('tags');
@@ -107,7 +99,7 @@ class EntryController extends Controller
      * @param HistoryLogger $logger
      * @return mixed
      */
-    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt)
+    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt, JWTAuth $jwt)
     {
         if (!$model->can_edit) {
             abort(403);
@@ -116,7 +108,7 @@ class EntryController extends Controller
         $share = KeyShare::where(['user_id' => Auth::user()->id, 'entry_id' => $model->id])->first();
 
         $key = new PrivateKey(Auth::user()->rsaKey->private);
-        $key->unlock('b');
+        $key->unlock(Crypt::decrypt($jwt->getPayload()->get('code')));
         $data = $entryCrypt->decrypt($model, $share->public, $key);
 
         $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
