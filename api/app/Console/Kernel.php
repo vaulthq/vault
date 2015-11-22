@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel {
 	protected $commands = [
 		'App\Console\Commands\KeyGenerateMaster',
 		'App\Console\Commands\KeyGenerateUsers',
+		'App\Console\Commands\EntryRestoreCommand',
 	];
 
 	/**

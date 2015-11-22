@@ -24,7 +24,7 @@ class KeyGenerateUsers extends Command
      *
      * @var string
      */
-    protected $description = 'Generates missing keys for existing users';
+    protected $description = 'Generates missing keys for existing users.';
 
     /**
      * Create a new command instance.
@@ -43,24 +43,42 @@ class KeyGenerateUsers extends Command
      */
     public function handle()
     {
-        $users = DB::table('user')
-            ->select('user.*')
-            ->leftJoin('rsa_key', 'user.id', '=', 'rsa_key.user_id')
-            ->whereNull('rsa_key.id')
-            ->get();
+        if ($this->confirm('Generate keys for specific user? [yes|no]')) {
+            $email = $this->ask('What is the email of user you want to generate keys for?');
+            $users = DB::table('user')
+                ->select('user.*')
+                ->where('email', $email)
+                ->get();
+        } else {
+            $users = DB::table('user')
+                ->select('user.*')
+                ->leftJoin('rsa_key', 'user.id', '=', 'rsa_key.user_id')
+                ->whereNull('rsa_key.id')
+                ->get();
+        }
 
+        $this->generateKeys($users);
+    }
+
+    /**
+     * @param $users
+     */
+    private function generateKeys($users)
+    {
         foreach ($users as $userRow) {
             $newPassword = md5(Crypt::encrypt($userRow->email));
 
             $pair = KeyPairGenerator::generate($newPassword);
 
+            $user = User::find($userRow->id);
+
             $key = new RsaKey();
             $key->private = $pair['private'];
             $key->public = $pair['public'];
-            $key->user_id = $userRow->id;
 
-            $key->save();
-            $user = User::find($userRow->id);
+            $user->rsaKey()->delete();
+            $user->rsaKey()->save($key);
+
             $user->password = Hash::make($newPassword);
             $user->save();
 

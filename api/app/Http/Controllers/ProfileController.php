@@ -34,7 +34,7 @@ class ProfileController extends Controller
             $model->password = Hash::make($newPassword);
 
             $rsa = $model->rsaKey;
-            $rsa->private = (new PrivateKey($rsa->private))->unlock($oldPassword)->lock($newPassword)->getKey();
+            $rsa->private = (new PrivateKey($rsa->private))->unlock(md5($oldPassword))->lock($newPassword)->getKey();
             $rsa->save();
 
             $model->save();
@@ -42,7 +42,7 @@ class ProfileController extends Controller
             $logger->log('auth', 'User changed password.', Auth::user()->id);
 
         } catch (\RuntimeException $e) {
-            return Response::make('New passwords do not match.', 419);
+            return Response::make('Incorrect old password for private key.', 419);
         }
 	}
 

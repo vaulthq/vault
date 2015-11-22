@@ -11,7 +11,7 @@ class Access
      */
     private $user;
 
-    public function __construct(User $user)
+    public function __construct(User $user = null)
     {
         $this->user = $user;
     }
@@ -25,11 +25,19 @@ class Access
      */
     public function userCanAccessEntry(Entry $entry)
     {
+        if (!$this->user) {
+            return false;
+        }
+
         return $entry->keyShares()->where('user_id', $this->user->id)->count() > 0;
     }
 
     public function userCanAccessProject(Project $project)
     {
+        if (!$this->user) {
+            return false;
+        }
+
         if ($project->user_id == $this->user->id) {
             return true;
         }
