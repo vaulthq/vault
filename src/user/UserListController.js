@@ -9,7 +9,12 @@
         $scope.createUser = function() {
             var modalInstance = $modal.open({
                 templateUrl: '/t/user/create.html',
-                controller: 'ModalCreateUserController'
+                controller: 'ModalCreateUserController',
+                resolve: {
+                    user: function() {
+                        return {$resolved: true};
+                    }
+                }
             });
 
             modalInstance.result.then(function (model) {

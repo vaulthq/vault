@@ -10,9 +10,10 @@
         return {
             restrict: 'E',
             scope: {
-                when: '='
+                when: '=',
+                type: '='
             },
-            template: '<ul class="loading" ng-if="when"><li></li><li></li><li></li></ul>'
+            template: '<div class="loading-holder" ng-show="when"><ul class="loading"><li></li><li></li><li></li></ul></div>'
         };
     }
 

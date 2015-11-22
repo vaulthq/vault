@@ -33,7 +33,7 @@ class TeamMembersController extends Controller
         if (!$model->save()) {
             abort(403);
         }
-//@todo figure out this does not work
+
 		foreach ($model->team->projects as $project) {
             foreach ($project->keys as $key) {
                 $entryCrypt->reencrypt($key);

@@ -2,9 +2,9 @@
     <h3>Share Key "{{ entry.name }}"</h3>
 </div>
 <div class="modal-body">
-    <loader when="!users.$resolved || !access.$resolved"></loader>
+    <loader when="!users.$resolved || !access.$resolved || !teams.$resolved || !entryTeams.$resolved"></loader>
 
-    <div ng-if="users.$resolved && access.$resolved">
+    <div ng-if="users.$resolved && access.$resolved && teams.$resolved && entryTeams.$resolved">
         <div class="form-group">
             <label class="control-label">Share to User</label>
             <div class="row">
@@ -46,15 +46,11 @@
         </table>
 
         <div ng-if="access.length == 0">
-            At the moment key is not shared to any user.
+            At the moment key is not directly shared to any user.
         </div>
-    </div>
 
-    <hr>
+        <hr>
 
-    <loader when="!teams.$resolved || !entryTeams.$resolved"></loader>
-
-    <div ng-if="teams.$resolved && entryTeams.$resolved">
         <div class="form-group">
             <label class="control-label">Share to Team</label>
             <div class="row">
@@ -103,7 +99,7 @@
         </table>
 
         <div ng-if="entryTeams.length == 0">
-            At the moment key is not shared to any team.
+            At the moment key is not directly shared to any team.
         </div>
     </div>
 
