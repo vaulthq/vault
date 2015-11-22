@@ -35,7 +35,7 @@ class KeyGenerateMaster extends Command
 	public function handle()
 	{
 		$path = storage_path('keys/master.pri');
-		$pathPublic = storage_path('keys/master.pub');
+		$pathPublic = config('app.backup_key');
 
 		if ($this->filesystem->exists($pathPublic)) {
 			$this->error('Master key already exist!');

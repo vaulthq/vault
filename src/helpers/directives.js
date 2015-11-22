@@ -24,8 +24,10 @@
             },
             restrict: 'A',
             link: function($scope, element) {
-                element.on('click', function(e){
-                    $scope.showPassword();
+                element.on('click', function() {
+                    if ($scope.entry.can_edit) {
+                        $scope.showPassword();
+                    }
                 });
             },
             controller: function($scope, $modal, modal) {
