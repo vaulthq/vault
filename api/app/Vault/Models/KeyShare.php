@@ -6,6 +6,8 @@ class KeyShare extends Model
 {
     protected $table = 'key_share';
 
+    protected $fillable = ['public', 'user_id'];
+
     public function user()
     {
         return $this->belongsTo('App\Vault\Models\User', 'user_id');

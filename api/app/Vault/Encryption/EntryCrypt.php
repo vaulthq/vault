@@ -1,7 +1,8 @@
 <?php namespace App\Vault\Encryption;
 
 use App\Vault\Models\Entry;
-use App\Vault\Models\KeyShare;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Crypt;
@@ -23,17 +24,34 @@ class EntryCrypt
      * @var DatabaseManager
      */
     private $db;
+
     /**
      * @var JWTAuth
      */
     private $auth;
 
-    public function __construct(AccessDecider $accessDecider, Sealer $sealer, DatabaseManager $db, JWTAuth $auth)
-    {
+    /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    /**
+     * @var bool|string|null
+     */
+    private $backupKey = false;
+
+    public function __construct(
+        AccessDecider $accessDecider,
+        Sealer $sealer,
+        DatabaseManager $db,
+        JWTAuth $auth,
+        Filesystem $fs
+    ) {
         $this->accessDecider = $accessDecider;
         $this->sealer = $sealer;
         $this->db = $db;
         $this->auth = $auth;
+        $this->fs = $fs;
     }
 
     public function encrypt($data, Entry $entry)
@@ -42,9 +60,11 @@ class EntryCrypt
         $users = $this->accessDecider->getUserListForEntry($entry);
         $keys = $this->getUserPublicKeys($users);
 
-        $encrypt = $this->sealer->seal($data, $keys);
+        if ($backupKey = $this->getBackupKey()) {
+            $keys[] = $backupKey;
+        }
 
-        $entry->data = $encrypt['sealed'];
+        $encrypt = $this->sealer->seal($data, $keys);
 
         $this->db->connection()->beginTransaction();
         try {
@@ -54,11 +74,14 @@ class EntryCrypt
                 $entry->save();
             }
 
+            $entry->data = $encrypt['sealed'];
+
             foreach ($users->values() as $id => $user) {
-                $share = new KeyShare();
-                $share->user_id = $user->id;
-                $share->public = $encrypt['keys'][$id];
-                $entry->keyShares()->save($share);
+                $entry->keyShares()->create(['user_id' => $user->id, 'public' => $encrypt['keys'][$id]]);
+            }
+
+            if ($backupKey) {
+                $entry->keyShares()->create(['public' => end($encrypt['keys'])]);
             }
 
             $entry->save();
@@ -99,6 +122,22 @@ class EntryCrypt
         }
 
         return $keys;
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getBackupKey()
+    {
+        if ($this->backupKey === false) {
+            try {
+                $this->backupKey = $this->fs->get(config('app.backup_key'));
+            } catch (FileNotFoundException $e) {
+                $this->backupKey = null;
+            }
+        }
+
+        return $this->backupKey;
     }
 
 }

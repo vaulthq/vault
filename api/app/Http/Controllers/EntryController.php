@@ -2,13 +2,10 @@
 
 use App\Vault\Encryption\AccessDecider;
 use App\Vault\Encryption\EntryCrypt;
-use App\Vault\Encryption\PrivateKey;
 use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
-use App\Vault\Models\KeyShare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Tymon\JWTAuth\JWTAuth;
@@ -27,13 +24,12 @@ class EntryController extends Controller
 
         $model->name = Input::get('name');
         $model->url = Input::get('url');
-        $model->password = 'gone...';
         $model->note = Input::get('note');
         $model->username = Input::get('username');
         $model->project_id = Input::get('project_id');
         $model->user_id = Auth::user()->id;
 
-        $entryCrypt->encrypt(Input::get('password'), $model);
+        $entryCrypt->encrypt(Input::get('password', ''), $model);
 
         $model->load('tags');
 
@@ -97,9 +93,10 @@ class EntryController extends Controller
      *
      * @param Entry $model
      * @param HistoryLogger $logger
+     * @param EntryCrypt $entryCrypt
      * @return mixed
      */
-    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt, JWTAuth $jwt)
+    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt)
     {
         if (!$model->can_edit) {
             abort(403);

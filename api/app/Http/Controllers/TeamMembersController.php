@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Vault\Encryption\EntryCrypt;
+use App\Vault\Models\EntryTeam;
 use App\Vault\Models\UserTeam;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -9,11 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class TeamMembersController extends Controller
 {
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param EntryCrypt $entryCrypt
+     * @return Response
+     */
 	public function store(EntryCrypt $entryCrypt)
 	{
         $validator = Validator::make([
@@ -34,11 +36,7 @@ class TeamMembersController extends Controller
             abort(403);
         }
 
-		foreach ($model->team->projects as $project) {
-            foreach ($project->keys as $key) {
-                $entryCrypt->reencrypt($key);
-            }
-		}
+        $this->recryptTeamEntries($entryCrypt, $model);
 
         return $model;
 	}
@@ -68,10 +66,29 @@ class TeamMembersController extends Controller
             abort(403);
         }
 
+        $this->recryptTeamEntries($entryCrypt, $model);
+    }
+
+    /**
+     * @param EntryCrypt $entryCrypt
+     * @param $model
+     */
+    private function recryptTeamEntries(EntryCrypt $entryCrypt, $model)
+    {
+        $entries = collect([]);
+
         foreach ($model->team->projects as $project) {
             foreach ($project->keys as $key) {
-                $entryCrypt->reencrypt($key);
+                $entries->push($key);
             }
         }
+
+        foreach (EntryTeam::where('team_id', $model->team_id)->get() as $entryTeam) {
+            $entries->push($entryTeam->entry);
+        }
+
+        $entries->unique('id')->each(function ($entry) use ($entryCrypt) {
+            $entryCrypt->reencrypt($entry);
+        });
     }
 }
