@@ -3,9 +3,7 @@
 use App\Http\Requests\ProjectRequest;
 use App\Vault\Models\Entry;
 use App\Vault\Models\Project;
-use App\Vault\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 
 class ProjectController extends Controller
@@ -94,29 +92,4 @@ class ProjectController extends Controller
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 	}
-
-    public function changeOwner(Project $project)
-    {
-        $newOwner = User::findOrFail(Input::get('owner'));
-        $recursive = Input::get('assign', false);
-
-        if (!$project->can_edit) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
-
-        if ($recursive) {
-            foreach ($project->keys as $key) {
-                if ($key->user_id == $project->user_id) {
-                    $key->user_id = $newOwner->id;
-                    $key->save();
-                }
-            }
-        }
-
-        $project->user_id = $newOwner->id;
-
-        if (!$project->save()) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
-    }
 }

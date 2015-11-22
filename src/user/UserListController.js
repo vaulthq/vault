@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('UserListController', controller);
 
-    function controller($scope, $modal, Api, users) {
+    function controller($scope, $modal, users) {
         $scope.users = users;
 
         $scope.createUser = function() {
@@ -35,15 +35,6 @@
 
             modalInstance.result.then(function (model) {
                 $scope.users[$scope.users.map(function(e) {return e.id}).indexOf(userId)] = model;
-            });
-        };
-
-        $scope.deleteUser = function(userId) {
-            if (!confirm('Are you sure?')) {
-                return;
-            }
-            Api.user.delete({id: userId}, function() {
-                $scope.users.splice($scope.users.map(function(e) {return e.id}).indexOf(userId), 1);
             });
         };
     }

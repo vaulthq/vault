@@ -25,16 +25,9 @@ class UserHistoryLogger
 		$this->logger->log('user', 'Created new user. (' . $user->email . ', ' . $user->getGroup() . ').', $user->id);
 	}
 
-	public function onUserDeleted(UserDeleted $event)
-	{
-		$user = $event->getUser();
-		$this->logger->log('user', 'Deleted user #' . $user->id . ' ('.$user->email.').', $user->id);
-	}
-
 	public function subscribe($events)
 	{
 		$events->listen('App\Events\User\UserCreated', 'App\Listeners\Events\UserHistoryLogger@onUserCreated');
-		$events->listen('App\Events\User\UserDeleted', 'App\Listeners\Events\UserHistoryLogger@onUserDeleted');
 	}
 
 }

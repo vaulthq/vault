@@ -16,7 +16,6 @@ Route::group(['prefix' => 'api', 'middleware' => 'api.key'], function() {
 Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::get('project/keys/{project}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
 	Route::get('project/teams/{project}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
-	Route::get('project/changeOwner/{project}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
 	Route::resource('project', 'ProjectController');
 
 	Route::resource('profile', 'ProfileController');

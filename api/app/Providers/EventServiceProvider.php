@@ -37,9 +37,6 @@ class EventServiceProvider extends ServiceProvider {
 
 		Event::subscribe('App\Listeners\Events\AuthHistoryLogger');
 		Event::subscribe('App\Listeners\Events\UserHistoryLogger');
-		Event::subscribe('App\Listeners\Events\ProjectHistoryLogger');
-
-		Event::subscribe('App\Listeners\Events\ProjectEventHandler');
 
 		Project::observe($this->app->make('App\Events\Observer\ProjectObserver'));
 		Entry::observe($this->app->make('App\Events\Observer\EntryObserver'));

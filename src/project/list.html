@@ -1,13 +1,13 @@
 <div class="page-header">
     <div class="row">
-        <div class="col-md-5 col-xs-4">
+        <div class="col-md-5 col-xs-5">
             <h3>Projects</h3>
         </div>
-        <div class="col-md-2 col-xs-4">
-            <input type="text" class="form-control input-sm" placeholder="Search project" ng-model="search.query" app-focus tabindex="1">
+        <div class="col-md-3 col-xs-4 col-md-offset-2">
+            <input type="text" class="form-control input-sm top-search" placeholder="Search..." ng-model="search.query" app-focus tabindex="1">
         </div>
-        <div class="col-md-5 col-xs-4 text-right">
-            <a class="btn btn-default btn-xs" title="Add new key" ng-click="create()">Add project</a>
+        <div class="col-md-2 col-xs-3 text-right">
+            <a class="btn btn-default btn-sm" title="Add new key" ng-click="create()">Add project</a>
         </div>
     </div>
 </div>
@@ -41,7 +41,9 @@
                         <i class="glyphicon glyphicon-question-sign"></i>
                     </a>
 
-                    <project-update project="project"></project-update>
+                    <a class="btn btn-warning btn-xs" title="Edit project" project-update="project" ng-if="project.can_edit">
+                        <i class="glyphicon glyphicon-edit"></i>
+                    </a>
 
                     <a class="btn btn-primary btn-xs" title="Project Access Information" project-show-owner="project" ng-if="!project.can_edit">
                         <i class="glyphicon glyphicon-info-sign"></i>

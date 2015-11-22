@@ -12,18 +12,11 @@ class ProjectObserver extends BaseObserver
 
     public function updating(Project $project)
     {
-        return $project->can_edit || ($project->getOriginal('user_id') == Auth::user()->id);
+        return $project->can_edit;
     }
 
     public function updated(Project $project)
     {
-        if ($project->isDirty('user_id')) {
-            $this->log(
-                sprintf('Changed owner from "%s" to "%s".', $project->getOriginal('user_id'), $project->user_id),
-                $project
-            );
-        }
-
         $this->log('Updated project details.', $project);
     }
 
