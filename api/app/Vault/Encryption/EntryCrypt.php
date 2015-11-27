@@ -1,11 +1,13 @@
 <?php namespace App\Vault\Encryption;
 
 use App\Vault\Models\Entry;
+use App\Vault\Models\User;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTAuth;
 
 class EntryCrypt
@@ -56,7 +58,6 @@ class EntryCrypt
 
     public function encrypt($data, Entry $entry)
     {
-        //@todo check if user can actually do this
         $users = $this->accessDecider->getUserListForEntry($entry);
         $keys = $this->getUserPublicKeys($users);
 
@@ -74,7 +75,7 @@ class EntryCrypt
                 $entry->save();
             }
 
-            $entry->data = $encrypt['sealed'];
+            DB::table('entry')->where('id', $entry->id)->update(['data' => $encrypt['sealed']]);
 
             foreach ($users->values() as $id => $user) {
                 $entry->keyShares()->create(['user_id' => $user->id, 'public' => $encrypt['keys'][$id]]);
@@ -85,7 +86,6 @@ class EntryCrypt
             }
 
             $entry->save();
-
             $this->db->connection()->commit();
         } catch (\Exception $e) {
             $this->db->connection()->rollBack();

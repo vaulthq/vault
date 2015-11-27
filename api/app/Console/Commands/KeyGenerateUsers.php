@@ -17,7 +17,7 @@ class KeyGenerateUsers extends Command
      *
      * @var string
      */
-    protected $signature = 'keys:generate:users';
+    protected $signature = 'key:generate:users';
 
     /**
      * The console command description.
