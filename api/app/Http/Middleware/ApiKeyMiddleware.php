@@ -1,12 +1,9 @@
 <?php namespace App\Http\Middleware;
 
-use App\Vault\Encryption\PrivateKey;
 use App\Vault\Exception\InvalidAuthException;
 use App\Vault\Models\User;
 use App\Vault\Security\ApiKey;
-use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\Guard;
-use Illuminate\Support\Facades\Crypt;
 
 class ApiKeyMiddleware
 {
@@ -36,7 +33,17 @@ class ApiKeyMiddleware
     {
         try {
             $userAndKey = $this->key->extractKeyAndUser($request);
-            $this->manager->setUser($userAndKey['user']);
+
+            if ($userAndKey) {
+                /** @var User $user */
+                $user = $userAndKey['user'];
+                if ($user->isDisabled()) {
+                    abort(403, 'User is disabled');
+                }
+
+                $this->manager->setUser($user);
+            }
+
 
             return $next($request);
 

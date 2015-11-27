@@ -117,6 +117,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->group == self::GROUP_ADMIN;
     }
 
+    public function isDisabled()
+    {
+        return $this->group == self::GROUP_DISABLED;
+    }
+
     public function getGroup()
     {
         return self::$groups[$this->group];
