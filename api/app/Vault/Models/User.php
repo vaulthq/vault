@@ -97,11 +97,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->hasMany('App\Vault\Models\Share', 'user_id');
     }
 
-    public function apiKeys()
-    {
-        return $this->hasMany('App\Vault\Models\ApiKey', 'user_id');
-    }
-
     public function teams()
     {
         $this->belongsToMany('App\Vault\Models\Team', 'user_team', 'team_id', 'user_id');

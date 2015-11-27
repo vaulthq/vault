@@ -44,7 +44,6 @@ class ApiKeyMiddleware
                 $this->manager->setUser($user);
             }
 
-
             return $next($request);
 
         } catch (InvalidAuthException $e) {
