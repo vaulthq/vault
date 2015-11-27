@@ -3,7 +3,6 @@
 use App\Vault\Facades\Access;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Crypt;
 
 class Entry extends Model
 {
@@ -11,24 +10,12 @@ class Entry extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	protected $table = 'entry';
-    protected $hidden = [
-        'deleted_at', 'password', 'data'
-    ];
+    protected $hidden = ['deleted_at', 'password', 'data'];
     protected $appends = ['can_edit'];
 
     public function getCanEditAttribute()
     {
         return Access::userCanAccessEntry($this);
-    }
-
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = Crypt::encrypt($this->fixNewLines($value));
-    }
-
-    public function getPasswordAttribute($value)
-    {
-        return Crypt::decrypt($value);
     }
 
     public function groupAccess()
@@ -64,10 +51,5 @@ class Entry extends Model
     public function keyShares()
     {
         return $this->hasMany('App\Vault\Models\KeyShare', 'entry_id');
-    }
-
-    private function fixNewLines($str)
-    {
-        return preg_replace('~\r\n?~', "\r\n", $str);
     }
 }

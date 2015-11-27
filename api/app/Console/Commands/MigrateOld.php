@@ -1,8 +1,13 @@
 <?php namespace App\Console\Commands;
 
+use App\Vault\Encryption\AccessDecider;
+use App\Vault\Encryption\EntryCrypt;
+use App\Vault\Models\Entry;
 use App\Vault\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class MigrateOld extends Command
 {
@@ -19,15 +24,27 @@ class MigrateOld extends Command
      * @var string
      */
     protected $description = 'Migrate old keys to RSA system';
+
     /**
      * @var Filesystem
      */
     private $filesystem;
 
-    public function __construct(Filesystem $filesystem)
+    /**
+     * @var AccessDecider
+     */
+    private $accessDecider;
+    /**
+     * @var EntryCrypt
+     */
+    private $entryCrypt;
+
+    public function __construct(Filesystem $filesystem, AccessDecider $accessDecider, EntryCrypt $entryCrypt)
     {
         parent::__construct();
         $this->filesystem = $filesystem;
+        $this->accessDecider = $accessDecider;
+        $this->entryCrypt = $entryCrypt;
     }
 
     /**
@@ -45,6 +62,35 @@ class MigrateOld extends Command
 
         if (!$this->filesystem->exists(config('app.backup_key'))) {
             $this->warn('Backup key does not exist. We recommend that you create one using key:generate:master');
+        }
+
+        foreach (Entry::all() as $entry) {
+            $list = $this->accessDecider->getUserListForEntry($entry);
+
+            if ($list->count() == 0) {
+                throw new \RuntimeException('Entry #' .$entry->id . ' has no access. Share it.');
+            }
+        }
+
+        foreach (Entry::all() as $entry) {
+            $list = $this->accessDecider->getUserListForEntry($entry);
+
+            if ($list->count() == 0) {
+                throw new \RuntimeException('Entry #' .$entry->id . ' has no access. Share it.');
+            }
+        }
+
+        foreach (Entry::all() as $entry) {
+            if ($entry->password == '') {
+                continue;
+            }
+            echo $entry->id .'... ';
+
+            $this->entryCrypt->encrypt(Crypt::decrypt($entry->password), $entry);
+
+            DB::table('entry')->where('id', $entry->id)->update(['password' => null]);
+
+            echo ' encrypted!' . "\n";
         }
     }
 }

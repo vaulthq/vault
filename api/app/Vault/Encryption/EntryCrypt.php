@@ -64,6 +64,10 @@ class EntryCrypt
             $keys[] = $backupKey;
         }
 
+        if ($data == '') { // empty strings causes no encryption to be done, therefore skipping shares
+            $data = ' ';
+        }
+
         $encrypt = $this->sealer->seal($data, $keys);
 
         $this->db->connection()->beginTransaction();
