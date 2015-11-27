@@ -42,12 +42,6 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::resource('entryTeams', 'EntryTeamsController');
 	Route::resource('entryTags', 'EntryTagController');
 
-	Route::group(['prefix' => 'apis'], function() {
-		Route::get('/', 'ApiKeyController@index');
-		Route::post('/', 'ApiKeyController@create');
-		Route::delete('/{apiKey}', 'ApiKeyController@delete');
-	});
-
 	Route::group(['before' => 'admin'], function() {
 		Route::resource('history', 'HistoryController');
 	});
