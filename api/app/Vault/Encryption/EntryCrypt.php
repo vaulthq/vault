@@ -1,7 +1,6 @@
 <?php namespace App\Vault\Encryption;
 
 use App\Vault\Models\Entry;
-use App\Vault\Models\User;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;

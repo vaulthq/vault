@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel {
 		'App\Console\Commands\KeyGenerateMaster',
 		'App\Console\Commands\KeyGenerateUsers',
 		'App\Console\Commands\EntryRestoreCommand',
+		'App\Console\Commands\MigrateOld',
 	];
 
 	/**
