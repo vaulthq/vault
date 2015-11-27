@@ -58,6 +58,10 @@ class EntryController extends Controller
      */
 	public function update(Entry $model, Request $request, EntryCrypt $entryCrypt)
 	{
+        if (!$model->can_edit) {
+            abort(403);
+        }
+
         $model->name = $request->get('name');
         $model->username = $request->get('username');
         $model->url = $request->get('url');
@@ -102,11 +106,13 @@ class EntryController extends Controller
             abort(403);
         }
 
-        $data = $entryCrypt->decrypt($model);
-
-        $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
-
-        return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
+        try {
+            $data = $entryCrypt->decrypt($model);
+            $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
+            return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
+        } catch (\RuntimeException $e) {
+            abort(403);
+        }
     }
 
     public function getAccess(Entry $entry, AccessDecider $decider)

@@ -76,6 +76,7 @@ class EntryCrypt
             }
 
             DB::table('entry')->where('id', $entry->id)->update(['data' => $encrypt['sealed']]);
+            $entry->fill(['data' => $encrypt['sealed']]);
 
             foreach ($users->values() as $id => $user) {
                 $entry->keyShares()->create(['user_id' => $user->id, 'public' => $encrypt['keys'][$id]]);
