@@ -172,23 +172,22 @@ body {
 
 .modal-header {
   height: 56px;
-  background: @sidebar-show-bg;
   padding: 1.1em;
+  text-align: center;
+  border: none;
   h3 {
-    color: #E7EDEA;
+    color: #333;
     margin: 0;
   }
 }
 
 .modal-content {
-  border: 1px solid #4F565E;
-  border-radius: 2px;
-  .box-shadow;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 .modal-footer {
-  background: #F1F1F1;
-  padding: 10px;
   border-top: none;
 }
 
@@ -233,4 +232,37 @@ body {
 
 .top-search {
   background: #FBFBFB;
+}
+
+.modal-backdrop.in {
+  opacity: 1;
+}
+
+.modal-backdrop {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.form-control {
+  border-radius: 1px;
+  background-color: #FBFBFB;
+}
+
+.close.modal-close {
+  margin: 30px 40px 0 0;
+  font-size: 2em;
+  opacity: 0.5;
+  padding: 15px;
+  outline:none;
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.btn {
+  border-radius: 1px;
+}
+
+.modal.fade .modal-dialog {
+  transition: opacity .3s ease;
+  transform: none;
 }
