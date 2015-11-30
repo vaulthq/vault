@@ -1,15 +1,15 @@
 <div class="modal-header">
     <h3>Team Details</h3>
 </div>
+
 <form>
     <div class="modal-body">
         <div class="form-group">
             <label class="control-label" for="iName">Name *</label>
-            <input type="text" name="email" class="form-control" id="iName" ng-model="team.name" required autofocus>
+            <input type="text" name="email" class="form-control" id="iName" ng-model="team.name" required app-focus>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block" ng-click="ok()">Save</button>
     </div>
 </form>
