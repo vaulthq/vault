@@ -54,6 +54,7 @@ class KeyGenerateUsers extends Command
                 ->select('user.*')
                 ->leftJoin('rsa_key', 'user.id', '=', 'rsa_key.user_id')
                 ->whereNull('rsa_key.id')
+                ->whereNull('user.deleted_at')
                 ->get();
         }
 
@@ -76,7 +77,10 @@ class KeyGenerateUsers extends Command
             $key->private = $pair['private'];
             $key->public = $pair['public'];
 
-            $user->rsaKey()->delete();
+            if ($user->rsaKey()->count()) {
+                $user->rsaKey()->delete();
+            }
+
             $user->rsaKey()->save($key);
 
             $user->password = Hash::make($newPassword);
