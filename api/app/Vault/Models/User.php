@@ -45,7 +45,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('password', 'created_at', 'updated_at', 'deleted_at', 'remember_token');
+	protected $hidden = array('password', 'created_at', 'deleted_at', 'remember_token');
 
 	/**
 	 * Get the unique identifier for the user.

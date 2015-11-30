@@ -13,7 +13,7 @@ Route::group(['prefix' => 'api', 'middleware' => 'api.key'], function() {
 	Route::get('keyByTag', 'DeployKeyController@findByTag');
 });
 
-Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
+Route::group(['prefix' => 'api', 'middleware' => ['jwt.auth', 'valid.user']], function() {
 	Route::get('project/keys/{project}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
 	Route::get('project/teams/{project}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
 	Route::resource('project', 'ProjectController');
