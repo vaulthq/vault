@@ -16,14 +16,7 @@ class EntryObserver extends BaseObserver
 
     public function updated(Entry $entry)
     {
-        if ($entry->isDirty('user_id')) {
-            $this->log(
-                sprintf('Changed entry owner from "%s" to "%s"', $entry->getOriginal('user_id'), $entry->user_id),
-                $entry
-            );
-        }
-
-        if ($entry->isDirty('password')) {
+        if ($entry->isDirty('data')) {
             $this->log('Updated entry password.', $entry);
         }
 

@@ -27,6 +27,7 @@ class EntryController extends Controller
         $model->note = Input::get('note');
         $model->username = Input::get('username');
         $model->project_id = Input::get('project_id');
+        $model->password = Input::get('password');
         $model->user_id = Auth::user()->id;
 
         $entryCrypt->encrypt(Input::get('password', ''), $model);
@@ -70,6 +71,7 @@ class EntryController extends Controller
         if (is_null($request->get('password', null))) {
             $model->save();
         } else {
+            $model->password = $request->get('password');
             $entryCrypt->encrypt($request->get('password'), $model);
         }
 
@@ -111,7 +113,7 @@ class EntryController extends Controller
             $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
             return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
         } catch (\RuntimeException $e) {
-            abort(403);
+            abort(409);
         }
     }
 

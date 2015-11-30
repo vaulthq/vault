@@ -7,7 +7,6 @@ use App\Vault\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 
 class MigrateOld extends Command
 {
@@ -87,8 +86,6 @@ class MigrateOld extends Command
             echo $entry->id .'... ';
 
             $this->entryCrypt->encrypt(Crypt::decrypt($entry->password), $entry);
-
-            DB::table('entry')->where('id', $entry->id)->update(['password' => null]);
 
             echo ' encrypted!' . "\n";
         }
