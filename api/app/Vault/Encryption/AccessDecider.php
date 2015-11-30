@@ -15,6 +15,8 @@ class AccessDecider
 
         $list->push($entry->owner);
 
+        $list->push($entry->project->owner);
+
         foreach ($entry->shares as $share) {
             $list->push($share->user);
         }

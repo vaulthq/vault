@@ -31,4 +31,9 @@ class Project extends Model
     {
         return $this->belongsToMany('App\Vault\Models\Team', 'project_team', 'project_id', 'team_id');
     }
+
+    public function owner()
+    {
+        return $this->belongsTo('App\Vault\Models\User', 'user_id');
+    }
 }
