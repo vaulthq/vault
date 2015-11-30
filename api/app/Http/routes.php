@@ -19,7 +19,6 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::resource('project', 'ProjectController');
 
 	Route::resource('profile', 'ProfileController');
-	Route::resource('user', 'UserController');
 	Route::resource('recent', 'RecentController');
 	Route::resource('share', 'ShareController');
 	Route::resource('teamMembers', 'TeamMembersController');
@@ -42,7 +41,17 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 	Route::resource('entryTeams', 'EntryTeamsController');
 	Route::resource('entryTags', 'EntryTagController');
 
-	Route::group(['before' => 'admin'], function() {
+	Route::group(['prefix' => 'user'], function() {
+		Route::get('/', 'UserController@index');
+		Route::get('/{user}', 'UserController@show');
+
+		Route::group(['middleware' => 'admin'], function() {
+			Route::post('/', 'UserController@store');
+			Route::put('/{user}', 'UserController@update');
+		});
+	});
+
+	Route::group(['middleware' => 'admin'], function() {
 		Route::resource('history', 'HistoryController');
 	});
 });

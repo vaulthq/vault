@@ -6,13 +6,6 @@ use App\Vault\Models\User;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->beforeFilter('admin', [
-            'only' => ['update', 'destroy']
-        ]);
-    }
-
     public function index()
     {
         return User::all();
