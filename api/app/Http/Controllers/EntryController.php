@@ -115,8 +115,15 @@ class EntryController extends Controller
         }
     }
 
-    public function getAccess(Entry $entry, AccessDecider $decider)
+    public function getAccess(Entry $entry)
     {
-        return $decider->getUserListForEntry($entry);
+        $entry->load('keyShares', 'keyShares.user');
+
+        $list = collect([]);
+        foreach ($entry->keyShares as $share) {
+            $list->push($share->user);
+        }
+
+        return $list;
     }
 }
