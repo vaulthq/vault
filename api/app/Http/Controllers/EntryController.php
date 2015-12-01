@@ -30,6 +30,8 @@ class EntryController extends Controller
         $model->password = Input::get('password');
         $model->user_id = Auth::user()->id;
 
+        $model->save();
+
         $entryCrypt->encrypt(Input::get('password', ''), $model);
 
         $model->load('tags');
@@ -68,10 +70,14 @@ class EntryController extends Controller
         $model->url = $request->get('url');
         $model->note = $request->get('note');
 
-        if (is_null($request->get('password', null))) {
-            $model->save();
-        } else {
+
+        if (!is_null($request->get('password', null))) {
             $model->password = $request->get('password');
+        }
+
+        $model->save();
+
+        if (!is_null($request->get('password', null))) {
             $entryCrypt->encrypt($request->get('password'), $model);
         }
 

@@ -21,6 +21,10 @@ class ProjectTeamsController extends Controller
             return Response::make($validator->messages()->first(), 419);
         }
 
+        if (ProjectTeam::where('team_id', Input::get('team_id'))->where('project_id', Input::get('project_id'))->count() > 0) {
+            return Response::make('This team already has access.', 419);
+        }
+
         $project = Project::findOrFail(Input::get('project_id'));
 
         $model = new ProjectTeam();

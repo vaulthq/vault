@@ -1,6 +1,7 @@
 <?php namespace App\Vault\Encryption;
 
 use App\Vault\Models\Entry;
+use App\Vault\Models\KeyShare;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -57,6 +58,10 @@ class EntryCrypt
 
     public function encrypt($data, Entry $entry)
     {
+        if (!$entry->exists) {
+            throw new \RuntimeException('Cannot encrypt unsaved models');
+        }
+
         $users = $this->accessDecider->getUserListForEntry($entry);
         $keys = $this->getUserPublicKeys($users);
 
@@ -72,25 +77,31 @@ class EntryCrypt
 
         $this->db->connection()->beginTransaction();
         try {
-            if ($entry->exists) {
-                $entry->keyShares()->delete();
-            } else {
-                $entry->save();
+            $current = DB::table('entry')->where('id', $entry->id)->lockForUpdate()->first();
+
+            if ($current->data != $entry->data) {
+                throw new \RuntimeException('Multiple threads trying to modify same record!');
             }
 
+            DB::table('key_share')->where('entry_id', $entry->id)->delete();
             DB::table('entry')->where('id', $entry->id)->update(['data' => $encrypt['sealed']]);
-            $entry->fill(['data' => $encrypt['sealed']]);
 
+            $dates = ['created_at' => date('Y-m-d H:i:s')];
+
+            $shares = [];
             foreach ($users->values() as $id => $user) {
-                $entry->keyShares()->create(['user_id' => $user->id, 'public' => $encrypt['keys'][$id]]);
+                $shares[] = ['user_id' => $user->id, 'public' => $encrypt['keys'][$id], 'entry_id' => $entry->id] + $dates;
             }
 
             if ($backupKey) {
-                $entry->keyShares()->create(['public' => end($encrypt['keys'])]);
+                $shares[] = ['public' => end($encrypt['keys']), 'entry_id' => $entry->id, 'user_id' => null] + $dates;
             }
 
-            $entry->save();
+            DB::table('key_share')->insert($shares);
+
             $this->db->connection()->commit();
+
+            $entry->fill(['data' => $encrypt['sealed']]);
         } catch (\Exception $e) {
             $this->db->connection()->rollBack();
             throw $e;
@@ -101,17 +112,13 @@ class EntryCrypt
     {
         $user = $this->auth->toUser();
         $share = $entry->keyShares()->where('user_id', $user->id)->firstOrFail();
-        $code = Crypt::decrypt($this->auth->getPayload()->get('code'));
 
-        $key = new PrivateKey($user->rsaKey->private);
-        $key->unlock($code);
-
-        return $this->sealer->unseal($entry->data, $share->public, $key);
+        return $this->sealer->unseal($entry->data, $share->public, $this->unlockPrivateKey($user->rsaKey->private));
     }
 
     public function reencrypt(Entry $entry)
     {
-        $this->encrypt($this->decrypt($entry), $entry);
+        $this->encrypt($this->decrypt($entry->fresh(['keyShares'])), $entry);
     }
 
     /**
@@ -126,6 +133,16 @@ class EntryCrypt
         }
 
         return $keys;
+    }
+
+    private function unlockPrivateKey($privateString)
+    {
+        $code = Crypt::decrypt($this->auth->getPayload()->get('code'));
+
+        $key = new PrivateKey($privateString);
+        $key->unlock($code);
+
+        return $key;
     }
 
     /**

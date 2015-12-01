@@ -85,7 +85,7 @@ class MigrateOld extends Command
             }
             echo $entry->id .'... ';
 
-            $this->entryCrypt->encrypt(Crypt::decrypt($entry->password), $entry);
+            $this->entryCrypt->encrypt($entry->password, $entry);
 
             echo ' encrypted!' . "\n";
         }
