@@ -4,6 +4,7 @@ use App\Vault\Encryption\EntryCrypt;
 use App\Vault\Models\EntryTeam;
 use App\Vault\Models\UserTeam;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -32,12 +33,14 @@ class TeamMembersController extends Controller
         $model->user_id = Input::get('user_id');
         $model->team_id = Input::get('id');
 
-        if (!$model->save()) {
-            abort(403);
-        }
+        DB::transaction(function() use ($model, $entryCrypt) {
+            if (!$model->save()) {
+                abort(403);
+            }
 
-        $this->getListOfEntries($model)->each(function ($entry) use ($entryCrypt) {
-            $entryCrypt->reencrypt($entry);
+            $this->getListOfEntries($model)->each(function ($entry) use ($entryCrypt) {
+                $entryCrypt->reencrypt($entry);
+            });
         });
 
         return $model;

@@ -6,6 +6,7 @@ use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Tymon\JWTAuth\JWTAuth;
@@ -30,11 +31,11 @@ class EntryController extends Controller
         $model->password = Input::get('password');
         $model->user_id = Auth::user()->id;
 
-        $model->save();
-
-        $entryCrypt->encrypt(Input::get('password', ''), $model);
-
-        $model->load('tags');
+        DB::transaction(function() use ($model, $entryCrypt) {
+            $model->save();
+            $entryCrypt->encrypt(Input::get('password', ''), $model);
+            $model->load('tags');
+        });
 
         return $model;
     }
@@ -75,13 +76,15 @@ class EntryController extends Controller
             $model->password = $request->get('password');
         }
 
-        $model->save();
+        DB::transaction(function() use ($model, $entryCrypt, $request) {
+            $model->save();
 
-        if (!is_null($request->get('password', null))) {
-            $entryCrypt->encrypt($request->get('password'), $model);
-        }
+            if (!is_null($request->get('password', null))) {
+                $entryCrypt->encrypt($request->get('password'), $model);
+            }
 
-        $model->load('tags');
+            $model->load('tags');
+        });
 
         return $model;
 	}

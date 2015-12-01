@@ -4,6 +4,7 @@ use App\Vault\Encryption\EntryCrypt;
 use App\Vault\Models\Project;
 use App\Vault\Models\ProjectTeam;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -32,13 +33,15 @@ class ProjectTeamsController extends Controller
         $model->project_id = Input::get('project_id');
         $model->team_id = Input::get('team_id');
 
-        if (!$model->save()) {
-            abort(403);
-        }
+        DB::transaction(function() use ($model, $entryCrypt, $project) {
+            if (!$model->save()) {
+                abort(403);
+            }
 
-		foreach ($project->keys as $key) {
-            $entryCrypt->reencrypt($key);
-        }
+            foreach ($project->keys as $key) {
+                $entryCrypt->reencrypt($key);
+            }
+        });
 
         return $model;
 	}

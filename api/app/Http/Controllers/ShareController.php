@@ -5,6 +5,7 @@ use App\Vault\Models\Entry;
 use App\Vault\Models\KeyShare;
 use App\Vault\Models\Share;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
@@ -42,11 +43,13 @@ class ShareController extends Controller
         $model->user_id = $userId;
         $model->entry_id = $entryId;
 
-        if (!$model->save()) {
-            return Response::json(['flash' => 'Unauthorized.'], 403);
-        }
+        DB::transaction(function() use ($model, $entryCrypt, $entry) {
+            if (!$model->save()) {
+                return Response::json(['flash' => 'Unauthorized.'], 403);
+            }
 
-        $entryCrypt->reencrypt($entry);
+            $entryCrypt->reencrypt($entry);
+        });
 
         return Share::with('user')->where('id', $model->id)->first();
     }
