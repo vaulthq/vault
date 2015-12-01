@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('ModalTagController', ctrl);
 
-    function ctrl($scope, $modalInstance, Api, entry, tags) {
+    function ctrl($scope, Api, entry, tags) {
         $scope.tags = tags;
         $scope.entry = entry;
 
@@ -40,10 +40,6 @@
             return _.filter($scope.tags, function(obj) {
                 return !_.findWhere($scope.entry.tags, {name: obj.name});
             });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
         };
 
         function defaultTag() {

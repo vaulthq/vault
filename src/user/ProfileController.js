@@ -20,9 +20,5 @@
                 }
             );
         };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
     }
 })();

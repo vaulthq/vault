@@ -39,7 +39,7 @@
         <hr>
         <label class="control-label">Assign existing</label>
 
-        <ul class="list-inline" style="font-size: 15px">
+        <ul class="list-inline" style="font-size: 15px; line-height: 2em">
             <li ng-repeat="tag in availableTags()|filter:tag.name">
                 <span class="label label-default cursor" ng-click="addTag(tag)" style="background-color: {{ tag.color }}">
                     {{ tag.name }}
@@ -50,8 +50,4 @@
             There are no more available tags.
         </div>
     </div>
-</div>
-
-<div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Close</button>
 </div>

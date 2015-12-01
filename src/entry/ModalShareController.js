@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('ModalShareController', shareController);
 
-    function shareController($scope, $modalInstance, Api, users, access, entry, teams, entryTeams) {
+    function shareController($scope, Api, users, access, entry, teams, entryTeams) {
         $scope.users = users;
         $scope.access = access;
         $scope.entry = entry;
@@ -55,10 +55,6 @@
             }, function() {
                 $scope.entryTeams.splice($scope.entryTeams.map(function(i) {return i.id;}).indexOf(accessId), 1);
             });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
         };
     }
 })();
