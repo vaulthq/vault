@@ -36,7 +36,9 @@ class TeamMembersController extends Controller
             abort(403);
         }
 
-        $this->recryptTeamEntries($entryCrypt, $model);
+        $this->getListOfEntries($model)->each(function ($entry) use ($entryCrypt) {
+            $entryCrypt->reencrypt($entry);
+        });
 
         return $model;
 	}
@@ -52,12 +54,13 @@ class TeamMembersController extends Controller
 		return UserTeam::where('team_id', $id)->get();
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     * @param EntryCrypt $entryCrypt
+     * @return Response
+     */
 	public function destroy($id, EntryCrypt $entryCrypt)
 	{
         $model = UserTeam::findOrFail($id);
@@ -66,29 +69,23 @@ class TeamMembersController extends Controller
             abort(403);
         }
 
-        $this->recryptTeamEntries($entryCrypt, $model);
+        $this->getListOfEntries($model)->each(function ($entry) use ($entryCrypt) {
+            $entryCrypt->removeInvalidShares($entry);
+        });
     }
 
-    /**
-     * @param EntryCrypt $entryCrypt
-     * @param $model
-     */
-    private function recryptTeamEntries(EntryCrypt $entryCrypt, $model)
+    private function getListOfEntries($model)
     {
         $entries = collect([]);
 
         foreach ($model->team->projects as $project) {
-            foreach ($project->keys as $key) {
-                $entries->push($key);
-            }
+            $entries = $entries->merge($project->keys);
         }
 
         foreach (EntryTeam::where('team_id', $model->team_id)->get() as $entryTeam) {
             $entries->push($entryTeam->entry);
         }
 
-        $entries->unique('id')->each(function ($entry) use ($entryCrypt) {
-            $entryCrypt->reencrypt($entry);
-        });
+        return $entries->unique('id');
     }
 }

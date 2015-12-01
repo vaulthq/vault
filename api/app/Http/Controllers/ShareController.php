@@ -80,6 +80,6 @@ class ShareController extends Controller
             return Response::json(['flash' => 'Unauthorized.'], 403);
         }
 
-        $entryCrypt->reencrypt($entry);
+        $entryCrypt->removeInvalidShares($entry);
     }
 }

@@ -54,12 +54,13 @@ class ProjectTeamsController extends Controller
         return ProjectTeam::where('project_id', $id)->get();
     }
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     * @param EntryCrypt $entryCrypt
+     * @return Response
+     */
 	public function destroy($id, EntryCrypt $entryCrypt)
 	{
         $model = ProjectTeam::findOrFail($id);
@@ -70,7 +71,7 @@ class ProjectTeamsController extends Controller
         }
 
         foreach ($project->keys as $key) {
-            $entryCrypt->reencrypt($key);
+            $entryCrypt->removeInvalidShares($key);
         }
 	}
 }

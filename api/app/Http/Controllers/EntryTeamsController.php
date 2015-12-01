@@ -74,6 +74,6 @@ class EntryTeamsController extends Controller
             abort(403);
         }
 
-		$entryCrypt->reencrypt($entry);
+		$entryCrypt->removeInvalidShares($entry);
 	}
 }

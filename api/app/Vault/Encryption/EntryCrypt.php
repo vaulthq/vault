@@ -121,6 +121,16 @@ class EntryCrypt
         $this->encrypt($this->decrypt($entry->fresh(['keyShares'])), $entry);
     }
 
+    public function removeInvalidShares(Entry $entry)
+    {
+        $users = $this->accessDecider->getUserListForEntry($entry);
+
+        $entry->keyShares()
+            ->whereNotNull('user_id')
+            ->whereNotIn('user_id', $users->pluck('id')->toArray())
+            ->delete();
+    }
+
     /**
      * @param $users
      * @return array
