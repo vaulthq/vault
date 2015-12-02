@@ -9,26 +9,26 @@
                 <small class="hidden-md">{{ project.description }}</small>
             </h3>
         </div>
-        <div class="col-md-2 col-xs-4">
-            <input type="text" class="form-control input-sm" style="margin-top:-2px" placeholder="Search password" ng-model="search.query" app-focus tabindex="1">
+        <div class="col-md-3 col-xs-4 col-md-offset-2">
+            <input type="text" class="form-control input-sm top-search" placeholder="Search..." ng-model="search.query" app-focus tabindex="1">
         </div>
-        <div class="col-md-5 col-xs-4">
-            <div class="pull-right">
-                <a class="btn btn-success btn-xs" title="Assign Team" project-teams="project" ng-if="project.can_edit">
-                    <i class="glyphicon glyphicon-link"></i>
-                </a>
-                <a class="btn btn-success btn-xs" title="Show Assigned Teams" project-show-teams="project" ng-if="!project.can_edit">
-                    <i class="glyphicon glyphicon-question-sign"></i>
-                </a>
+        <div class="col-md-2 col-xs-3 text-right">
+            <a class="btn btn-success btn-sm" title="Assign Team" project-teams="project" ng-if="project.can_edit">
+                <i class="glyphicon glyphicon-link"></i>
+            </a>
+            <a class="btn btn-success btn-sm" title="Show Assigned Teams" project-show-teams="project" ng-if="!project.can_edit">
+                <i class="glyphicon glyphicon-question-sign"></i>
+            </a>
 
-                <a class="btn btn-primary btn-xs" title="Project Access Information" project-show-owner="project" ng-if="!project.can_edit">
-                    <i class="glyphicon glyphicon-info-sign"></i>
-                </a>
+            <a class="btn btn-primary btn-sm" title="Project Access Information" project-show-owner="project" ng-if="!project.can_edit">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </a>
 
-                <project-update project="project"></project-update>
+            <a class="btn btn-warning btn-sm" title="Edit project" project-update="project" ng-if="project.can_edit">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
 
-                <a class="btn btn-default btn-xs" title="Add new key" entry-create="project">Add new key</a>
-            </div>
+            <a class="btn btn-default btn-sm" title="Add new key" entry-create="project">Add new key</a>
         </div>
     </div>
 </div>

@@ -11,6 +11,7 @@
             login: login,
             logout: logout,
             getUser: getUser,
+            getCode: getCode,
             isLoggedIn: isLoggedIn,
             initLogin: initLogin,
             getToken: getToken,
@@ -43,6 +44,16 @@
             if (token) {
                 try {
                     return jwtHelper.decodeToken(token).user;
+                } catch(err) {}
+            }
+            return [];
+        }
+
+        function getCode() {
+            var token = getToken();
+            if (token) {
+                try {
+                    return jwtHelper.decodeToken(token).code;
                 } catch(err) {}
             }
             return [];

@@ -13,14 +13,12 @@ Route::group(['prefix' => 'api', 'middleware' => 'api.key'], function() {
 	Route::get('keyByTag', 'DeployKeyController@findByTag');
 });
 
-Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
+Route::group(['prefix' => 'api', 'middleware' => ['jwt.auth', 'valid.user']], function() {
 	Route::get('project/keys/{project}', ['as' => 'keys', 'uses' => 'ProjectController@getKeys']);
 	Route::get('project/teams/{project}', ['as' => 'teams', 'uses' => 'ProjectController@getTeams']);
-	Route::get('project/changeOwner/{project}', ['as' => 'projectOwner', 'uses' => 'ProjectController@changeOwner']);
 	Route::resource('project', 'ProjectController');
 
 	Route::resource('profile', 'ProfileController');
-	Route::resource('user', 'UserController');
 	Route::resource('recent', 'RecentController');
 	Route::resource('share', 'ShareController');
 	Route::resource('teamMembers', 'TeamMembersController');
@@ -34,20 +32,26 @@ Route::group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function() {
 		Route::delete('/{team}', 'TeamController@destroy');
 	});
 
-	Route::get('entry/password/{id}', ['as' => 'password', 'uses' => 'EntryController@getPassword']);
-	Route::get('entry/access/{id}', ['as' => 'access', 'uses' => 'EntryController@getAccess']);
+	Route::group(['prefix' => 'entry'], function() {
+		Route::get('/access/{entry}', 'EntryController@getAccess');
+		Route::get('/password/{entry}', 'EntryController@getPassword');
+	});
 
 	Route::resource('entry', 'EntryController');
 	Route::resource('entryTeams', 'EntryTeamsController');
 	Route::resource('entryTags', 'EntryTagController');
 
-	Route::group(['prefix' => 'apis'], function() {
-		Route::get('/', 'ApiKeyController@index');
-		Route::post('/', 'ApiKeyController@create');
-		Route::delete('/{apiKey}', 'ApiKeyController@delete');
+	Route::group(['prefix' => 'user'], function() {
+		Route::get('/', 'UserController@index');
+		Route::get('/{user}', 'UserController@show');
+
+		Route::group(['middleware' => 'admin'], function() {
+			Route::post('/', 'UserController@store');
+			Route::put('/{user}', 'UserController@update');
+		});
 	});
 
-	Route::group(['before' => 'admin'], function() {
+	Route::group(['middleware' => 'admin'], function() {
 		Route::resource('history', 'HistoryController');
 	});
 });

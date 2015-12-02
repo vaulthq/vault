@@ -3,8 +3,8 @@
         .module('xApp')
         .controller('ModalCreateUserController', ctrl);
 
-    function ctrl($scope, $modalInstance, Api, GROUPS) {
-        $scope.user = {};
+    function ctrl($scope, $modalInstance, Api, user, GROUPS) {
+        $scope.user = user;
         $scope.groups = GROUPS;
 
         $scope.ok = function () {

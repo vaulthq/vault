@@ -45,7 +45,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('password', 'created_at', 'updated_at', 'deleted_at', 'remember_token');
+	protected $hidden = array('password', 'created_at', 'deleted_at', 'remember_token');
 
 	/**
 	 * Get the unique identifier for the user.
@@ -97,19 +97,24 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->hasMany('App\Vault\Models\Share', 'user_id');
     }
 
-    public function apiKeys()
-    {
-        return $this->hasMany('App\Vault\Models\ApiKey', 'user_id');
-    }
-
     public function teams()
     {
         $this->belongsToMany('App\Vault\Models\Team', 'user_team', 'team_id', 'user_id');
     }
 
+    public function rsaKey()
+    {
+        return $this->hasOne('App\Vault\Models\RsaKey', 'user_id');
+    }
+
     public function isAdmin()
     {
         return $this->group == self::GROUP_ADMIN;
+    }
+
+    public function isDisabled()
+    {
+        return $this->group == self::GROUP_DISABLED;
     }
 
     public function getGroup()

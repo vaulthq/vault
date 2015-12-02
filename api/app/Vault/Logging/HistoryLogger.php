@@ -22,6 +22,6 @@ class HistoryLogger
 
     private function getCurrentUserId()
     {
-        return Auth::user()->id;
+        return Auth::check() ? Auth::user()->id : '1';
     }
 }

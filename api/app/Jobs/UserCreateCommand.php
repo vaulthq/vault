@@ -1,6 +1,8 @@
 <?php namespace App\Jobs;
 
 use App\Events\User\UserCreated;
+use App\Vault\Encryption\KeyPairGenerator;
+use App\Vault\Models\RsaKey;
 use App\Vault\Models\User;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Support\Facades\Hash;
@@ -53,6 +55,13 @@ class UserCreateCommand extends Command implements SelfHandling
             'name' => $this->name,
             'surname' => $this->surname
         ]);
+
+        $keys = KeyPairGenerator::generate($this->password);
+        $key = new RsaKey();
+        $key->private = $keys['private'];
+        $key->public = $keys['public'];
+        $key->user_id = $model->id;
+        $key->save();
 
         event(new UserCreated($model));
 

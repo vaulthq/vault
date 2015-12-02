@@ -1,41 +1,26 @@
 <div class="page-header">
-    <h3>
-        API Access Keys
-
-        <div class="pull-right">
-            <key-create></key-create>
-        </div>
-    </h3>
+    <h3>API Token</h3>
 </div>
 
 <div class="content">
-    <loader when="!apis.$resolved"></loader>
 
-    <table class="table table-hover" ng-show="apis.length > 0">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Public Key</th>
-            <th>Private Key</th>
-            <th>Updated</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tr ng-repeat="api in apis">
-            <td>{{ api.id }}</td>
-            <td>{{ api.key_public }}</td>
-            <td>{{ api.key_secret || "*******" }}</td>
-            <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
-            <td class="text-right">
-                <a ng-click="revoke(api)" class="btn btn-danger btn-xs" title="Revoke">
-                    <i class="glyphicon glyphicon-ban-circle"></i>
-                </a>
-            </td>
-        </tr>
-    </table>
-
-    <div ng-show="apis.$resolved && apis.length == 0">
-        At the moment you do not have any API keys.
+    <div class="row">
+        <div class="col-sm-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="user" class="col-sm-2 control-label">User</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="user" readonly ng-model="user">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-sm-2 control-label">Access code</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="code" readonly ng-model="code" rows="4"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
+</div>

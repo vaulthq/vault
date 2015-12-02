@@ -3,19 +3,17 @@
         .module('xApp')
         .controller('ModalTagController', ctrl);
 
-    function ctrl($scope, $modalInstance, Api, entry, tags) {
+    function ctrl($scope, Api, entry, tags) {
         $scope.tags = tags;
         $scope.entry = entry;
 
-        $scope.tag_color = '#dbdbdb';
-        $scope.tag_name = '';
+        $scope.tag = defaultTag();
 
         $scope.createTag = function() {
-            Api.entryTags.save({color: $scope.tag_color, name: $scope.tag_name, entryId: entry.id}, function(res) {
+            Api.entryTags.save({color: $scope.tag.color, name: $scope.tag.name, entryId: entry.id}, function(res) {
                 $scope.entry.tags.push(res);
                 $scope.tags.push(res);
-                $scope.tag_color = '#dbdbdb';
-                $scope.tag_name = '';
+                $scope.tag = defaultTag();
             });
         };
 
@@ -34,6 +32,7 @@
         $scope.addTag = function(tag) {
             Api.entryTags.save({color: tag.color, name: tag.name, entryId: entry.id}, function(res) {
                 $scope.entry.tags.push(res);
+                $scope.tag = defaultTag();
             });
         };
 
@@ -43,8 +42,8 @@
             });
         };
 
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
+        function defaultTag() {
+            return {color: '#dbdbdb', name: ''};
+        }
     }
 })();

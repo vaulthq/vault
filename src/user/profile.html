@@ -1,7 +1,7 @@
 <div class="modal-header">
     <h3>Change Password</h3>
 </div>
-<form>
+<form novalidate>
     <div class="modal-body">
         <div class="form-group">
             <label class="control-label" for="iOld">Old password *</label>
@@ -17,7 +17,6 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block" ng-click="ok()">Save</button>
     </div>
 </form>

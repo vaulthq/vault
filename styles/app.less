@@ -56,7 +56,7 @@ body {
 
 .project-jump {
   > .scroller {
-    max-height: 400px;
+    max-height: 600px;
     overflow-y: scroll;
     margin-right: -10px;
   }
@@ -91,6 +91,12 @@ body {
 
 .cursor {
   cursor: pointer;
+}
+
+.side-logo {
+  padding: 12px;
+  display: block;
+  width: 100%;
 }
 
 .btn-side-menu {
@@ -172,23 +178,22 @@ body {
 
 .modal-header {
   height: 56px;
-  background: @sidebar-show-bg;
   padding: 1.1em;
+  text-align: center;
+  border: none;
   h3 {
-    color: #E7EDEA;
+    color: #333;
     margin: 0;
   }
 }
 
 .modal-content {
-  border: 1px solid #4F565E;
-  border-radius: 2px;
-  .box-shadow;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 .modal-footer {
-  background: #F1F1F1;
-  padding: 10px;
   border-top: none;
 }
 
@@ -223,4 +228,49 @@ body {
 
 #container {
   margin-left: @sidebar-show-width;
+}
+
+.page-header {
+  .top-search, a {
+    margin-top: -3px;
+  }
+}
+
+.top-search {
+  background: #FBFBFB;
+}
+
+.modal-backdrop.in {
+  opacity: 1;
+}
+
+.modal-backdrop {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.form-control {
+  border-radius: 1px;
+  background-color: #FBFBFB;
+}
+
+.close.modal-close {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  font-size: 2em;
+  opacity: 0.5;
+  padding: 15px;
+  outline:none;
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.btn {
+  border-radius: 1px;
+}
+
+.modal.fade .modal-dialog {
+  transition: opacity .3s ease;
+  transform: none;
 }

@@ -3,16 +3,16 @@
         .module('xApp')
         .directive('loader', loaderDirective)
         .directive('showPassword', showPasswordDirective)
-        .directive('fileRead', fileReadDirective)
-        .directive('changeProjectOwner', projectOwnerDirective);
+        .directive('fileRead', fileReadDirective);
 
     function loaderDirective() {
         return {
             restrict: 'E',
             scope: {
-                when: '='
+                when: '=',
+                type: '='
             },
-            template: '<ul class="loading" ng-if="when"><li></li><li></li><li></li></ul>'
+            template: '<div class="loading-holder" ng-show="when"><ul class="loading"><li></li><li></li><li></li></ul></div>'
         };
     }
 
@@ -23,8 +23,10 @@
             },
             restrict: 'A',
             link: function($scope, element) {
-                element.on('click', function(e){
-                    $scope.showPassword();
+                element.on('click', function() {
+                    if ($scope.entry.can_edit || $scope.entry.can_edit == undefined) {
+                        $scope.showPassword();
+                    }
                 });
             },
             controller: function($scope, $modal, modal) {
@@ -58,38 +60,6 @@
                     };
                     reader.readAsText(file);
                 });
-            }
-        };
-    }
-
-    function projectOwnerDirective() {
-        return {
-            scope: {
-                projectId: '=',
-                elementClass: '=?'
-            },
-            template:
-                '<a ng-click="showModal()" ng-class="elementClass" title="Change Project Owner">' +
-                '    <i class="glyphicon glyphicon-share-alt"></i>' +
-                '</a>',
-            controller: function($scope, $modal) {
-                $scope.elementClass = $scope.elementClass || 'btn btn-default';
-                $scope.showModal = showModal;
-
-                function showModal() {
-                    $modal.open({
-                        templateUrl: '/t/project/changeOwner.html',
-                        controller: 'ModalChangeProjectOwnerController',
-                        resolve: {
-                            users: function(Api) {
-                                return Api.user.query();
-                            },
-                            project: function(Api) {
-                                return Api.project.get({id: $scope.projectId});
-                            }
-                        }
-                    });
-                }
             }
         };
     }

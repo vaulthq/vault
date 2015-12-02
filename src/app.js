@@ -166,12 +166,7 @@
             .state('user.api', {
                 url: '/api',
                 templateUrl: '/t/api/list.html',
-                controller: 'ApiController',
-                resolve: {
-                    apis: function(Api) {
-                        return Api.apis.query();
-                    }
-                }
+                controller: 'ApiController'
             })
             .state('user.teams', {
                 url: '/teams',

@@ -5,13 +5,14 @@
 
     function projectUpdateDirective() {
         return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-warning btn-xs" title="Edit project" ng-click="update()" ng-if="project.can_edit">' +
-                    '<i class="glyphicon glyphicon-edit"></i>' +
-                '</a>',
+            restrict: 'A',
             scope: {
-                project: '='
+                projectUpdate: '='
+            },
+            link: function($scope, elem) {
+                elem.on('click', function() {
+                    $scope.update();
+                });
             },
             controller: function($rootScope, $scope, $modal) {
                 $scope.update = updateProject;
@@ -22,7 +23,7 @@
                         controller: 'ModalUpdateProjectController',
                         resolve: {
                             project: function(Api) {
-                                return Api.project.get({id: $scope.project.id});
+                                return Api.project.get({id: $scope.projectUpdate.id});
                             }
                         }
                     }).result.then(function (model) {

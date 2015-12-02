@@ -1,22 +1,20 @@
 {
   "name": "vault",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Password save and share system.",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",
-    "url": "git@pm.datajob.lt:datadog/vault.git"
+    "url": "git@github.com:private-vault/vault.git"
   },
-  "author": "",
+  "author": "Private Vault",
   "license": "MIT",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-concat": "2.4.1",
     "gulp-uglify": "1.1.0",
     "gulp-less": "2.0.1",
-    "del": "~1.1.0"
-  },
-  "dependencies": {
+    "del": "~1.1.0",
     "gulp-expect-file": "0.0.7"
   }
 }

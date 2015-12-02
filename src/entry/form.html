@@ -21,7 +21,7 @@
             <label class="control-label" for="iPassword">Password</label>
             <div class="row">
                 <div class="col-xs-10">
-                    <textarea name="password" class="form-control password" id="iPassword" ng-model="entry.password" rows="1"></textarea>
+                    <textarea name="password" class="form-control password" id="iPassword" ng-model="entry.password" rows="4"></textarea>
                 </div>
                 <div class="col-xs-2" style="overflow: hidden; color: white; font-size: 13px">
                     <input type="file" file-read content="entry.password" name="entry.username" style="margin-left: -15px"/>
@@ -37,13 +37,16 @@
         <input type="hidden" ng-model="entry.project_id">
     </div>
     <div class="modal-footer">
-        <a href show-password="entry" class="btn btn-info pull-left" ng-if="entry.id > 0"><i class="fa fa-lock"></i></a>
-        <div style="width: 5px; height: 1px" class="pull-left" ng-if="entry.id > 0"></div>
+        <div class="row">
+            <div class="col-sm-6">
+                <a href show-password="entry" class="btn btn-info pull-left" ng-if="entry.id > 0"><i class="fa fa-lock"></i></a>
+                <div style="width: 5px; height: 1px" class="pull-left" ng-if="entry.id > 0"></div>
+                <button class="btn btn-default pull-left" title="Generate random password" ng-click="generate()">Random</button>
 
-        <button type="submit" class="btn btn-primary" ng-click="ok()">Save</button>
-
-        <button class="btn btn-default pull-left" title="Generate random password" ng-click="generate()">Random</button>
-
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+            </div>
+            <div class="col-sm-6">
+                <button type="submit" class="btn btn-primary btn-block" ng-click="ok()">Save</button>
+            </div>
+        </div>
     </div>
 </form>

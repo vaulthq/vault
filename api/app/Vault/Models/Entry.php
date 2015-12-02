@@ -11,9 +11,7 @@ class Entry extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'user_id', 'deleted_at'];
 	protected $table = 'entry';
-    protected $hidden = [
-        'deleted_at', 'password'
-    ];
+    protected $hidden = ['deleted_at', 'password', 'data'];
     protected $appends = ['can_edit'];
 
     public function getCanEditAttribute()
@@ -25,7 +23,6 @@ class Entry extends Model
     {
         $this->attributes['password'] = Crypt::encrypt($this->fixNewLines($value));
     }
-
     public function getPasswordAttribute($value)
     {
         return Crypt::decrypt($value);
@@ -59,6 +56,11 @@ class Entry extends Model
     public function teamShares()
     {
         return $this->hasMany('App\Vault\Models\EntryTeam', 'entry_id');
+    }
+
+    public function keyShares()
+    {
+        return $this->hasMany('App\Vault\Models\KeyShare', 'entry_id');
     }
 
     private function fixNewLines($str)

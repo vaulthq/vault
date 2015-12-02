@@ -1,31 +1,33 @@
-    <div class="side-menu">
-        <div class="side-menu-top">
-            <a class="btn btn-side-menu" ui-sref="user.home" tooltip-placement="right" tooltip="Recently Used" ui-sref-active="active">
-                <i class="fa fa-home fa-2x"></i>
-            </a>
-            <a class="btn btn-side-menu" ui-sref="user.projects" tooltip-placement="right" tooltip="Project List" ng-class="{'active': isEntryActive}">
-                <i class="fa fa-th-list fa-2x"></i>
-            </a>
+<div class="side-menu">
+    <div class="side-menu-top">
+        <img src="/img/logo.svg" class="side-logo">
 
-            <a class="btn btn-side-menu" ui-sref="user.teams" tooltip-placement="right" tooltip="Manage Teams" ui-sref-active="active">
-                <i class="fa fa-link fa-2x"></i>
-            </a>
+        <a class="btn btn-side-menu" ui-sref="user.home" tooltip-placement="right" tooltip="Recently Used" ui-sref-active="active">
+            <i class="fa fa-home fa-2x"></i>
+        </a>
+        <a class="btn btn-side-menu" ui-sref="user.projects" tooltip-placement="right" tooltip="Project List" ng-class="{'active': isEntryActive}">
+            <i class="fa fa-th-list fa-2x"></i>
+        </a>
 
-            <div ng-if="login.group == 'admin'">
-                <a class="btn btn-side-menu" ui-sref="user.list" tooltip-placement="right" tooltip="Manage Users" ui-sref-active="active">
-                    <i class="fa fa-users fa-2x"></i>
-                </a>
-                <a class="btn btn-side-menu" ui-sref="user.history" tooltip-placement="right" tooltip="Action History" ui-sref-active="active">
-                    <i class="fa fa-flag fa-2x"></i>
-                </a>
-            </div>
+        <a class="btn btn-side-menu" ui-sref="user.teams" tooltip-placement="right" tooltip="Manage Teams" ui-sref-active="active">
+            <i class="fa fa-link fa-2x"></i>
+        </a>
 
-            <a class="btn btn-side-menu" ui-sref="user.api" tooltip-placement="right" tooltip="API Keys" ui-sref-active="active">
-                <i class="fa fa-cloud-upload fa-2x"></i>
+        <div ng-if="login.group == 'admin'">
+            <a class="btn btn-side-menu" ui-sref="user.list" tooltip-placement="right" tooltip="Manage Users" ui-sref-active="active">
+                <i class="fa fa-users fa-2x"></i>
             </a>
-            <profile></profile>
-            <logout></logout>
+            <a class="btn btn-side-menu" ui-sref="user.history" tooltip-placement="right" tooltip="Action History" ui-sref-active="active">
+                <i class="fa fa-flag fa-2x"></i>
+            </a>
         </div>
+
+        <a class="btn btn-side-menu" ui-sref="user.api" tooltip-placement="right" tooltip="API Token" ui-sref-active="active">
+            <i class="fa fa-cloud-upload fa-2x"></i>
+        </a>
+        <profile></profile>
+        <logout></logout>
     </div>
+</div>
 
 <div id="container" class="content-background"><ui-view/></div>

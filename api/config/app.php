@@ -97,6 +97,8 @@ return [
 
 	'log' => 'daily',
 
+	'backup_key' => storage_path('keys/master.pub'),
+
 	/*
 	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers

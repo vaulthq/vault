@@ -1,33 +1,41 @@
 <?php namespace App\Http\Controllers;
 
+use App\Vault\Encryption\AccessDecider;
+use App\Vault\Encryption\EntryCrypt;
 use App\Vault\Logging\HistoryLogger;
 use App\Vault\Models\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
+use Tymon\JWTAuth\JWTAuth;
 
 class EntryController extends Controller
 {
     /**
      * Create new Entry in database
      *
+     * @param EntryCrypt $entryCrypt
      * @return Entry
      */
-    public function store()
+    public function store(EntryCrypt $entryCrypt)
     {
         $model = new Entry();
 
         $model->name = Input::get('name');
         $model->url = Input::get('url');
-        $model->password = Input::get('password');
         $model->note = Input::get('note');
         $model->username = Input::get('username');
         $model->project_id = Input::get('project_id');
+        $model->password = Input::get('password');
         $model->user_id = Auth::user()->id;
 
-        $model->save();
-        $model->load('tags');
+        DB::transaction(function() use ($model, $entryCrypt) {
+            $model->save();
+            $entryCrypt->encrypt(Input::get('password', ''), $model);
+            $model->load('tags');
+        });
 
         return $model;
     }
@@ -49,24 +57,34 @@ class EntryController extends Controller
      *
      * @param Entry $model
      * @param Request $request
+     * @param EntryCrypt $entryCrypt
      * @return Response
      */
-	public function update(Entry $model, Request $request)
+	public function update(Entry $model, Request $request, EntryCrypt $entryCrypt)
 	{
+        if (!$model->can_edit) {
+            abort(403);
+        }
+
         $model->name = $request->get('name');
         $model->username = $request->get('username');
         $model->url = $request->get('url');
         $model->note = $request->get('note');
 
+
         if (!is_null($request->get('password', null))) {
             $model->password = $request->get('password');
         }
 
-        if (!$model->save()) {
-            abort(403);
-        }
+        DB::transaction(function() use ($model, $entryCrypt, $request) {
+            $model->save();
 
-        $model->load('tags');
+            if (!is_null($request->get('password', null))) {
+                $entryCrypt->encrypt($request->get('password'), $model);
+            }
+
+            $model->load('tags');
+        });
 
         return $model;
 	}
@@ -88,70 +106,35 @@ class EntryController extends Controller
     /**
      * Get password for Entry
      *
-     * @param $id
+     * @param Entry $model
      * @param HistoryLogger $logger
+     * @param EntryCrypt $entryCrypt
      * @return mixed
      */
-    public function getPassword($id, HistoryLogger $logger)
+    public function getPassword(Entry $model, HistoryLogger $logger, EntryCrypt $entryCrypt)
     {
-        $model = Entry::findOrFail($id);
-
         if (!$model->can_edit) {
             abort(403);
         }
 
-        $logger->log('password', 'Accessed password #' . $id . ' ('.$model->project->name.').', $id);
-
-        return Response::json(['password' => strlen($model->password) > 0 ? $model->password : ''], 200);
+        try {
+            $data = $entryCrypt->decrypt($model);
+            $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
+            return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
+        } catch (\RuntimeException $e) {
+            abort(409);
+        }
     }
 
-    public function getAccess($id)
+    public function getAccess(Entry $entry)
     {
-        $model = Entry::findOrFail($id);
-        $users = [];
-        $added = [];
+        $entry->load('keyShares', 'keyShares.user');
 
-        foreach ($model->shares()->get() as $share) {
-            if (!in_array($share->user_id, $added)) {
-                $users[] = $share->user->toArray();
-                $added[] = $share->user_id;
-            }
+        $list = collect([]);
+        foreach ($entry->keyShares as $share) {
+            $list->push($share->user);
         }
 
-        foreach ($model->teamShares()->with('team', 'team.users')->get() as $share) {
-            $team = $share->team;
-            if (!in_array($team->user_id, $added)) {
-                $users[] = $team->owner->toArray();
-                $added[] = $team->user_id;
-            }
-
-            foreach ($team->users as $user) {
-                if (!in_array($user->id, $added)) {
-                    $users[] = $user->toArray();
-                    $added[] = $user->id;
-                }
-            }
-        }
-
-        if (!in_array($model->owner->id, $added)) {
-            $users[] = $model->owner->toArray();
-            $added[] = $model->owner->id;
-        }
-
-        foreach ($model->project->teams()->with('users')->get() as $team) {
-            if (!in_array($team->user_id, $added)) {
-                $users[] = $team->owner->toArray();
-                $added[] = $team->user_id;
-            }
-
-            foreach ($team->users as $user) {
-                if (!in_array($user->id, $added)) {
-                    $users[] = $user->toArray();
-                    $added[] = $user->id;
-                }
-            }
-        }
-
-        return $users;
+        return $list;
     }
 }

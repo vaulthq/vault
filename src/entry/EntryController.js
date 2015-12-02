@@ -14,7 +14,7 @@
         $scope.getFiltered = getFiltered;
 
         $scope.entries.$promise.then(function(){
-            if (!$scope.active.id && $scope.entries.length > 0) {
+            if (!$scope.active || !$scope.active.id && $scope.entries.length > 0) {
                 $scope.active = $scope.entries[0];
             }
         });
@@ -38,7 +38,7 @@
         function onFilterChanged() {
             var filtered = getFiltered();
             var current = _.findIndex(filtered, function(x) {
-                return x.id == $scope.active.id;
+                return $scope.active && x.id == $scope.active.id;
             });
             if (current == -1 && filtered.length > 0) {
                 $scope.active = filtered[0];

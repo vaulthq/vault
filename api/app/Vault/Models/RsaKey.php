@@ -1,15 +1,12 @@
 <?php namespace App\Vault\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ApiKey extends Model
+class RsaKey extends Model
 {
-    use SoftDeletes;
+    protected $table = 'rsa_key';
 
-    protected $table = 'api_key';
-
-    protected $hidden = ['key_secret'];
+    protected $hidden = ['private', 'updated_at'];
 
     public function user()
     {

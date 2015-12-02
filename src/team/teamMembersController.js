@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('teamMembersController', controller);
 
-    function controller($rootScope, $scope, $modalInstance, Api, users, access, team) {
+    function controller($rootScope, $scope, Api, users, access, team) {
         $scope.users = users;
         $scope.access = access;
         $scope.team = team;
@@ -33,10 +33,6 @@
                 $scope.access.splice(accessIndex, 1);
                 $rootScope.$broadcast('teamMemberRemoved', {userId: user.id, team: $scope.team});
             });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
         };
 
         function getAccessIndexForUserId(userId) {
