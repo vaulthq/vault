@@ -6,7 +6,7 @@ Vault is a tool for securely sharing and storing secrets. A secret is anything t
 The key features of this system:
 
 * **Web client**: Vault includes a web frontend for easy access to your secrets. This is the primary way to interact with this system.
-* **Data encryption**: Because secrets are stored in a database, they have to be encrypted. Vault uses AES-256 encryption to protect your secrets from unauthorized access.
+* **Data encryption**: Because secrets are stored in a database, they have to be encrypted. Vault uses RSA 2048 encryption to protect your secrets from unauthorized access.
 * **API**: Vault also includes an API for accessing secrets automatically, enabling you to create integrations with other software.
 * **Audit logs**: Every action in system is logged, so you can see who accessed which secrets.
 
