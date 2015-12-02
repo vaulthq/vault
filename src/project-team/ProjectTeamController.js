@@ -3,7 +3,7 @@
         .module('xApp')
         .controller('ProjectTeamController', teamController);
 
-    function teamController($scope, $modalInstance, Api, teams, project, access) {
+    function teamController($scope, Api, teams, project, access) {
         $scope.teams = teams;
         $scope.access = access;
         $scope.project = project;
@@ -31,12 +31,8 @@
             });
         };
 
-        $scope.cancel = function () {
-            $modalInstance.dismiss();
-        };
-
         function getAccessIndexForUserId(teamId) {
             return $scope.access.map(function (e) { return e.team_id; }).indexOf(teamId);
-        };
+        }
     }
 })();

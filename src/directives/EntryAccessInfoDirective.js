@@ -5,13 +5,12 @@
 
     function entryAccessInfoDirective() {
         return {
-            restrict: 'E',
-            template:
-                '<a class="btn btn-primary btn-xs" title="Access Information" ng-click="info()" ng-if="!entry.can_edit">' +
-                    '<i class="glyphicon glyphicon-info-sign"></i>' +
-                '</a>',
+            restrict: 'A',
             scope: {
-                entry: '='
+                entryAccessInfo: '='
+            },
+            link: function($scope, $elem) {
+                $elem.on('click', $scope.info);
             },
             controller: function($rootScope, $scope, $modal) {
                 $scope.info = entryInfo;
@@ -19,10 +18,16 @@
                 function entryInfo() {
                     $modal.open({
                         templateUrl: '/t/entry/access.html',
-                        controller: 'ModalAccessController',
+                        controller: function($scope, $modalInstance, access, entry) {
+                            $scope.access = access;
+                            $scope.entry = entry;
+                        },
                         resolve: {
                             access: function(Api) {
-                                return Api.entryAccess.query({id: $scope.entry.id});
+                                return Api.entryAccess.query({id: $scope.entryAccessInfo.id});
+                            },
+                            entry: function() {
+                                return $scope.entryAccessInfo;
                             }
                         }
                     });

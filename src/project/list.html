@@ -1,13 +1,13 @@
 <div class="page-header">
     <div class="row">
-        <div class="col-md-5 col-xs-5">
+        <div class="col-xs-4">
             <h3>Projects</h3>
         </div>
-        <div class="col-md-3 col-xs-4 col-md-offset-2">
+        <div class="col-xs-4 col-md-offset-1">
             <input type="text" class="form-control input-sm top-search" placeholder="Search..." ng-model="search.query" app-focus tabindex="1">
         </div>
-        <div class="col-md-2 col-xs-3 text-right">
-            <a class="btn btn-default btn-sm" title="Add new key" ng-click="create()">Add project</a>
+        <div class="col-xs-3 text-right">
+            <a class="btn btn-default btn-sm" title="Add new key" ng-click="create()">Add new project</a>
         </div>
     </div>
 </div>
@@ -37,16 +37,12 @@
                         <i class="glyphicon glyphicon-link"></i>
                     </a>
 
-                    <a class="btn btn-success btn-xs" title="Show Assigned Teams" project-show-teams="project" ng-if="!project.can_edit">
-                        <i class="glyphicon glyphicon-question-sign"></i>
+                    <a class="btn btn-primary btn-xs" title="Project information" project-info="project" ng-if="!project.can_edit">
+                        <i class="glyphicon glyphicon-question-sign"></i> Information
                     </a>
 
                     <a class="btn btn-warning btn-xs" title="Edit project" project-update="project" ng-if="project.can_edit">
                         <i class="glyphicon glyphicon-edit"></i>
-                    </a>
-
-                    <a class="btn btn-primary btn-xs" title="Project Access Information" project-show-owner="project" ng-if="!project.can_edit">
-                        <i class="glyphicon glyphicon-info-sign"></i>
                     </a>
 
                     <a class="btn btn-danger btn-xs" title="Delete project" ng-click="delete(project)" ng-if="project.can_edit">

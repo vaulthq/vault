@@ -1,36 +1,56 @@
 <div class="modal-header">
-    <h3>Assigned Teams</h3>
+    <h3>"{{ project.name }}" project information</h3>
 </div>
+
 <div class="modal-body">
 
-    <loader when="!teams.$resolved"></loader>
+    <loader when="!teams.$resolved || !owner.$resolved"></loader>
 
-    <table class="table" ng-show="teams.$resolved" ng-if="teams.length > 0">
-        <thead>
-            <th>Name</th>
-            <th>Members</th>
-        </thead>
-        <tbody>
-            <tr class="filter-row">
-                <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
-                <td></td>
-            </tr>
-            <tr ng-repeat="team in teams | filter:search">
-                <td>{{team.name}}</td>
-                <td>
-                    <ul class="list-inline">
-                        <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
-                        <li ng-repeat="user in team.users">{{ user.email }}</li>
-                    </ul>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div ng-show="teams.$resolved && owner.$resolved">
 
-    <div ng-if="teams.$resolved && teams.length == 0">
-        This project has no assigned teams.
+        <h4>Project owner</h4>
+
+        <table class="table">
+            <thead>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Email</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{owner.name}}</td>
+                    <td>{{owner.surname}}</td>
+                    <td>{{owner.email}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Assigned teams</h4>
+
+        <table class="table" ng-if="teams.length > 0">
+            <thead>
+                <th>Name</th>
+                <th>Members</th>
+            </thead>
+            <tbody>
+                <tr class="filter-row">
+                    <td><input type="text" class="form-control input-sm" ng-model="search.name"></td>
+                    <td></td>
+                </tr>
+                <tr ng-repeat="team in teams | filter:search">
+                    <td>{{team.name}}</td>
+                    <td>
+                        <ul class="list-inline">
+                            <li title="Team Owner"><u>{{ team.owner.email }}</u></li>
+                            <li ng-repeat="user in team.users">{{ user.email }}</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div ng-if="teams.$resolved && teams.length == 0">
+            There are no teams assigned. Only project owner can make changes.
+        </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Close</button>
 </div>
