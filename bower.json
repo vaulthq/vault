@@ -32,5 +32,8 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.4.5",
     "lodash": "~3.9.3",
     "font-awesome": "~4.4"
+  },
+  "resolutions": {
+    "angular": "1.4.8"
   }
 }

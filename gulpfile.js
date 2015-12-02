@@ -8,12 +8,7 @@ var del = require('del');
 
 var paths = {
     vendor_styles: [
-        'bower_components/bootstrap/dist/css/bootstrap.min.css',
-        'bower_components/AngularJS-Toaster/toaster.css',
-        'bower_components/angular-ui-select/dist/select.min.css',
-        'bower_components/angular-hotkeys/build/hotkeys.min.css',
-        'bower_components/font-awesome/css/font-awesome.min.css',
-        'bower_components/angular-bootstrap-colorpicker/css/colorpicker.min.css'
+        'styles/vendor.less'
     ],
     html_templates: [
         'src/**/*.html'
@@ -66,7 +61,7 @@ gulp.task('vendor_scripts', [], function() {
 
 gulp.task('vendor_styles', [], function() {
     return gulp.src(paths.vendor_styles)
-        .pipe(expect(paths.vendor_styles))
+        .pipe(less())
         .pipe(concat('vendor_styles.css'))
         .pipe(gulp.dest('api/public/css'));
 });
@@ -84,12 +79,11 @@ gulp.task('scripts', [], function() {
 });
 
 gulp.task('styles', [], function() {
-    return gulp.src(paths.styles)
+    return gulp.src('styles/app.less')
         .pipe(less())
         .pipe(concat('app.css'))
         .pipe(gulp.dest('api/public/css'));
 });
-
 
 gulp.task('html_templates', [], function() {
     return gulp.src(paths.html_templates)
@@ -100,6 +94,7 @@ gulp.task('watch', ['default'], function() {
   gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.html_templates, ['html_templates']);
   gulp.watch(paths.styles, ['styles']);
+  gulp.watch(paths.vendor_styles, ['vendor_styles']);
 });
 
 gulp.task('default', ['vendor_fonts', 'vendor_styles', 'html_templates', 'vendor_scripts', 'scripts', 'styles']);
