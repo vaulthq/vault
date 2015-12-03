@@ -18,7 +18,7 @@
 
                 function tagEntry() {
                     $modal.open({
-                        templateUrl: '/t/entry/tag.html',
+                        templateUrl: 'entry/tag.html',
                         controller: 'ModalTagController',
                         resolve: {
                             entry: function() {

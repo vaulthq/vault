@@ -41,7 +41,7 @@
 
         function createProject() {
             $modal.open({
-                templateUrl: '/t/project/form.html',
+                templateUrl: 'project/form.html',
                 controller: 'ModalCreateProjectController'
             }).result.then(function (model) {
                 $scope.projects.push(model);

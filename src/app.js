@@ -43,7 +43,7 @@
             })
             .state('anon.login', {
                 url: '/login',
-                templateUrl: '/t/auth/login.html',
+                templateUrl: 'auth/login.html',
                 controller: 'AuthController',
                 data: {
                   bodyClass: 'login-page'
@@ -53,7 +53,7 @@
         $stateProvider
             .state('user', {
                 abstract: true,
-                templateUrl: '/t/home/home.html',
+                templateUrl: 'home/home.html',
                 controller: function($scope, $rootScope, $location, $modal, projects, AuthFactory, Api, $filter, $state, hotkeys) {
                     $scope.projects = projects;
                     $scope.login = AuthFactory.getUser();
@@ -66,7 +66,7 @@
                         callback: function(event) {
                             event.preventDefault();
                             $modal.open({
-                                templateUrl: '/t/project/projectJumper.html',
+                                templateUrl: 'project/projectJumper.html',
                                 controller: 'ModalProjectJumperController',
                                 size: 'sm',
                                 resolve: {
@@ -94,7 +94,7 @@
             })
             .state('user.home', {
                 url: '/recent',
-                templateUrl: '/t/home/recentlyUsed.html',
+                templateUrl: 'home/recentlyUsed.html',
                 controller: 'HomeController',
                 resolve: {
                     recent: function(RecentFactory) {
@@ -104,7 +104,7 @@
             })
             .state('user.project', {
                 url: '/project/:projectId/:active?',
-                templateUrl: '/t/entry/list.html',
+                templateUrl: 'entry/list.html',
                 controller: 'EntryController',
                 resolve: {
                     project: function ($stateParams, projects) {
@@ -135,7 +135,7 @@
             })
             .state('user.list', {
                 url: '/users',
-                templateUrl: '/t/user/userList.html',
+                templateUrl: 'user/userList.html',
                 controller: 'UserListController',
                 resolve: {
                     users: function(Api) {
@@ -145,7 +145,7 @@
             })
             .state('user.projects', {
                 url: '/projects/:active?',
-                templateUrl: '/t/project/list.html',
+                templateUrl: 'project/list.html',
                 controller: 'ProjectController',
                 resolve: {
                     active: function($stateParams) {
@@ -155,7 +155,7 @@
             })
             .state('user.history', {
                 url: '/history',
-                templateUrl: '/t/history/list.html',
+                templateUrl: 'history/list.html',
                 controller: 'HistoryController',
                 resolve: {
                     history: function(HistoryFactory) {
@@ -165,12 +165,12 @@
             })
             .state('user.api', {
                 url: '/api',
-                templateUrl: '/t/api/list.html',
+                templateUrl: 'api/list.html',
                 controller: 'ApiController'
             })
             .state('user.teams', {
                 url: '/teams',
-                templateUrl: '/t/team/teamList.html',
+                templateUrl: 'team/teamList.html',
                 controller: 'TeamListController',
                 resolve: {
                     teams: function(Api) {
@@ -180,7 +180,7 @@
             })
             .state('user.404', {
                 url: '/404',
-                templateUrl: '/t/error/404.html'
+                templateUrl: 'error/404.html'
             });
 
         $urlRouterProvider.otherwise('/404');

@@ -16,7 +16,7 @@
 
         function create() {
             $modal.open({
-                templateUrl: '/t/team/form.html',
+                templateUrl: 'team/form.html',
                 controller: 'createTeamController'
             }).result.then(function (model) {
                 $scope.teams.push(model);
@@ -25,7 +25,7 @@
 
         function update(teamId) {
             $modal.open({
-                templateUrl: '/t/team/form.html',
+                templateUrl: 'team/form.html',
                 controller: 'updateTeamController',
                 resolve: {
                     team: function(Api) {
@@ -50,7 +50,7 @@
 
         function members(teamId) {
             $modal.open({
-                templateUrl: '/t/team/members.html',
+                templateUrl: 'team/members.html',
                 controller: 'teamMembersController',
                 resolve: {
                     users: function(Api) {

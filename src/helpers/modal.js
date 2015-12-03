@@ -10,7 +10,7 @@
 
         function showPassword(entryId) {
             return $modal.open({
-                templateUrl: '/t/entry/password.html',
+                templateUrl: 'entry/password.html',
                 controller: 'ModalGetPasswordController',
                 resolve: {
                     password: function (Api) {

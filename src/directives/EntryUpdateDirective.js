@@ -24,7 +24,7 @@
 
                 function updateEntry() {
                     $modal.open({
-                        templateUrl: '/t/entry/form.html',
+                        templateUrl: 'entry/form.html',
                         controller: 'ModalUpdateEntryController',
                         resolve: {
                             entry: function(Api) {

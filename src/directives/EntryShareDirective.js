@@ -18,7 +18,7 @@
 
                 function shareEntry() {
                     $modal.open({
-                        templateUrl: '/t/entry/share.html',
+                        templateUrl: 'entry/share.html',
                         controller: 'ModalShareController',
                         resolve: {
                             users: function(Api) {

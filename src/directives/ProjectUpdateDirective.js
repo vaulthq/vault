@@ -19,7 +19,7 @@
 
                 function updateProject() {
                     $modal.open({
-                        templateUrl: '/t/project/form.html',
+                        templateUrl: 'project/form.html',
                         controller: 'ModalUpdateProjectController',
                         resolve: {
                             project: function(Api) {

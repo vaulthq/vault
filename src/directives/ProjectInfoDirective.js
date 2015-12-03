@@ -17,7 +17,7 @@
 
                 function openModal() {
                     $modal.open({
-                        templateUrl: '/t/project-team/assigned.html',
+                        templateUrl: 'project-team/assigned.html',
                         controller: function($scope, teams, project, owner) {
                             $scope.teams = teams;
                             $scope.project = project;

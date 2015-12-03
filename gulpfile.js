@@ -3,7 +3,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var less = require('gulp-less');
 var expect = require('gulp-expect-file');
-
+var templateCache = require('gulp-angular-templatecache');
 var del = require('del');
 
 var paths = {
@@ -42,7 +42,6 @@ var paths = {
         'styles/fonts/*'
     ],
     cleanup: [
-        'api/public/t',
         'api/public/js',
         'api/public/fonts'
     ]
@@ -87,7 +86,8 @@ gulp.task('styles', [], function() {
 
 gulp.task('html_templates', [], function() {
     return gulp.src(paths.html_templates)
-        .pipe(gulp.dest('api/public/t'));
+        .pipe(templateCache({module: 'xApp'}))
+        .pipe(gulp.dest('api/public/js'));
 });
 
 gulp.task('watch', ['default'], function() {

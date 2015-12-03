@@ -17,7 +17,7 @@
 
                 function entryInfo() {
                     $modal.open({
-                        templateUrl: '/t/entry/access.html',
+                        templateUrl: 'entry/access.html',
                         controller: function($scope, $modalInstance, access, entry) {
                             $scope.access = access;
                             $scope.entry = entry;

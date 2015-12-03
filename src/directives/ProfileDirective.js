@@ -15,7 +15,7 @@
 
                 function profile() {
                     $modal.open({
-                        templateUrl: '/t/user/profile.html',
+                        templateUrl: 'user/profile.html',
                         controller: 'ProfileController'
                     });
                 }

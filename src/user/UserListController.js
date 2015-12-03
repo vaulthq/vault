@@ -8,7 +8,7 @@
 
         $scope.createUser = function() {
             var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
+                templateUrl: 'user/create.html',
                 controller: 'ModalCreateUserController',
                 resolve: {
                     user: function() {
@@ -24,7 +24,7 @@
 
         $scope.updateUser = function(userId) {
             var modalInstance = $modal.open({
-                templateUrl: '/t/user/create.html',
+                templateUrl: 'user/create.html',
                 controller: 'ModalUpdateUserController',
                 resolve: {
                     user: function(Api) {

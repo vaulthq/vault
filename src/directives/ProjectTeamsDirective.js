@@ -17,7 +17,7 @@
 
                 function openModal() {
                     $modal.open({
-                        templateUrl: '/t/project-team/teams.html',
+                        templateUrl: 'project-team/teams.html',
                         controller: 'ProjectTeamController',
                         resolve: {
                             teams: function (Api) {
