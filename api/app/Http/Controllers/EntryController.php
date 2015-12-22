@@ -137,4 +137,26 @@ class EntryController extends Controller
 
         return $list;
     }
+
+    /**
+     * Get list of available passwords by domain
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function getByDomain(Request $request)
+    {
+        $domain = $request->get('domain', null);
+
+        if (is_null($domain)) {
+            return [];
+        }
+
+        return Entry::where('url', 'like', '%'.$domain.'%')
+            ->with('tags')
+            ->whereHas('keyShares', function($q) {
+                $q->where('user_id', Auth::user()->id);
+            })
+            ->get();
+    }
 }

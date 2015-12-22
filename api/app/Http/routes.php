@@ -35,6 +35,7 @@ Route::group(['prefix' => 'api', 'middleware' => ['jwt.auth', 'valid.user']], fu
 	Route::group(['prefix' => 'entry'], function() {
 		Route::get('/access/{entry}', 'EntryController@getAccess');
 		Route::get('/password/{entry}', 'EntryController@getPassword');
+		Route::get('/by-domain', 'EntryController@getByDomain');
 	});
 
 	Route::resource('entry', 'EntryController');

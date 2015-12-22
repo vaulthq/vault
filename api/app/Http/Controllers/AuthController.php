@@ -8,6 +8,7 @@ use App\Vault\Response\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Providers\Auth\AuthInterface;
 
@@ -53,8 +54,12 @@ class AuthController extends Controller
 
     public function getStatus(JWTAuth $jwt)
     {
-        if ($token = $jwt->getToken()) {
-            return $this->jsonResponse(['user' => $jwt->toUser($token)]);
+        try {
+            if ($token = $jwt->getToken()) {
+                return $this->jsonResponse(['user' => $jwt->toUser($token)]);
+            }
+        } catch (TokenBlacklistedException $e) {
+
         }
 
         return $this->jsonResponse(null, 405);
