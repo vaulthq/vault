@@ -63,7 +63,9 @@ class MigrateOld extends Command
             $this->warn('Backup key does not exist. We recommend that you create one using key:generate:master');
         }
 
-        foreach (Entry::all() as $entry) {
+        $entries = Entry::with('project')->whereNull('project.deleted_at');
+
+        foreach ($entries as $entry) {
             $list = $this->accessDecider->getUserListForEntry($entry);
 
             if ($list->count() == 0) {
@@ -71,15 +73,7 @@ class MigrateOld extends Command
             }
         }
 
-        foreach (Entry::all() as $entry) {
-            $list = $this->accessDecider->getUserListForEntry($entry);
-
-            if ($list->count() == 0) {
-                throw new \RuntimeException('Entry #' .$entry->id . ' has no access. Share it.');
-            }
-        }
-
-        foreach (Entry::all() as $entry) {
+        foreach ($entries as $entry) {
             if ($entry->password == '') {
                 continue;
             }
