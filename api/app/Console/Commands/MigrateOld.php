@@ -63,7 +63,7 @@ class MigrateOld extends Command
             $this->warn('Backup key does not exist. We recommend that you create one using key:generate:master');
         }
 
-        $entries = Entry::with('project')->get();
+        $entries = Entry::with('project', 'owner', 'project.owner')->get();
 
         foreach ($entries as $entry) {
             $list = $this->accessDecider->getUserListForEntry($entry);
