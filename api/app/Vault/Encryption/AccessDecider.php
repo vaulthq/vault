@@ -15,20 +15,22 @@ class AccessDecider
 
         $list->push($entry->owner);
 
-        $list->push($entry->project->owner);
+        if (!$entry->isPersonal()) {
+            $list->push($entry->project->owner);
 
-        foreach ($entry->shares as $share) {
-            $list->push($share->user);
-        }
+            foreach ($entry->shares as $share) {
+                $list->push($share->user);
+            }
 
-        foreach ($entry->teamShares()->with('team', 'team.users')->get() as $share) {
-            $list->push($share->team->owner);
-            $list = $list->merge($share->team->users);
-        }
+            foreach ($entry->teamShares()->with('team', 'team.users')->get() as $share) {
+                $list->push($share->team->owner);
+                $list = $list->merge($share->team->users);
+            }
 
-        foreach ($entry->project->teams()->with('users')->get() as $team) {
-            $list->push($team->owner);
-            $list = $list->merge($team->users);
+            foreach ($entry->project->teams()->with('users')->get() as $team) {
+                $list->push($team->owner);
+                $list = $list->merge($team->users);
+            }
         }
 
         return $list->unique('id');

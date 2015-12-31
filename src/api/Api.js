@@ -8,6 +8,7 @@
             auth: $resource("/internal/auth"),
             project: $resource("/api/project/:id", null, enableCustom),
             projectKeys: $resource("/api/project/keys/:id"),
+            personalKeys: $resource("/api/personal/keys"),
             assignedTeams: $resource("/api/project/teams/:id", null, enableCustom),
             user: $resource("/api/user/:id", null, enableCustom),
             team: $resource("/api/team/:id", null, enableCustom),

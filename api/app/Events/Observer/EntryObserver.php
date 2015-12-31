@@ -6,7 +6,9 @@ class EntryObserver extends BaseObserver
 {
     public function created(Entry $entry)
     {
-        $this->log(sprintf('Created entry "%s" in project "%s".', $entry->name, $entry->project->name), $entry);
+        if (!$entry->isPersonal()) {
+            $this->log(sprintf('Created entry "%s" in project "%s".', $entry->name, $entry->project->name), $entry);
+        }
     }
 
     public function updating(Entry $entry)
@@ -16,6 +18,10 @@ class EntryObserver extends BaseObserver
 
     public function updated(Entry $entry)
     {
+        if ($entry->isPersonal()) {
+            return;
+        }
+
         if ($entry->isDirty('data')) {
             $this->log('Updated entry password.', $entry);
         }
@@ -30,6 +36,8 @@ class EntryObserver extends BaseObserver
 
     public function deleted(Entry $entry)
     {
-        $this->log(sprintf('Deleted entry "%s" in project "%s".', $entry->name, $entry->project->name), $entry);
+        if (!$entry->isPersonal()) {
+            $this->log(sprintf('Deleted entry "%s" in project "%s".', $entry->name, $entry->project->name), $entry);
+        }
     }
 }

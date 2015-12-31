@@ -19,6 +19,11 @@ class Entry extends Model
         return Access::userCanAccessEntry($this);
     }
 
+    public function isPersonal()
+    {
+        return $this->project_id == null;
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Crypt::encrypt($this->fixNewLines($value));

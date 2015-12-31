@@ -143,6 +143,16 @@
                     }
                 }
             })
+            .state('user.personal', {
+                url: '/personal',
+                templateUrl: 'personal/personal.html',
+                controller: 'PersonalController',
+                resolve: {
+                    entries: function($stateParams, Api) {
+                        return Api.personalKeys.query();
+                    }
+                }
+            })
             .state('user.projects', {
                 url: '/projects/:active?',
                 templateUrl: 'project/list.html',

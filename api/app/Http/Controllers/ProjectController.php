@@ -40,11 +40,19 @@ class ProjectController extends Controller
      * Return list of keys which belong to project
      *
      * @param Project $model
-     * @return mixed
+     * @return Entry[]
      */
     public function getKeys(Project $model)
     {
         return Entry::with('tags')->where('entry.project_id', $model->id)->get();
+    }
+
+    /**
+     * @return Entry[]
+     */
+    public function getPersonalKeys()
+    {
+        return Entry::with('tags')->where('entry.user_id', auth()->user()->id)->whereNull('entry.project_id')->get();
     }
 
     public function getTeams(Project $model)
