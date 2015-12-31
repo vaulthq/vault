@@ -30,7 +30,7 @@
                         controller: 'ModalCreateEntryController',
                         resolve: {
                             project_id: function () {
-                                return $scope.project.id;
+                                return $scope.project ? $scope.project.id : undefined;
                             }
                         }
                     }).result.then(onModalSuccess, onModalDismiss);

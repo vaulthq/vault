@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div class="row">
+    <div class="col-xs-4">
+      <h3>Personal Secrets</h3>
+    </div>
+    <div class="col-xs-4 col-md-offset-1">
+      <input type="text" class="form-control input-sm top-search" placeholder="Search..." ng-model="search.query" app-focus tabindex="1">
+    </div>
+    <div class="col-xs-3 text-right">
+      <a class="btn btn-default btn-sm" title="Add new key" entry-create="project">Add new key</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <loader when="!entries.$resolved"></loader>
+
+  <table class="table table-entries" ng-if="entries.length > 0">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Title</th>
+        <th>Username / Address</th>
+        <th>Tags</th>
+        <th style="min-width: 130px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-if="0" ng-repeat-start="entry in getFiltered()"></tr>
+      <tr ng-class="{'current': entry.id == active.id}" ng-mouseover="setActive(entry)" id="e-{{ entry.id }}">
+        <td ng-click="setActive(entry)" class="cursor col-min col-id">#{{ entry.id }}</td>
+        <td ng-click="setActive(entry)" class="cursor col-title" show-password="entry">
+                <span title="{{entry.note}}" class="title">
+                    {{ entry.name }}
+                    <span class="note">{{ entry.note }}</span>
+                </span>
+
+          <div class="text-small">
+            <span class="time" am-time-ago="entry.updated_at" title="{{ entry.updated_at }}, created: {{ entry.created_at }}"></span>
+          </div>
+        </td>
+        <td ng-click="setActive(entry)" class="cursor">
+          <div class="text-large">
+            <span title="{{entry.note}}">{{ entry.username }}</span><span class="text-muted" ng-if="entry.username && entry.url">@</span><span title="{{entry.note}}">{{ entry.url }}</span>
+          </div>
+        </td>
+
+        <td ng-click="setActive(entry)" class="cursor">
+          <div class="tags">
+            <span ng-repeat="tag in entry.tags" class="label label-default" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+            <entry-tag ng-if="entry.can_edit" entry="active"></entry-tag>
+          </div>
+        </td>
+        <td class="text-right">
+          <a class="btn btn-primary btn-xs" title="Access Information" entry-access-info="entry" ng-if="!entry.can_edit">
+            <i class="glyphicon glyphicon-info-sign"></i>
+          </a>
+
+          <div ng-if="entry.can_edit">
+
+            <copy-password entry="entry"></copy-password>
+
+            <div class="btn-group" dropdown is-open="status.isopen">
+
+              <a href class="btn btn-link" dropdown-toggle>
+                <i class="fa fa-cogs"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li class="dropdown-header">Common actions</li>
+                <li>
+                  <a entry-update="entry" href><i class="fa fa-pencil-square-o"></i> Edit</a>
+                </li>
+                <li class="dropdown-header">Dangerous actions</li>
+                <li>
+                  <a entry-delete="entry" href><i class="fa fa-trash"></i> Delete</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+
+      <tr ng-if="0" ng-repeat-end></tr>
+    </tbody>
+  </table>
+
+  <div ng-if="entries.$resolved && entries.length == 0">
+    You have no personal keys.
+  </div>
+</div>

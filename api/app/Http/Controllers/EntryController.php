@@ -119,7 +119,9 @@ class EntryController extends Controller
 
         try {
             $data = $entryCrypt->decrypt($model);
-            $logger->log('password', 'Accessed password #' . $model->id . ' ('.$model->project->name.').', $model->id);
+            if (!$model->isPersonal()) {
+                $logger->log('password', sprintf('Accessed password #%d (%s).', $model->id, $model->project->name), $model->id);
+            }
             return Response::json(['password' => strlen($data) > 0 ? $data : ''], 200);
         } catch (\RuntimeException $e) {
             abort(409);

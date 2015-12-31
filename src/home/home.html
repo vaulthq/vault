@@ -5,14 +5,15 @@
         <a class="btn btn-side-menu" ui-sref="user.home" tooltip-placement="right" tooltip="Recently Used" ui-sref-active="active">
             <i class="fa fa-home fa-2x"></i>
         </a>
+        <a class="btn btn-side-menu" ui-sref="user.personal" tooltip-placement="right" tooltip="Personal Secrets" ui-sref-active="active">
+            <i class="fa fa-shield fa-2x"></i>
+        </a>
         <a class="btn btn-side-menu" ui-sref="user.projects" tooltip-placement="right" tooltip="Project List" ng-class="{'active': isEntryActive}">
             <i class="fa fa-th-list fa-2x"></i>
         </a>
-
         <a class="btn btn-side-menu" ui-sref="user.teams" tooltip-placement="right" tooltip="Manage Teams" ui-sref-active="active">
             <i class="fa fa-link fa-2x"></i>
         </a>
-
         <div ng-if="login.group == 'admin'">
             <a class="btn btn-side-menu" ui-sref="user.list" tooltip-placement="right" tooltip="Manage Users" ui-sref-active="active">
                 <i class="fa fa-users fa-2x"></i>
