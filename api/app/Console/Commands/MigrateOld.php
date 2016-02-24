@@ -74,7 +74,7 @@ class MigrateOld extends Command
         }
 
         foreach ($entries as $entry) {
-            if ($entry->password == '') {
+            if ($entry->password != '') {
                 continue;
             }
             echo $entry->id .'... ';
