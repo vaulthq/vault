@@ -26,7 +26,7 @@
             </td>
             <td>
                 <div class="text-large">
-                    <span title="{{entry.note}}">{{ entry.username }}</span><span class="text-muted" ng-if="entry.username && entry.url">@</span><span title="{{entry.note}}">{{ entry.url }}</span>
+                    <span class="copyable" title="{{entry.note}}" copyable>{{ entry.username }}</span><span class="text-muted" ng-if="entry.username && entry.url">@</span><div ng-switch on="entry.url|limitTo:4"><a ng-switch-when="http"  title="{{entry.note}}" ng-href="{{entry.url}}" target="_blank">{{entry.url}}</a><span class="copyable" ng-switch-default title="{{entry.note}}" copyable>{{entry.url}}</span></div>
                 </div>
             </td>
             <td><span am-time-ago="entry.created_at" title="{{ entry.created_at }}"></span></td>
