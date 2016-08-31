@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Vault\Encryption\EntryCrypt;
+use App\Vault\Models\Entry;
 use App\Vault\Models\EntryTeam;
 use App\Vault\Models\UserTeam;
 use Illuminate\Support\Facades\Auth;
@@ -89,6 +90,10 @@ class TeamMembersController extends Controller
             $entries->push($entryTeam->entry);
         }
 
-        return $entries->unique('id');
+        return $entries
+            ->filter(function($item) {
+                return $item instanceof Entry;
+            })
+            ->unique('id');
     }
 }
